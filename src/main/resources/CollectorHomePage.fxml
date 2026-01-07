@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.collectorHomepage.JavaFxCollectorHomePageView"
+            prefHeight="500.0" prefWidth="700.0">
+
+    <children>
+        <VBox spacing="20.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0"
+              AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="60.0">
+            <children>
+                <!-- Welcome Header -->
+                <Label fx:id="welcomeLabel" text="Benvenuto Collezionista!"
+                       style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+                <Separator/>
+
+                <!-- Collector Actions -->
+                <Label text="Gestione Collezione" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+                <HBox spacing="15.0">
+                    <children>
+                        <Button text="La Mia Collezione" prefWidth="200.0" prefHeight="50.0"
+                                style="-fx-font-size: 14px; -fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                        <Button text="Cerca Carte" prefWidth="200.0" prefHeight="50.0"
+                                style="-fx-font-size: 14px; -fx-background-color: #2196F3; -fx-text-fill: white;"/>
+                        <Button text="Scambi" prefWidth="200.0" prefHeight="50.0"
+                                style="-fx-font-size: 14px; -fx-background-color: #FF9800; -fx-text-fill: white;"/>
+                    </children>
+                </HBox>
+
+                <Separator/>
+
+                <!-- Collector Info -->
+                <Label text="Il Mio Profilo" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+                <HBox spacing="15.0">
+                    <children>
+                        <Button text="Visualizza Profilo" prefWidth="200.0" prefHeight="50.0"
+                                style="-fx-font-size: 14px;"/>
+                        <Button text="Impostazioni" prefWidth="200.0" prefHeight="50.0"
+                                style="-fx-font-size: 14px;"/>
+                        <Button text="Statistiche" prefWidth="200.0" prefHeight="50.0"
+                                style="-fx-font-size: 14px;"/>
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+
+        <!-- Bottom Actions -->
+        <HBox spacing="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="20.0">
+            <children>
+                <Button text="Logout" onAction="#onLogoutClicked" prefWidth="100.0"
+                        style="-fx-background-color: #ff6b6b; -fx-text-fill: white;"/>
+                <Button text="Esci" onAction="#onExitClicked" prefWidth="100.0"
+                        style="-fx-background-color: #6c757d; -fx-text-fill: white;"/>
+            </children>
+        </HBox>
+
+        <!-- Persistence indicator -->
+        <Label text="Collector Account"
+               style="-fx-font-size: 10px; -fx-text-fill: gray; -fx-font-weight: bold;"
+               AnchorPane.bottomAnchor="5.0"
+               AnchorPane.leftAnchor="10.0"/>
+    </children>
+
+</AnchorPane>

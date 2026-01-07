@@ -1,0 +1,219 @@
+package controller;
+
+import config.AppConfig;
+import model.bean.UserBean;
+import model.dao.UserDao;
+import model.dao.factory.JdbcDaoFactory;
+import model.dao.factory.JsonDaoFactory;
+import view.InputManager;
+import view.IView;
+import view.collectorHomepage.ICollectorHomePageView;
+import view.factory.CliIViewFactory;
+import view.factory.IViewFactory;
+import view.factory.JavaFxViewFactory;
+import view.login.ILoginView;
+import view.registration.IRegistrationView;
+import view.storeHomepage.IStoreHomePageView;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class ApplicationController {
+    private static final Logger LOGGER = Logger.getLogger(ApplicationController.class.getName());
+    private static final String JAVAFX = "JavaFX";
+    private static final String CLI = "CLI";
+    private UserDao userDao;
+    private final Deque<IView> viewStack = new ArrayDeque<>();
+    private IViewFactory viewFactory;
+    private String currentInterface = CLI;
+
+    public ApplicationController() {
+    }
+
+    public void start() {
+        chooseInterface();
+        choosePersistence();
+        userDao = createUserDao()  ;
+
+        if (JAVAFX.equals(currentInterface)) {
+            viewFactory = new JavaFxViewFactory();
+        } else {
+            InputManager inputManager = new InputManager();
+            viewFactory = new CliIViewFactory(inputManager);
+        }
+
+        navigateToLogin();
+    }
+
+    private UserDao createUserDao() {
+        String persistenceType = AppConfig.getPersistenceType();
+
+        if (AppConfig.DAO_TYPE_JDBC.equals(persistenceType)) {
+            return new JdbcDaoFactory().createUserDao();
+        } else {
+            return new JsonDaoFactory().createUserDao();
+        }
+    }
+
+    private void chooseInterface() {
+        Scanner scanner = new Scanner(System.in);
+        boolean validChoice = false;
+
+        while (!validChoice) {
+            System.out.println("\n=== CARDIFY - Scegli Interfaccia ===");
+            System.out.println("1) JavaFX (Interfaccia Grafica)");
+            System.out.println("2) CLI (Interfaccia Testuale)");
+            System.out.print("Scelta (1-2): ");
+
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1":
+                    currentInterface = JAVAFX;
+                    validChoice = true;
+                    break;
+                case "2":
+                    currentInterface = CLI;
+                    validChoice = true;
+                    break;
+                default:
+                    System.out.println("Scelta non valida. Riprova.");
+            }
+        }
+        System.out.println("Interfaccia selezionata: " + currentInterface);
+    }
+
+    private void choosePersistence() {
+        Scanner scanner = new Scanner(System.in);
+        boolean validChoice = false;
+
+        while (!validChoice) {
+            System.out.println("\n=== CARDIFY - Scegli Persistenza ===");
+            System.out.println("1) JSON (File System)");
+            System.out.println("2) JDBC (Database)");
+            System.out.print("Scelta (1-2): ");
+
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1":
+                    AppConfig.setPersistenceType(AppConfig.DAO_TYPE_JSON);
+                    validChoice = true;
+                    break;
+                case "2":
+                    AppConfig.setPersistenceType(AppConfig.DAO_TYPE_JDBC);
+                    validChoice = true;
+                    break;
+                default:
+                    System.out.println("Scelta non valida. Riprova.");
+            }
+        }
+        System.out.println("Persistenza selezionata: " + AppConfig.getPersistenceType());
+    }
+
+    public void navigateToLogin() {
+        try {
+            LoginController loginController = new LoginController(userDao, this);
+            ILoginView loginView = viewFactory.createLoginView(loginController);
+            loginController.setView(loginView);
+            viewStack.addLast(loginView);
+            loginView.display();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to login", e);
+            handleNavigationError(e);
+        }
+    }
+
+    public void navigateToRegistration() {
+        try {
+            RegistrationController registrationController = new RegistrationController(userDao, this);
+            IRegistrationView registrationView = viewFactory.createRegistrationView(registrationController);
+            registrationController.setView(registrationView);
+            viewStack.addLast(registrationView);
+            registrationView.display();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to registration", e);
+            handleNavigationError(e);
+        }
+    }
+
+    public void handleRoleBasedNavigation(UserBean loggedInUser) {
+        String userType = loggedInUser.getUserType();
+
+        if (UserBean.USER_TYPE_COLLECTOR.equals(userType)) {
+            navigateToCollectorHomePage(loggedInUser);
+        } else if (UserBean.USER_TYPE_STORE.equals(userType)) {
+            navigateToStoreHomePage(loggedInUser);
+        } else {
+            LOGGER.warning("Unknown user type: " + userType);
+            navigateToLogin();
+        }
+    }
+
+    public void navigateToCollectorHomePage(UserBean loggedInUser) {
+        try {
+            CollectorHomePageController controller = new CollectorHomePageController(loggedInUser.getUsername(), this);
+            ICollectorHomePageView view = viewFactory.createCollectorHomePageView(controller);
+            controller.setView(view);
+            viewStack.addLast(view);
+            view.display();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to collector home page", e);
+            handleNavigationError(e);
+        }
+    }
+
+    public void navigateToStoreHomePage(UserBean loggedInUser) {
+        try {
+            StoreHomePageController controller = new StoreHomePageController(loggedInUser.getUsername(), this);
+            IStoreHomePageView view = viewFactory.createStoreHomePageView(controller);
+            controller.setView(view);
+            viewStack.addLast(view);
+            view.display();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to store home page", e);
+            handleNavigationError(e);
+        }
+    }
+
+    public void back() {
+        if (viewStack.size() > 1) {
+            IView currentView = viewStack.removeLast();
+            closeView(currentView);
+
+            IView previousView = viewStack.getLast();
+            displayView(previousView);
+        } else {
+            LOGGER.info("Cannot go back, already at root view");
+        }
+    }
+
+    public void exit() {
+        LOGGER.info("Exiting application");
+        while (!viewStack.isEmpty()) {
+            IView view = viewStack.removeLast();
+            closeView(view);
+        }
+        System.exit(0);
+    }
+
+    private void closeView(IView view) {
+        try {
+            view.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error closing view", e);
+        }
+    }
+
+    private void displayView(IView view) {
+        view.display();
+    }
+
+    private void handleNavigationError(Exception e) {
+        System.err.println("Errore di navigazione: " + e.getMessage());
+        if (viewStack.isEmpty()) {
+            navigateToLogin();
+        }
+    }
+}
