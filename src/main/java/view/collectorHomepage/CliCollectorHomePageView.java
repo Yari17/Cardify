@@ -1,4 +1,4 @@
-package view.collectorHomepage;
+package view.collectorhomepage;
 
 import controller.CollectorHomePageController;
 import view.InputManager;

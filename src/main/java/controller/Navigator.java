@@ -3,11 +3,11 @@ package controller;
 import model.bean.UserBean;
 import model.dao.UserDao;
 import view.IView;
-import view.collectorHomepage.ICollectorHomePageView;
+import view.collectorhomepage.ICollectorHomePageView;
 import view.factory.IViewFactory;
 import view.login.ILoginView;
 import view.registration.IRegistrationView;
-import view.storeHomepage.IStoreHomePageView;
+import view.storehomepage.IStoreHomePageView;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

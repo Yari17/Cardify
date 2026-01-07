@@ -1,6 +1,6 @@
 package controller;
 
-import view.collectorHomepage.ICollectorHomePageView;
+import view.collectorhomepage.ICollectorHomePageView;
 
 import java.util.logging.Logger;
 

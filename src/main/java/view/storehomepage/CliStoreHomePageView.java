@@ -1,4 +1,4 @@
-package view.storeHomepage;
+package view.storehomepage;
 
 import controller.StoreHomePageController;
 import view.InputManager;

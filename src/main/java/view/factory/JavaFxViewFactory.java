@@ -8,14 +8,14 @@ import controller.CollectorHomePageController;
 import controller.LoginController;
 import controller.RegistrationController;
 import controller.StoreHomePageController;
-import view.collectorHomepage.ICollectorHomePageView;
-import view.collectorHomepage.JavaFxCollectorHomePageView;
+import view.collectorhomepage.ICollectorHomePageView;
+import view.collectorhomepage.JavaFxCollectorHomePageView;
 import view.login.ILoginView;
 import view.login.JavaFxLoginView;
 import view.registration.IRegistrationView;
 import view.registration.JavaFxRegistrationView;
-import view.storeHomepage.IStoreHomePageView;
-import view.storeHomepage.JavaFxStoreHomePageView;
+import view.storehomepage.IStoreHomePageView;
+import view.storehomepage.JavaFxStoreHomePageView;
 
 import java.io.IOException;
 import java.util.logging.Level;

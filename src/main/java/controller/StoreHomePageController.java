@@ -1,6 +1,6 @@
 package controller;
 
-import view.storeHomepage.IStoreHomePageView;
+import view.storehomepage.IStoreHomePageView;
 
 import java.util.logging.Logger;
 

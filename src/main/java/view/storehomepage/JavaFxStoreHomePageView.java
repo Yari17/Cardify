@@ -1,4 +1,4 @@
-package view.storeHomepage;
+package view.storehomepage;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

@@ -5,14 +5,14 @@ import controller.LoginController;
 import controller.RegistrationController;
 import controller.StoreHomePageController;
 import view.InputManager;
-import view.collectorHomepage.CliCollectorHomePageView;
-import view.collectorHomepage.ICollectorHomePageView;
+import view.collectorhomepage.CliCollectorHomePageView;
+import view.collectorhomepage.ICollectorHomePageView;
 import view.login.CliILoginView;
 import view.login.ILoginView;
 import view.registration.CliRegistrationView;
 import view.registration.IRegistrationView;
-import view.storeHomepage.CliStoreHomePageView;
-import view.storeHomepage.IStoreHomePageView;
+import view.storehomepage.CliStoreHomePageView;
+import view.storehomepage.IStoreHomePageView;
 
 public class CliIViewFactory implements IViewFactory {
 

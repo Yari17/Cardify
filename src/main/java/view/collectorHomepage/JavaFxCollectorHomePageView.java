@@ -1,4 +1,4 @@
-package view.collectorHomepage;
+package view.collectorhomepage;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
