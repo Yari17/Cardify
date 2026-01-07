@@ -5,7 +5,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.view.javafx.JavaFxRegistrationView"
+            fx:controller="org.example.view.registration.JavaFxRegistrationView"
             prefHeight="300.0" prefWidth="400.0">
 
     <children>
@@ -14,6 +14,7 @@
                 <Label text="Cardify - Registrazione" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
                 <TextField fx:id="usernameField" promptText="Nome utente" maxWidth="300.0"/>
                 <PasswordField fx:id="passwordField" promptText="Password" maxWidth="300.0"/>
+                <ComboBox fx:id="userTypeComboBox" promptText="Tipo utente" maxWidth="300.0"/>
                 <Button fx:id="registerButton" text="Registrati" maxWidth="300.0" onAction="#onRegisterClicked"/>
                 <Label fx:id="messageLabel" style="-fx-text-fill: red;"/>
             </children>

@@ -29,6 +29,7 @@ public class JdbcUserDao implements UserDao {
             CREATE TABLE IF NOT EXISTS users (
                 username VARCHAR(255) PRIMARY KEY,
                 password VARCHAR(255) NOT NULL,
+                user_type VARCHAR(50) DEFAULT 'Collezionista',
                 reliability_score INT DEFAULT 0,
                 review_count INT DEFAULT 0
             )
@@ -67,11 +68,13 @@ public class JdbcUserDao implements UserDao {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return Optional.of(new User(
+                User user = new User(
                         rs.getString("username"),
                         rs.getInt("reliability_score"),
                         rs.getInt("review_count")
-                ));
+                );
+                user.setUserType(rs.getString("user_type"));
+                return Optional.of(user);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to find user", e);
@@ -90,11 +93,13 @@ public class JdbcUserDao implements UserDao {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                users.add(new User(
+                User user = new User(
                         rs.getString("username"),
                         rs.getInt("reliability_score"),
                         rs.getInt("review_count")
-                ));
+                );
+                user.setUserType(rs.getString("user_type"));
+                users.add(user);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to retrieve users", e);
@@ -151,18 +156,19 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public void register(String username, String password) {
+    public void register(String username, String password, String userType) {
         // Check if user already exists
         if (findByName(username).isPresent()) {
             throw new IllegalArgumentException("Username già esistente");
         }
 
-        String sql = "INSERT INTO users (username, password, reliability_score, review_count) VALUES (?, ?, 0, 0)";
+        String sql = "INSERT INTO users (username, password, user_type, reliability_score, review_count) VALUES (?, ?, ?, 0, 0)";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
+            pstmt.setString(3, userType);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Failed to register user", e);

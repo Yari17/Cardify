@@ -1,72 +1,75 @@
 package org.example.controller;
 
+import org.example.model.bean.UserBean;
 import org.example.model.dao.UserDao;
-import org.example.view.IRegistrationView;
+import org.example.view.registration.IRegistrationView;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Application Controller for registration use-case.
- * Pure Java, UI-agnostic; it communicates with the view only through IRegistrationView.
+ * Handles registration business logic and delegates navigation to NavigationController.
+ *
+ * GRASP Principles:
+ * - Controller: Handles registration use-case operations
+ * - Low Coupling: Doesn't know about other views, uses NavigationController
+ * - Information Expert: Delegates user creation to UserDao
  */
 public class RegistrationController {
     private static final Logger LOGGER = Logger.getLogger(RegistrationController.class.getName());
 
-    private final IRegistrationView view;
+    private IRegistrationView view;
     private final UserDao userDao;
+    private final NavigationController navigationController;
 
-    public RegistrationController(IRegistrationView view, UserDao userDao) {
+    /**
+     * Constructor with dependency injection.
+     * @param view the registration view (can be null initially for circular dependency resolution)
+     * @param userDao data access object for user operations
+     * @param navigationController controller for navigation between views
+     */
+    public RegistrationController(IRegistrationView view, UserDao userDao, NavigationController navigationController) {
         this.view = view;
         this.userDao = userDao;
+        this.navigationController = navigationController;
     }
 
     /**
-     * Entry point invoked by the graphic controller when user clicks "Registrati".
+     * Sets the view (used to resolve circular dependency).
+     * @param view the registration view
+     */
+    public void setView(IRegistrationView view) {
+        this.view = view;
+    }
+
+    /**
+     * Entry point invoked by the view when user clicks "Registrati".
      */
     public void onRegisterRequested() {
+        UserBean userBean = view.getUserData();
+
+        if (userBean == null) {
+            view.showInputError("Impossibile recuperare i dati utente");
+            return;
+        }
+
+        // Delegate validation to the Bean (Information Expert principle)
+        String validationError = userBean.getValidationError();
+        if (validationError != null) {
+            view.showInputError(validationError);
+            return;
+        }
+
         try {
-            // Read inputs from view
-            String username = view.getUsername();
-            String password = view.getPassword();
-
-            // Validation
-            if (username == null || username.trim().isEmpty()) {
-                view.showInputError("Il campo username non può essere vuoto");
-                return;
-            }
-
-            if (password == null || password.trim().isEmpty()) {
-                view.showInputError("Il campo password non può essere vuoto");
-                return;
-            }
-
-            // Validate minimum length
-            if (username.length() < 3) {
-                view.showInputError("L'username deve contenere almeno 3 caratteri");
-                return;
-            }
-
-            if (password.length() < 6) {
-                view.showInputError("La password deve contenere almeno 6 caratteri");
-                return;
-            }
-
             // Delegate to DAO - it will check for duplicates and throw exception if exists
-            userDao.register(username, password);
+            userDao.register(userBean.getUsername(), userBean.getPassword(), userBean.getUserType());
 
             // Success
             view.showSuccess("Registrazione completata! Ora puoi effettuare il login.");
 
-            // Close registration dialog after 2 seconds
-            new Thread(() -> {
-                try {
-                    Thread.sleep(2000);
-                    cleanup();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }).start();
+            // Navigate back to login
+            navigationController.navigateToLogin();
 
         } catch (IllegalArgumentException e) {
             // Username already exists
@@ -77,11 +80,10 @@ public class RegistrationController {
         }
     }
 
-    public void show() {
-        view.display();
-    }
-
-    public void cleanup() {
-        view.close();
+    /**
+     * Called when user clicks "Torna al login" or back button.
+     */
+    public void onBackToLoginRequested() {
+        navigationController.navigateToLogin();
     }
 }

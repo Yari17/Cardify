@@ -1,14 +1,11 @@
-package org.example.view.javafx;
+package org.example.view.login;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.example.config.AppConfig;
-import org.example.controller.RegistrationController;
-import org.example.model.dao.UserDao;
-import org.example.view.ILoginView;
-import org.example.view.IRegistrationView;
+import org.example.controller.LoginController;
+import org.example.model.bean.UserBean;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,18 +22,14 @@ public class JavaFxLoginView implements ILoginView {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
-    @FXML private Button loginButton;
-    @FXML private Button registerButton;
     @FXML private Label persistenceLabel;
 
     // Reference to application controller (pure Java controller)
-    private org.example.controller.LoginController appController;
+    private LoginController loginController;
 
     // Stage is set by the factory after loading the FXML
     private Stage stage;
 
-    // UserDao reference needed for registration
-    private UserDao userDao;
 
     @FXML
     private void initialize() {
@@ -47,11 +40,11 @@ public class JavaFxLoginView implements ILoginView {
     }
 
     @FXML
-    private void onLoginClicked(ActionEvent event) {
+    private void onLoginClicked() {
         try {
-            if (appController != null) {
+            if (loginController != null) {
                 // Delegate to application controller
-                appController.onLoginRequested();
+                loginController.onLoginRequested();
             } else {
                 LOGGER.warning("Application controller not set on JavaFxLoginView");
             }
@@ -61,20 +54,14 @@ public class JavaFxLoginView implements ILoginView {
     }
 
     @FXML
-    private void onRegisterClicked(ActionEvent event) {
+    private void onRegisterClicked() {
         try {
-            if (userDao == null) {
-                showInputError("UserDao non disponibile per la registrazione");
-                LOGGER.warning("UserDao not available for registration");
-                return;
+            if (loginController != null) {
+                // Delegate to application controller
+                loginController.onRegisterRequested();
+            } else {
+                LOGGER.warning("Application controller not set on JavaFxLoginView");
             }
-
-            // Open registration dialog
-            JavaFxViewFactory viewFactory = new JavaFxViewFactory();
-            IRegistrationView registrationView = viewFactory.createRegistrationView();
-            RegistrationController registrationController = new RegistrationController(registrationView, userDao);
-            registrationView.setController(registrationController);
-            registrationController.show();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Unhandled exception opening registration dialog", e);
         }
@@ -83,13 +70,10 @@ public class JavaFxLoginView implements ILoginView {
     // --- ILoginView implementation (UI-only) ---
 
     @Override
-    public String getUsername() {
-        return usernameField != null ? usernameField.getText() : "";
-    }
-
-    @Override
-    public String getPassword() {
-        return passwordField != null ? passwordField.getText() : "";
+    public UserBean getUserCredentials() {
+        String username = usernameField != null ? usernameField.getText() : "";
+        String password = passwordField != null ? passwordField.getText() : "";
+        return new UserBean(username, password);
     }
 
     @Override
@@ -113,12 +97,8 @@ public class JavaFxLoginView implements ILoginView {
     }
 
     @Override
-    public void setController(org.example.controller.LoginController controller) {
-        this.appController = controller;
-        // Extract and store the UserDao from the LoginController
-        if (controller != null) {
-            this.userDao = controller.getUserDao();
-        }
+    public void setController(LoginController controller) {
+        this.loginController = controller;
     }
 
     @Override
@@ -150,7 +130,7 @@ public class JavaFxLoginView implements ILoginView {
     }
 
     // Package-visible so factory can set the stage after loading the FXML
-    void setStage(Stage stage) {
+    public void setStage(Stage stage) {
         this.stage = stage;
     }
 }

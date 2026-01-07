@@ -3,16 +3,18 @@
     "user1": {
       "name": "user1",
       "reliabilityScore": 0,
-      "reviewCount": 0
+      "reviewCount": 0,
+      "userType": "Collezionista"
     },
-    "admin": {
-      "name": "admin",
+    "Store1": {
+      "name": "Store1",
       "reliabilityScore": 0,
-      "reviewCount": 0
+      "reviewCount": 0,
+      "userType": "Store"
     }
   },
   "credentials": {
     "user1": "password",
-    "admin": "password123"
+    "Store1": "password"
   }
 }

@@ -123,15 +123,17 @@ public class JsonUserDao implements UserDao {
     }
 
     @Override
-    public void register(String username, String password) {
+    public void register(String username, String password, String userType) {
         // Check if user already exists
         if (users.containsKey(username)) {
             throw new IllegalArgumentException("Username già esistente");
         }
 
-        // Create new user with credentials
+        // Create new user with credentials and userType
         credentials.put(username, password);
-        users.put(username, new User(username, 0, 0));
+        User newUser = new User(username, 0, 0);
+        newUser.setUserType(userType); // Set the user type
+        users.put(username, newUser);
         saveToJson();
     }
 }

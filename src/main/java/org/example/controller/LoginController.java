@@ -1,68 +1,96 @@
 package org.example.controller;
 
+import org.example.model.bean.UserBean;
 import org.example.model.dao.UserDao;
-import org.example.view.ILoginView;
+import org.example.view.login.ILoginView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Application Controller for Login use-case.
+ * Handles login business logic and delegates navigation to NavigationController.
+ *
+ * GRASP Principles:
+ * - Controller: Handles login use-case operations
+ * - Low Coupling: Doesn't know about other views, uses NavigationController
+ * - Information Expert: Delegates authentication to UserDao
+ */
 public class LoginController {
     private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
 
-    private final ILoginView view;
+    private ILoginView view;
     private final UserDao userDao;
+    private final NavigationController navigationController;
 
-    private static final int MIN_USERNAME_LENGTH = 3;
-    private static final int MIN_PASSWORD_LENGTH = 6;
-
-    // Updated constructor to receive a ILoginView so views are swappable at runtime
-    public LoginController(ILoginView view, UserDao userDao) {
+    /**
+     * Constructor with dependency injection.
+     * @param view the login view (can be null initially for circular dependency resolution)
+     * @param userDao data access object for user operations
+     * @param navigationController controller for navigation between views
+     */
+    public LoginController(ILoginView view, UserDao userDao, NavigationController navigationController) {
         this.view = view;
         this.userDao = userDao;
+        this.navigationController = navigationController;
     }
 
-    // Application Controller entry point called by the Graphic Controller
+    /**
+     * Sets the view (used to resolve circular dependency).
+     * @param view the login view
+     */
+    public void setView(ILoginView view) {
+        this.view = view;
+    }
+
+    /**
+     * Entry point called by the view when user clicks "Login".
+     */
     public void onLoginRequested() {
-        String username = view.getUsername();
-        String password = view.getPassword();
+        UserBean userBean = view.getUserCredentials();
 
-        // Validation (business logic lives here)
-        if (username == null || username.trim().isEmpty()) {
-            view.showInputError("Il campo username non può essere vuoto");
+        if (userBean == null) {
+            view.showInputError("Impossibile recuperare le credenziali");
             return;
         }
 
-        if (password == null || password.trim().isEmpty()) {
-            view.showInputError("Il campo password non può essere vuoto");
+        // Delegate validation to the Bean (Information Expert principle)
+        String validationError = userBean.getValidationError();
+        if (validationError != null) {
+            view.showInputError(validationError);
             return;
         }
 
-        if (username.length() < MIN_USERNAME_LENGTH) {
-            view.showInputError("L'username deve contenere almeno " + MIN_USERNAME_LENGTH + " caratteri");
-            return;
-        }
-
-        if (password.length() < MIN_PASSWORD_LENGTH) {
-            view.showInputError("La password deve contenere almeno " + MIN_PASSWORD_LENGTH + " caratteri");
-            return;
-        }
-
-        boolean authenticated = authenticateUser(username, password);
+        boolean authenticated = authenticateUser(userBean);
 
         if (authenticated) {
-            view.showSuccess("Login effettuato con successo! Benvenuto " + username);
+            view.showSuccess("Login effettuato con successo! Benvenuto " + userBean.getUsername());
+            // Navigate to home page
+            navigationController.navigateToHomePage(userBean.getUsername());
         } else {
             view.showInputError("Credenziali non valide. Riprova.");
         }
     }
 
-    private boolean authenticateUser(String username, String password) {
+    /**
+     * Called when user clicks "Registrati" link.
+     */
+    public void onRegisterRequested() {
+        navigationController.navigateToRegistration();
+    }
+
+    /**
+     * Authenticates user credentials.
+     * @param userBean the user credentials
+     * @return true if authenticated, false otherwise
+     */
+    private boolean authenticateUser(UserBean userBean) {
         if (userDao != null) {
             try {
                 Method m = userDao.getClass().getMethod("authenticate", String.class, String.class);
-                Object result = m.invoke(userDao, username, password);
+                Object result = m.invoke(userDao, userBean.getUsername(), userBean.getPassword());
                 if (result instanceof Boolean b) {
                     return b;
                 }
@@ -73,23 +101,6 @@ public class LoginController {
             }
         }
         // Fallback simulation
-        return "admin".equals(username) && "password123".equals(password);
-    }
-
-    public void show() {
-        view.display();
-    }
-
-    public void cleanup() {
-        view.close();
-    }
-
-    /**
-     * Get the UserDao instance used by this controller.
-     * Used by the view to pass it to the RegistrationController.
-     * @return the UserDao instance
-     */
-    public UserDao getUserDao() {
-        return userDao;
+        return "admin".equals(userBean.getUsername()) && "password123".equals(userBean.getPassword());
     }
 }

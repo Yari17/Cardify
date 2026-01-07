@@ -1,12 +1,11 @@
-package org.example.view.javafx;
+package org.example.view.registration;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.example.config.AppConfig;
 import org.example.controller.RegistrationController;
-import org.example.view.IRegistrationView;
+import org.example.model.bean.UserBean;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,8 +21,8 @@ public class JavaFxRegistrationView implements IRegistrationView {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    @FXML private ComboBox<String> userTypeComboBox;
     @FXML private Label messageLabel;
-    @FXML private Button registerButton;
     @FXML private Label persistenceLabel;
 
     // Reference to the pure-Java application controller
@@ -38,10 +37,20 @@ public class JavaFxRegistrationView implements IRegistrationView {
         if (persistenceLabel != null) {
             persistenceLabel.setText(AppConfig.getPersistenceLabel());
         }
+
+        // Initialize userType ComboBox
+        if (userTypeComboBox != null) {
+            userTypeComboBox.getItems().addAll(
+                UserBean.USER_TYPE_COLLECTOR,
+                UserBean.USER_TYPE_STORE
+            );
+            // Set default selection
+            userTypeComboBox.getSelectionModel().selectFirst();
+        }
     }
 
     @FXML
-    private void onRegisterClicked(ActionEvent event) {
+    private void onRegisterClicked() {
         try {
             if (appController != null) {
                 // Delegate the action to application controller
@@ -57,13 +66,14 @@ public class JavaFxRegistrationView implements IRegistrationView {
     // --- IRegistrationView implementation ---
 
     @Override
-    public String getUsername() {
-        return usernameField != null ? usernameField.getText() : "";
-    }
+    public UserBean getUserData() {
+        String username = usernameField != null ? usernameField.getText() : "";
+        String password = passwordField != null ? passwordField.getText() : "";
+        String userType = userTypeComboBox != null && userTypeComboBox.getValue() != null
+            ? userTypeComboBox.getValue()
+            : UserBean.USER_TYPE_COLLECTOR;
 
-    @Override
-    public String getPassword() {
-        return passwordField != null ? passwordField.getText() : "";
+        return new UserBean(username, password, userType);
     }
 
     @Override
@@ -120,7 +130,7 @@ public class JavaFxRegistrationView implements IRegistrationView {
     }
 
     // Package-visible so a factory can set the stage after loading the FXML
-    void setStage(Stage stage) {
+    public void setStage(Stage stage) {
         this.stage = stage;
     }
 }

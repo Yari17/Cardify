@@ -1,7 +1,7 @@
-package org.example.view.cli;
+package org.example.view.login;
 
 import org.example.controller.LoginController;
-import org.example.view.ILoginView;
+import org.example.model.bean.UserBean;
 
 import java.util.Scanner;
 
@@ -18,7 +18,7 @@ public class CliILoginView implements ILoginView {
     @Override
     public void display() {
         System.out.println("\n=== CARDIFY LOGIN (CLI) ===");
-        System.out.println("1. Login");
+        System.out.println("1. login");
         System.out.println("2. Registrati");
         System.out.println("0. Esci");
         System.out.print("Scegli un'opzione: ");
@@ -62,10 +62,10 @@ public class CliILoginView implements ILoginView {
     private void handleRegistration() {
         System.out.println("\n=== REGISTRAZIONE ===");
         System.out.print("Username (min 3 caratteri): ");
-        String regUsername = scanner.nextLine();
+        this.username = scanner.nextLine();
 
         System.out.print("Password (min 6 caratteri): ");
-        String regPassword = scanner.nextLine();
+        this.password = scanner.nextLine();
 
         // For CLI, we need to directly call the DAO
         // This is a limitation of the current architecture
@@ -78,13 +78,8 @@ public class CliILoginView implements ILoginView {
     }
 
     @Override
-    public String getUsername() {
-        return username != null ? username : "";
-    }
-
-    @Override
-    public String getPassword() {
-        return password != null ? password : "";
+    public UserBean getUserCredentials() {
+        return new UserBean(username, password);
     }
 
     @Override

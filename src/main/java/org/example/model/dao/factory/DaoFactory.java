@@ -1,4 +1,6 @@
-package org.example.model.dao;
+package org.example.model.dao.factory;
+
+import org.example.model.dao.UserDao;
 
 @FunctionalInterface
 public interface DaoFactory {
