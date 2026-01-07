@@ -4,12 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.domain.User;
 import model.dao.UserDao;
+import model.dao.exception.*;
 
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class JsonUserDao implements UserDao {
+    private static final Logger LOGGER = Logger.getLogger(JsonUserDao.class.getName());
     private final Map<String, User> users;
     private final Map<String, String> credentials; 
     private final String jsonFilePath;
@@ -59,6 +63,7 @@ public class JsonUserDao implements UserDao {
                 }
             }
         } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "Error loading JSON, creating new file", e);
             saveToJson();
         }
     }
@@ -67,7 +72,7 @@ public class JsonUserDao implements UserDao {
             UserData data = new UserData(users, credentials);
             gson.toJson(data, writer);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save JSON", e);
+            throw new DataPersistenceException("Failed to save JSON to " + jsonFilePath, e);
         }
     }
 
@@ -78,7 +83,10 @@ public class JsonUserDao implements UserDao {
     @Override
     public boolean authenticate(String username, String password) {
         String storedPassword = credentials.get(username);
-        return storedPassword != null && storedPassword.equals(password);
+        if (storedPassword == null) {
+            throw new UserNotFoundException(username);
+        }
+        return storedPassword.equals(password);
     }
 
     @Override
@@ -93,7 +101,7 @@ public class JsonUserDao implements UserDao {
     public void register(String username, String password, String userType) {
         
         if (users.containsKey(username)) {
-            throw new IllegalArgumentException("Username già esistente");
+            throw new UserAlreadyExistsException(username);
         }
 
         

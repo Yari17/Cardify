@@ -1,72 +1,161 @@
 package controller;
 
+import model.bean.UserBean;
+import model.dao.UserDao;
 import view.IView;
+import view.collectorHomepage.ICollectorHomePageView;
+import view.factory.IViewFactory;
+import view.login.ILoginView;
+import view.registration.IRegistrationView;
+import view.storeHomepage.IStoreHomePageView;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Navigator gestisce la navigazione tra le viste dell'applicazione.
- * Mantiene traccia della vista corrente e gestisce il ciclo di vita delle viste.
+ * Navigator gestisce tutta la navigazione tra le viste.
+ * Principi GRASP:
+ * - Information Expert: sa come creare e navigare tra le viste
+ * - Low Coupling: separa la logica di navigazione dal controller principale
+ * - Single Responsibility: unica responsabilità è la navigazione
  */
 public class Navigator {
     private static final Logger LOGGER = Logger.getLogger(Navigator.class.getName());
-    private IView currentView;
 
-    /**
-     * Naviga verso una nuova vista, chiudendo quella corrente se presente.
-     *
-     * @param newView la nuova vista da visualizzare
-     */
-    public void navigateTo(IView newView) {
-        if (currentView != null) {
-            closeCurrentView();
-        }
-        currentView = newView;
-        displayCurrentView();
+    private final Deque<IView> viewStack = new ArrayDeque<>();
+    private final UserDao userDao;
+    private final IViewFactory viewFactory;
+    private final ApplicationController applicationController;
+
+    public Navigator(UserDao userDao, IViewFactory viewFactory, ApplicationController applicationController) {
+        this.userDao = userDao;
+        this.viewFactory = viewFactory;
+        this.applicationController = applicationController;
     }
 
     /**
-     * Visualizza la vista corrente.
+     * Naviga alla schermata di login (aggiunge alla history).
      */
-    private void displayCurrentView() {
-        if (currentView != null) {
+    public void navigateToLogin() {
+        try {
+            LoginController controller = new LoginController(userDao, applicationController);
+            ILoginView view = viewFactory.createLoginView(controller);
+            controller.setView(view);
+            displayView(view);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to login", e);
+            handleNavigationError(e);
+        }
+    }
+
+    /**
+     * Effettua il logout: pulisce tutta la history e naviga al login.
+     */
+    public void logout() {
+        LOGGER.info("Logging out: clearing history and navigating to login");
+        closeAll();
+        navigateToLogin();
+    }
+
+    /**
+     * Naviga alla schermata di registrazione.
+     */
+    public void navigateToRegistration() {
+        try {
+            RegistrationController controller = new RegistrationController(userDao, applicationController);
+            IRegistrationView view = viewFactory.createRegistrationView(controller);
+            controller.setView(view);
+            displayView(view);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to registration", e);
+            handleNavigationError(e);
+        }
+    }
+
+    /**
+     * Naviga alla home page del collezionista.
+     */
+    public void navigateToCollectorHomePage(UserBean user) {
+        try {
+            CollectorHomePageController controller = new CollectorHomePageController(user.getUsername(), applicationController);
+            ICollectorHomePageView view = viewFactory.createCollectorHomePageView(controller);
+            controller.setView(view);
+            displayView(view);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to collector home page", e);
+            handleNavigationError(e);
+        }
+    }
+
+    /**
+     * Naviga alla home page del negozio.
+     */
+    public void navigateToStoreHomePage(UserBean user) {
+        try {
+            StoreHomePageController controller = new StoreHomePageController(user.getUsername(), applicationController);
+            IStoreHomePageView view = viewFactory.createStoreHomePageView(controller);
+            controller.setView(view);
+            displayView(view);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to store home page", e);
+            handleNavigationError(e);
+        }
+    }
+
+    public void handleRoleBasedNavigation(UserBean loggedInUser) {
+        if (UserBean.USER_TYPE_COLLECTOR.equals(loggedInUser.getUserType())) {
+            navigateToCollectorHomePage(loggedInUser);
+        } else if (UserBean.USER_TYPE_STORE.equals(loggedInUser.getUserType())) {
+            navigateToStoreHomePage(loggedInUser);
+        } else {
+            LOGGER.warning(() -> "Unknown user type: " + loggedInUser.getUserType());
+            navigateToLogin();
+        }
+    }
+
+    private void displayView(IView newView) {
+        viewStack.addLast(newView);
+        try {
+            newView.display();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error displaying view", e);
+        }
+    }
+
+    public void back() {
+        if (viewStack.size() > 1) {
+            IView currentView = viewStack.removeLast();
+            closeView(currentView);
+
+            IView previousView = viewStack.getLast();
             try {
-                currentView.display();
+                previousView.display();
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error displaying view", e);
+                LOGGER.log(Level.SEVERE, "Error displaying previous view", e);
             }
+        } else {
+            LOGGER.info("Cannot go back, already at root view");
         }
     }
-
-    /**
-     * Chiude la vista corrente.
-     */
-    private void closeCurrentView() {
-        if (currentView != null) {
+    public void closeAll() {
+        while (!viewStack.isEmpty()) {
+            IView view = viewStack.removeLast();
+            closeView(view);
+        }
+    }
+    private void closeView(IView view) {
+        if (view != null) {
             try {
-                currentView.close();
+                view.close();
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Error closing view", e);
             }
         }
     }
-
-    /**
-     * Chiude tutte le viste e pulisce le risorse.
-     */
-    public void closeAll() {
-        closeCurrentView();
-        currentView = null;
-    }
-
-    /**
-     * Ottiene la vista corrente.
-     *
-     * @return la vista corrente o null se non presente
-     */
-    public IView getCurrentView() {
-        return currentView;
+    private void handleNavigationError(Exception e) {
+        System.err.println("Errore di navigazione: " + e.getMessage());
+        navigateToLogin();
     }
 }
-

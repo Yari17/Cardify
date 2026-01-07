@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 public class CollectorHomePageController {
     private static final Logger LOGGER = Logger.getLogger(CollectorHomePageController.class.getName());
 
-    private ICollectorHomePageView view;
     private final String username;
     private final ApplicationController applicationController;
 
@@ -17,7 +16,6 @@ public class CollectorHomePageController {
     }
 
     public void setView(ICollectorHomePageView view) {
-        this.view = view;
     }
 
     public String getUsername() {
@@ -26,7 +24,7 @@ public class CollectorHomePageController {
 
     public void onLogoutRequested() {
         LOGGER.info("User " + username + " logging out");
-        applicationController.navigateToLogin();
+        applicationController.logout();
     }
 
     public void onExitRequested() {

@@ -26,7 +26,7 @@ public class StoreHomePageController {
 
     public void onLogoutRequested() {
         LOGGER.info("Store user " + username + " logging out");
-        applicationController.navigateToLogin();
+        applicationController.logout();
     }
 
     public void onExitRequested() {

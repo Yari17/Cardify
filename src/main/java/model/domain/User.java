@@ -4,14 +4,7 @@ public class User {
     private String name;
     private int reliabilityScore;
     private int reviewCount;
-    private String userType; 
-
-    public User(String name) {
-        this.name = name;
-        this.reliabilityScore = 0;
-        this.reviewCount = 0;
-        this.userType = "Collezionista"; 
-    }
+    private String userType;
 
     public User(String name, int reliabilityScore, int reviewCount) {
         this.name = name;

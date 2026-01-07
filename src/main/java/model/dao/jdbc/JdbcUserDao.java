@@ -2,13 +2,15 @@ package model.dao.jdbc;
 
 import model.domain.User;
 import model.dao.UserDao;
+import model.dao.exception.*;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class JdbcUserDao implements UserDao {
+    private static final Logger LOGGER = Logger.getLogger(JdbcUserDao.class.getName());
     private final String jdbcUrl;
     private final String dbUser;
     private final String dbPassword;
@@ -39,13 +41,13 @@ public class JdbcUserDao implements UserDao {
              Statement stmt = conn.createStatement()) {
             stmt.execute(createUsersTable);
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to initialize database", e);
+            LOGGER.log(Level.WARNING, "Error initializing database", e);
         }
     }
 
     @Override
     public Optional<User> findByName(String name) {
-        String sql = "SELECT * FROM users WHERE username = ?";
+        String sql = "SELECT  FROM users WHERE username = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -62,7 +64,7 @@ public class JdbcUserDao implements UserDao {
                 return Optional.of(user);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to find user", e);
+            throw new DataPersistenceException("Failed to find user: " + name, e);
         }
 
         return Optional.empty();
@@ -80,11 +82,10 @@ public class JdbcUserDao implements UserDao {
             if (rs.next()) {
                 return password.equals(rs.getString("password"));
             }
+            throw new UserNotFoundException(username);
         } catch (SQLException e) {
-            throw new RuntimeException("Authentication failed", e);
+            throw new AuthenticationException("Authentication failed for user: " + username, e);
         }
-
-        return false;
     }
 
     @Override
@@ -99,7 +100,7 @@ public class JdbcUserDao implements UserDao {
     public void register(String username, String password, String userType) {
         
         if (findByName(username).isPresent()) {
-            throw new IllegalArgumentException("Username già esistente");
+            throw new UserAlreadyExistsException(username);
         }
 
         String sql = "INSERT INTO users (username, password, user_type, reliability_score, review_count) VALUES (?, ?, ?, 0, 0)";
@@ -111,7 +112,7 @@ public class JdbcUserDao implements UserDao {
             pstmt.setString(3, userType);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to register user", e);
+            throw new DataPersistenceException("Failed to register user: " + username, e);
         }
     }
 }
