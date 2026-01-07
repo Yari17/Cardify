@@ -1,0 +1,18 @@
+{
+  "users": {
+    "user1": {
+      "name": "user1",
+      "reliabilityScore": 0,
+      "reviewCount": 0
+    },
+    "admin": {
+      "name": "admin",
+      "reliabilityScore": 0,
+      "reviewCount": 0
+    }
+  },
+  "credentials": {
+    "user1": "password",
+    "admin": "password123"
+  }
+}
