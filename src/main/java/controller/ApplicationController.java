@@ -6,7 +6,6 @@ import model.dao.UserDao;
 import model.dao.factory.JdbcDaoFactory;
 import model.dao.factory.JsonDaoFactory;
 import view.InputManager;
-import view.IView;
 import view.collectorHomepage.ICollectorHomePageView;
 import view.factory.CliIViewFactory;
 import view.factory.IViewFactory;
@@ -15,8 +14,6 @@ import view.login.ILoginView;
 import view.registration.IRegistrationView;
 import view.storeHomepage.IStoreHomePageView;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +23,7 @@ public class ApplicationController {
     private static final String JAVAFX = "JavaFX";
     private static final String CLI = "CLI";
     private UserDao userDao;
-    private final Deque<IView> viewStack = new ArrayDeque<>();
+    private final Navigator navigator = new Navigator();
     private IViewFactory viewFactory;
     private String currentInterface = CLI;
 
@@ -36,16 +33,31 @@ public class ApplicationController {
     public void start() {
         chooseInterface();
         choosePersistence();
-        userDao = createUserDao()  ;
 
         if (JAVAFX.equals(currentInterface)) {
-            viewFactory = new JavaFxViewFactory();
+            startJavaFx();
         } else {
-            InputManager inputManager = new InputManager();
-            viewFactory = new CliIViewFactory(inputManager);
+            startCli();
         }
+    }
 
+    private void startCli() {
+        userDao = createUserDao();
+        InputManager inputManager = new InputManager();
+        viewFactory = new CliIViewFactory(inputManager);
         navigateToLogin();
+    }
+
+    private void startJavaFx() {
+        // Inizializza JavaFX toolkit manualmente usando Platform.startup()
+        javafx.application.Platform.startup(() -> {
+            // Questo runnable viene eseguito quando JavaFX è pronto
+            userDao = createUserDao();
+            viewFactory = new JavaFxViewFactory();
+
+            // Naviga al login dopo l'inizializzazione
+            javafx.application.Platform.runLater(this::navigateToLogin);
+        });
     }
 
     private UserDao createUserDao() {
@@ -117,8 +129,7 @@ public class ApplicationController {
             LoginController loginController = new LoginController(userDao, this);
             ILoginView loginView = viewFactory.createLoginView(loginController);
             loginController.setView(loginView);
-            viewStack.addLast(loginView);
-            loginView.display();
+            navigator.navigateTo(loginView);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error navigating to login", e);
             handleNavigationError(e);
@@ -130,8 +141,7 @@ public class ApplicationController {
             RegistrationController registrationController = new RegistrationController(userDao, this);
             IRegistrationView registrationView = viewFactory.createRegistrationView(registrationController);
             registrationController.setView(registrationView);
-            viewStack.addLast(registrationView);
-            registrationView.display();
+            navigator.navigateTo(registrationView);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error navigating to registration", e);
             handleNavigationError(e);
@@ -156,8 +166,7 @@ public class ApplicationController {
             CollectorHomePageController controller = new CollectorHomePageController(loggedInUser.getUsername(), this);
             ICollectorHomePageView view = viewFactory.createCollectorHomePageView(controller);
             controller.setView(view);
-            viewStack.addLast(view);
-            view.display();
+            navigator.navigateTo(view);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error navigating to collector home page", e);
             handleNavigationError(e);
@@ -169,8 +178,7 @@ public class ApplicationController {
             StoreHomePageController controller = new StoreHomePageController(loggedInUser.getUsername(), this);
             IStoreHomePageView view = viewFactory.createStoreHomePageView(controller);
             controller.setView(view);
-            viewStack.addLast(view);
-            view.display();
+            navigator.navigateTo(view);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error navigating to store home page", e);
             handleNavigationError(e);
@@ -178,42 +186,22 @@ public class ApplicationController {
     }
 
     public void back() {
-        if (viewStack.size() > 1) {
-            IView currentView = viewStack.removeLast();
-            closeView(currentView);
-
-            IView previousView = viewStack.getLast();
-            displayView(previousView);
-        } else {
-            LOGGER.info("Cannot go back, already at root view");
-        }
+        LOGGER.info("Going back to login");
+        navigateToLogin();
     }
 
     public void exit() {
         LOGGER.info("Exiting application");
-        while (!viewStack.isEmpty()) {
-            IView view = viewStack.removeLast();
-            closeView(view);
+        navigator.closeAll();
+
+        if (JAVAFX.equals(currentInterface)) {
+            javafx.application.Platform.exit();
         }
         System.exit(0);
     }
 
-    private void closeView(IView view) {
-        try {
-            view.close();
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error closing view", e);
-        }
-    }
-
-    private void displayView(IView view) {
-        view.display();
-    }
-
     private void handleNavigationError(Exception e) {
         System.err.println("Errore di navigazione: " + e.getMessage());
-        if (viewStack.isEmpty()) {
-            navigateToLogin();
-        }
+        navigateToLogin();
     }
 }
