@@ -3,17 +3,17 @@ package view.storehomepage;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import controller.StoreHomePageController;
+import controller.StoreHPController;
 
 import java.util.logging.Logger;
 
-public class JavaFxStoreHomePageView implements IStoreHomePageView {
-    private static final Logger LOGGER = Logger.getLogger(JavaFxStoreHomePageView.class.getName());
+public class FXStoreHPView implements IStoreHPView {
+    private static final Logger LOGGER = Logger.getLogger(FXStoreHPView.class.getName());
 
     @FXML
     private Label welcomeLabel;
 
-    private StoreHomePageController controller;
+    private StoreHPController controller;
     private Stage stage;
 
     @FXML
@@ -22,7 +22,7 @@ public class JavaFxStoreHomePageView implements IStoreHomePageView {
     }
 
     @Override
-    public void setController(StoreHomePageController controller) {
+    public void setController(StoreHPController controller) {
         this.controller = controller;
         if (controller != null && welcomeLabel != null) {
             showWelcomeMessage(controller.getUsername());

@@ -11,11 +11,11 @@ public class LoginController {
 
     private ILoginView view;
     private final UserDao userDao;
-    private final ApplicationController applicationController;
+    private final Navigator navigator;
 
-    public LoginController(UserDao userDao, ApplicationController applicationController) {
+    public LoginController(UserDao userDao, Navigator navigator) {
         this.userDao = userDao;
-        this.applicationController = applicationController;
+        this.navigator = navigator;
     }
 
     public void setView(ILoginView view) {
@@ -48,13 +48,13 @@ public class LoginController {
             view.close();
 
             UserBean loggedInUserBean = new UserBean(user.getName(), null, user.getUserType());
-            applicationController.handleRoleBasedNavigation(loggedInUserBean);
+            navigator.handleRoleBasedNavigation(loggedInUserBean);
         } else {
             view.showInputError("Credenziali non valide. Riprova.");
         }
     }
 
     public void onRegisterRequested() {
-        applicationController.navigateToRegistration();
+        navigator.navigateToRegistration();
     }
 }

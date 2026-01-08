@@ -10,7 +10,8 @@ public final class AppConfig {
     public static final String DAO_TYPE_JDBC = "jdbc";
     public static final String DEFAULT_DAO_TYPE = DAO_TYPE_JSON;
 
-    public static final String API_KEY = "fe40ebec-dddc-446e-98e0-9a4348f2cd35";
+    public static final String POKEMON_GAME="POKEMON";
+    public static final String MAGIC_GAME="MAGIC";
 
 
     private static String currentPersistenceType = DEFAULT_DAO_TYPE;

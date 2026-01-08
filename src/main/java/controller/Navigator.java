@@ -3,11 +3,11 @@ package controller;
 import model.bean.UserBean;
 import model.dao.UserDao;
 import view.IView;
-import view.collectorhomepage.ICollectorHomePageView;
+import view.collectorhomepage.ICollectorHPView;
 import view.factory.IViewFactory;
 import view.login.ILoginView;
 import view.registration.IRegistrationView;
-import view.storehomepage.IStoreHomePageView;
+import view.storehomepage.IStoreHPView;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -20,17 +20,15 @@ public class Navigator {
     private final Deque<IView> viewStack = new ArrayDeque<>();
     private final UserDao userDao;
     private final IViewFactory viewFactory;
-    private final ApplicationController applicationController;
 
-    public Navigator(UserDao userDao, IViewFactory viewFactory, ApplicationController applicationController) {
+    public Navigator(UserDao userDao, IViewFactory viewFactory) {
         this.userDao = userDao;
         this.viewFactory = viewFactory;
-        this.applicationController = applicationController;
     }
 
     public void navigateToLogin() {
         try {
-            LoginController controller = new LoginController(userDao, applicationController);
+            LoginController controller = new LoginController(userDao, this);
             ILoginView view = viewFactory.createLoginView(controller);
             controller.setView(view);
             displayView(view);
@@ -48,7 +46,7 @@ public class Navigator {
 
     public void navigateToRegistration() {
         try {
-            RegistrationController controller = new RegistrationController(userDao, applicationController);
+            RegistrationController controller = new RegistrationController(userDao, this);
             IRegistrationView view = viewFactory.createRegistrationView(controller);
             controller.setView(view);
             displayView(view);
@@ -60,8 +58,8 @@ public class Navigator {
 
     public void navigateToCollectorHomePage(UserBean user) {
         try {
-            CollectorHomePageController controller = new CollectorHomePageController(user.getUsername(), applicationController);
-            ICollectorHomePageView view = viewFactory.createCollectorHomePageView(controller);
+            CollectorHPController controller = new CollectorHPController(user.getUsername(), this);
+            ICollectorHPView view = viewFactory.createCollectorHomePageView(controller);
             controller.setView(view);
             displayView(view);
         } catch (Exception e) {
@@ -72,8 +70,8 @@ public class Navigator {
 
     public void navigateToStoreHomePage(UserBean user) {
         try {
-            StoreHomePageController controller = new StoreHomePageController(user.getUsername(), applicationController);
-            IStoreHomePageView view = viewFactory.createStoreHomePageView(controller);
+            StoreHPController controller = new StoreHPController(user.getUsername(), this);
+            IStoreHPView view = viewFactory.createStoreHomePageView(controller);
             controller.setView(view);
             displayView(view);
         } catch (Exception e) {

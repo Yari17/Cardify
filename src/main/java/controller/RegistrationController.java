@@ -12,11 +12,11 @@ public class RegistrationController {
 
     private IRegistrationView view;
     private final UserDao userDao;
-    private final ApplicationController applicationController;
+    private final Navigator navigator;
 
-    public RegistrationController(UserDao userDao, ApplicationController applicationController) {
+    public RegistrationController(UserDao userDao, Navigator navigator) {
         this.userDao = userDao;
-        this.applicationController = applicationController;
+        this.navigator = navigator;
     }
 
     public void setView(IRegistrationView view) {
@@ -42,7 +42,7 @@ public class RegistrationController {
 
             view.showSuccess("Registrazione completata! Ora puoi effettuare il login.");
 
-            applicationController.navigateToLogin();
+            navigator.navigateToLogin();
 
         } catch (IllegalArgumentException e) {
             view.showInputError(e.getMessage());
@@ -53,6 +53,6 @@ public class RegistrationController {
     }
 
     public void onBackToLoginRequested() {
-        applicationController.navigateToLogin();
+        navigator.navigateToLogin();
     }
 }

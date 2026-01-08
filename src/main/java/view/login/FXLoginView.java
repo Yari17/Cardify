@@ -1,73 +1,71 @@
-package view.registration;
+package view.login;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import config.AppConfig;
-import controller.RegistrationController;
+import controller.LoginController;
 import model.bean.UserBean;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class JavaFxRegistrationView implements IRegistrationView {
-    private static final Logger LOGGER = Logger.getLogger(JavaFxRegistrationView.class.getName());
+public class FXLoginView implements ILoginView {
+    private static final Logger LOGGER = Logger.getLogger(FXLoginView.class.getName());
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
-    @FXML private ComboBox<String> userTypeComboBox;
     @FXML private Label messageLabel;
     @FXML private Label persistenceLabel;
 
     
-    private RegistrationController appController;
+    private LoginController loginController;
 
     
     private Stage stage;
-
     @FXML
     private void initialize() {
         
         if (persistenceLabel != null) {
             persistenceLabel.setText(AppConfig.getPersistenceLabel());
         }
+    }
 
-        
-        if (userTypeComboBox != null) {
-            userTypeComboBox.getItems().addAll(
-                UserBean.USER_TYPE_COLLECTOR,
-                UserBean.USER_TYPE_STORE
-            );
-            
-            userTypeComboBox.getSelectionModel().selectFirst();
+    @FXML
+    private void onLoginClicked() {
+        try {
+            if (loginController != null) {
+                
+                loginController.onLoginRequested();
+            } else {
+                LOGGER.warning("Application controller not set on FXLoginView");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unhandled exception in login handler", e);
         }
     }
 
     @FXML
     private void onRegisterClicked() {
         try {
-            if (appController != null) {
+            if (loginController != null) {
                 
-                appController.onRegisterRequested();
+                loginController.onRegisterRequested();
             } else {
-                LOGGER.warning("Application controller not set on JavaFxRegistrationView");
+                LOGGER.warning("Application controller not set on FXLoginView");
             }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Unhandled exception in registration handler", e);
+            LOGGER.log(Level.SEVERE, "Unhandled exception opening registration dialog", e);
         }
     }
 
     
 
     @Override
-    public UserBean getUserData() {
+    public UserBean getUserCredentials() {
         String username = usernameField != null ? usernameField.getText() : "";
         String password = passwordField != null ? passwordField.getText() : "";
-        String userType = userTypeComboBox != null && userTypeComboBox.getValue() != null
-            ? userTypeComboBox.getValue()
-            : UserBean.USER_TYPE_COLLECTOR;
-
-        return new UserBean(username, password, userType);
+        return new UserBean(username, password);
     }
 
     @Override
@@ -91,8 +89,8 @@ public class JavaFxRegistrationView implements IRegistrationView {
     }
 
     @Override
-    public void setController(RegistrationController controller) {
-        this.appController = controller;
+    public void setController(LoginController controller) {
+        this.loginController = controller;
     }
 
     @Override

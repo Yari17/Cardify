@@ -9,7 +9,7 @@ import model.dao.factory.JsonDaoFactory;
 import view.InputManager;
 import view.factory.CliIViewFactory;
 import view.factory.IViewFactory;
-import view.factory.JavaFxViewFactory;
+import view.factory.FXViewFactory;
 
 import java.util.logging.Logger;
 
@@ -30,7 +30,7 @@ public class ApplicationController {
 
         UserDao userDao = createUserDao();
         IViewFactory viewFactory = createViewFactory(inputManager);
-        navigator = new Navigator(userDao, viewFactory, this);
+        navigator = new Navigator(userDao, viewFactory);
 
         if (JAVAFX.equals(currentInterface)) {
             startJavaFx();
@@ -41,7 +41,7 @@ public class ApplicationController {
 
     private IViewFactory createViewFactory(InputManager inputManager) {
         return JAVAFX.equals(currentInterface)
-            ? new JavaFxViewFactory()
+            ? new FXViewFactory()
             : new CliIViewFactory(inputManager);
     }
 

@@ -1,18 +1,18 @@
 package view.storehomepage;
 
-import controller.StoreHomePageController;
+import controller.StoreHPController;
 import view.InputManager;
 
-public class CliStoreHomePageView implements IStoreHomePageView {
+public class CliStoreHPView implements IStoreHPView {
     private final InputManager inputManager;
-    private StoreHomePageController controller;
+    private StoreHPController controller;
 
-    public CliStoreHomePageView(InputManager inputManager) {
+    public CliStoreHPView(InputManager inputManager) {
         this.inputManager = inputManager;
     }
 
     @Override
-    public void setController(StoreHomePageController controller) {
+    public void setController(StoreHPController controller) {
         this.controller = controller;
     }
 

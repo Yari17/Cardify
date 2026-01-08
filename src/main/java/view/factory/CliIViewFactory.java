@@ -1,18 +1,18 @@
 package view.factory;
 
-import controller.CollectorHomePageController;
+import controller.CollectorHPController;
 import controller.LoginController;
 import controller.RegistrationController;
-import controller.StoreHomePageController;
+import controller.StoreHPController;
 import view.InputManager;
-import view.collectorhomepage.CliCollectorHomePageView;
-import view.collectorhomepage.ICollectorHomePageView;
+import view.collectorhomepage.CliCollectorHPView;
+import view.collectorhomepage.ICollectorHPView;
 import view.login.CliILoginView;
 import view.login.ILoginView;
 import view.registration.CliRegistrationView;
 import view.registration.IRegistrationView;
-import view.storehomepage.CliStoreHomePageView;
-import view.storehomepage.IStoreHomePageView;
+import view.storehomepage.CliStoreHPView;
+import view.storehomepage.IStoreHPView;
 
 public class CliIViewFactory implements IViewFactory {
 
@@ -37,15 +37,15 @@ public class CliIViewFactory implements IViewFactory {
     }
 
     @Override
-    public ICollectorHomePageView createCollectorHomePageView(CollectorHomePageController controller) {
-        CliCollectorHomePageView view = new CliCollectorHomePageView(inputManager);
+    public ICollectorHPView createCollectorHomePageView(CollectorHPController controller) {
+        CliCollectorHPView view = new CliCollectorHPView(inputManager);
         view.setController(controller);
         return view;
     }
 
     @Override
-    public IStoreHomePageView createStoreHomePageView(StoreHomePageController controller) {
-        CliStoreHomePageView view = new CliStoreHomePageView(inputManager);
+    public IStoreHPView createStoreHomePageView(StoreHPController controller) {
+        CliStoreHPView view = new CliStoreHPView(inputManager);
         view.setController(controller);
         return view;
     }

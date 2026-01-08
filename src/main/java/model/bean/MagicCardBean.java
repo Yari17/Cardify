@@ -1,45 +1,28 @@
 package model.bean;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import model.domain.CardGameType;
 
-/**
- * Bean for Magic: The Gathering API responses
- * Uses Jackson for automatic JSON mapping
- */
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class MagicCardBean {
-    private String id;
-    private String name;
+
+public class MagicCardBean extends CardBean {
+
     private String manaCost;
-    private String type;
-    private String text;
+    private String cardType;
+    private String oracleText;
+    private String flavorText;
     private String power;
     private String toughness;
+    private String setCode;
     private String rarity;
-    private String artist;
-    private String setName;
-    private String number;
-    private String imageUrl;
 
-    // Costruttore vuoto richiesto per Jackson
-    public MagicCardBean() {}
-
-    // Getters and Setters
-    public String getId() {
-        return id;
+    public MagicCardBean() {
+        super(null, null, null, CardGameType.MAGIC);
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public MagicCardBean(String id, String name, String imageUrl) {
+        super(id, name, imageUrl, CardGameType.MAGIC);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    // Getters & Setters
 
     public String getManaCost() {
         return manaCost;
@@ -49,20 +32,28 @@ public class MagicCardBean {
         this.manaCost = manaCost;
     }
 
-    public String getType() {
-        return type;
+    public String getCardType() {
+        return cardType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
 
-    public String getText() {
-        return text;
+    public String getOracleText() {
+        return oracleText;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setOracleText(String oracleText) {
+        this.oracleText = oracleText;
+    }
+
+    public String getFlavorText() {
+        return flavorText;
+    }
+
+    public void setFlavorText(String flavorText) {
+        this.flavorText = flavorText;
     }
 
     public String getPower() {
@@ -81,6 +72,14 @@ public class MagicCardBean {
         this.toughness = toughness;
     }
 
+    public String getSetCode() {
+        return setCode;
+    }
+
+    public void setSetCode(String setCode) {
+        this.setCode = setCode;
+    }
+
     public String getRarity() {
         return rarity;
     }
@@ -89,36 +88,14 @@ public class MagicCardBean {
         this.rarity = rarity;
     }
 
-    public String getArtist() {
-        return artist;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    public String getSetName() {
-        return setName;
-    }
-
-    public void setSetName(String setName) {
-        this.setName = setName;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    @Override
+    public String toString() {
+        return "MagicCardBean{" +
+                "id='" + getId() + '\'' +
+                ", name='" + getName() + '\'' +
+                ", manaCost='" + manaCost + '\'' +
+                ", cardType='" + cardType + '\'' +
+                '}';
     }
 }
 

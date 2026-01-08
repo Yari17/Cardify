@@ -1,6 +1,6 @@
 package model.domain;
 
-import model.domain.card.Card;
+import model.bean.CardBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +9,10 @@ public class Binder {
     private int id;
     private String ownerUsername;
     private CardGameType type; 
-    private List<Card> cards;
+    private List<CardBean> ITCGCards;
 
     public Binder(CardGameType type) {
         this.type = type;
-        this.cards = new ArrayList<>();
+        this.ITCGCards = new ArrayList<>();
     }
 }

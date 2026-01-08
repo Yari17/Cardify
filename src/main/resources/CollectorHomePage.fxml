@@ -2,12 +2,11 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.geometry.Insets?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="view.collectorhomepage.JavaFxCollectorHomePageView"
+            fx:controller="view.collectorhomepage.FXCollectorHPView"
             prefHeight="800.0" prefWidth="1400.0"
             style="-fx-font-family: 'Arial', sans-serif; -fx-background-color: #252F3D;">
 
@@ -17,14 +16,27 @@
               style="-fx-background-color: #1F2933; -fx-padding: 15;">
 
             <!-- Left Navigation Icons -->
-            <Button text="🏠"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"/>
-            <Button text="📊"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"/>
-            <Button text="📁"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"/>
-            <Button fx:id="logoutButton" text="🚪" onAction="#onLogoutClicked"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;"/>
+            <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-home" iconSize="18" iconColor="white"/>
+                </graphic>
+            </Button>
+            <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-chart-bar" iconSize="18" iconColor="white"/>
+                </graphic>
+            </Button>
+            <Button style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-folder" iconSize="18" iconColor="white"/>
+                </graphic>
+            </Button>
+            <Button fx:id="logoutButton" onAction="#onLogoutClicked"
+                    style="-fx-background-color: transparent; -fx-cursor: hand;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-sign-out-alt" iconSize="18" iconColor="white"/>
+                </graphic>
+            </Button>
 
             <!-- Search Bar -->
             <TextField fx:id="searchField" promptText="Search for user, collection, cards..."
@@ -32,8 +44,69 @@
                        style="-fx-background-color: #3E4C59; -fx-text-fill: white; -fx-prompt-text-fill: lightgray; -fx-background-radius: 5; -fx-padding: 10; -fx-font-size: 14px;"/>
 
             <!-- Search Button -->
-            <Button text="🔍 Search" onAction="#onSearchClicked"
-                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand; -fx-padding: 10 20 10 20;"/>
+            <Button text="Search" onAction="#onSearchClicked"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand; -fx-padding: 10 20 10 20;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="white"/>
+                </graphic>
+            </Button>
+
+            <!-- Filters MenuButton -->
+            <MenuButton text="Filters" prefHeight="40"
+                        style="-fx-background-color: #3E4C59; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand; -fx-padding: 10 20 10 20;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-filter" iconSize="14" iconColor="white"/>
+                </graphic>
+                <items>
+                    <CustomMenuItem hideOnClick="false">
+                        <content>
+                            <VBox spacing="10" style="-fx-padding: 10; -fx-background-color: white;">
+                                <!-- Game Filter -->
+                                <VBox spacing="5">
+                                    <Label text="Game" style="-fx-text-fill: #1F2933; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                    <ComboBox fx:id="gameComboBox" prefWidth="200" promptText="Select Game"
+                                              style="-fx-background-color: white;"/>
+                                </VBox>
+
+                                <!-- Expansion Filter -->
+                                <VBox spacing="5">
+                                    <Label text="Expansion" style="-fx-text-fill: #1F2933; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                    <ComboBox fx:id="expansionComboBox" prefWidth="200" promptText="Select Expansion"
+                                              style="-fx-background-color: white;"/>
+                                </VBox>
+
+                                <!-- Condition Filter -->
+                                <VBox spacing="5">
+                                    <Label text="Condition" style="-fx-text-fill: #1F2933; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                    <CheckBox fx:id="mintCheckBox" text="Mint" style="-fx-text-fill: #1F2933;"/>
+                                    <CheckBox fx:id="nearMintCheckBox" text="Near Mint" style="-fx-text-fill: #1F2933;"/>
+                                    <CheckBox fx:id="excellentCheckBox" text="Excellent" style="-fx-text-fill: #1F2933;"/>
+                                    <CheckBox fx:id="goodCheckBox" text="Good" style="-fx-text-fill: #1F2933;"/>
+                                    <CheckBox fx:id="playedCheckBox" text="Played" style="-fx-text-fill: #1F2933;"/>
+                                </VBox>
+
+                                <!-- Language Filter -->
+                                <VBox spacing="5">
+                                    <Label text="Language" style="-fx-text-fill: #1F2933; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                    <ComboBox fx:id="languageComboBox" prefWidth="200" promptText="Select Language"
+                                              style="-fx-background-color: white;"/>
+                                </VBox>
+
+                                <!-- Price Filter -->
+                                <VBox spacing="5">
+                                    <Label text="Price Range" style="-fx-text-fill: #1F2933; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                                    <Slider fx:id="priceSlider" min="0" max="1000" value="500" showTickLabels="true" showTickMarks="true" prefWidth="200"/>
+                                </VBox>
+
+                                <!-- Apply Button -->
+                                <Button fx:id="applyFiltersButton" text="Apply Filters" prefWidth="200"
+                                        onAction="#onApplyFiltersClicked"
+                                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                            </VBox>
+                        </content>
+                    </CustomMenuItem>
+                </items>
+            </MenuButton>
 
             <!-- Spacer -->
             <Region HBox.hgrow="ALWAYS"/>
@@ -41,82 +114,18 @@
             <!-- Welcome Label -->
             <Label fx:id="welcomeLabel" text="Benvenuto!"
                    style="-fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 0 10 0 0;"/>
-
-            <!-- Right Icon -->
-            <Button text="🛒" onAction="#onExitClicked"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-cursor: hand;"/>
         </HBox>
     </top>
-
-    <!-- Left Sidebar -->
-    <left>
-        <VBox spacing="15" prefWidth="250"
-              style="-fx-background-color: #1A1D21; -fx-padding: 20;">
-
-            <!-- Filters Title -->
-            <Label text="Filters"
-                   style="-fx-font-size: 24px; -fx-font-family: 'Georgia', serif; -fx-text-fill: white; -fx-font-weight: bold;"/>
-
-            <!-- Game Filter -->
-            <VBox spacing="5">
-                <Label text="Game" style="-fx-text-fill: lightgray; -fx-font-size: 14px;"/>
-                <ComboBox fx:id="gameComboBox" prefWidth="210" promptText="Select Game"
-                          style="-fx-background-color: #3E4C59; -fx-text-fill: white; -fx-prompt-text-fill: lightgray;"/>
-            </VBox>
-
-            <!-- Expansion Filter -->
-            <VBox spacing="5">
-                <Label text="Expansion" style="-fx-text-fill: lightgray; -fx-font-size: 14px;"/>
-                <ComboBox fx:id="expansionComboBox" prefWidth="210" promptText="Select Expansion"
-                          style="-fx-background-color: #3E4C59; -fx-text-fill: white; -fx-prompt-text-fill: lightgray;"/>
-            </VBox>
-
-            <!-- Condition Filter -->
-            <VBox spacing="8">
-                <Label text="Condition" style="-fx-text-fill: lightgray; -fx-font-size: 14px;"/>
-                <CheckBox fx:id="mintCheckBox" text="Mint"
-                          style="-fx-text-fill: white;"/>
-                <CheckBox fx:id="nearMintCheckBox" text="Near Mint"
-                          style="-fx-text-fill: white;"/>
-                <CheckBox fx:id="excellentCheckBox" text="Excellent"
-                          style="-fx-text-fill: white;"/>
-                <CheckBox fx:id="goodCheckBox" text="Good"
-                          style="-fx-text-fill: white;"/>
-                <CheckBox fx:id="playedCheckBox" text="Played"
-                          style="-fx-text-fill: white;"/>
-            </VBox>
-
-            <!-- Price Filter -->
-            <VBox spacing="5">
-                <Label text="Price Range" style="-fx-text-fill: lightgray; -fx-font-size: 14px;"/>
-                <Slider fx:id="priceSlider" min="0" max="1000" value="500" showTickLabels="true" showTickMarks="true"
-                        style="-fx-control-inner-background: #3E4C59;"/>
-            </VBox>
-
-            <!-- Language Filter -->
-            <VBox spacing="5">
-                <Label text="Language" style="-fx-text-fill: lightgray; -fx-font-size: 14px;"/>
-                <ComboBox fx:id="languageComboBox" prefWidth="210" promptText="Select Language"
-                          style="-fx-background-color: #3E4C59; -fx-text-fill: white; -fx-prompt-text-fill: lightgray;"/>
-            </VBox>
-
-            <!-- Spacer -->
-            <Region VBox.vgrow="ALWAYS"/>
-
-            <!-- Apply Filters Button -->
-            <Button fx:id="applyFiltersButton" text="Apply Filters" prefWidth="210" prefHeight="40"
-                    onAction="#onApplyFiltersClicked"
-                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 5; -fx-cursor: hand;"/>
-        </VBox>
-    </left>
 
     <!-- Main Content Area -->
     <center>
         <VBox spacing="20" style="-fx-background-color: #252F3D; -fx-padding: 20;">
 
             <!-- Header -->
-            <Label text="POPULAR CARDS"
-                   style="-fx-font-size: 24px; -fx-font-family: 'Georgia', serif; -fx-text-fill: white; -fx-font-weight: bold;"/>
+            <HBox alignment="CENTER">
+                <Label text="POPULAR CARDS"
+                       style="-fx-font-size: 36px; -fx-font-family: 'Playfair Display', 'Georgia', serif; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 2);"/>
+            </HBox>
 
             <!-- Cards Grid in ScrollPane -->
             <ScrollPane fitToWidth="true" fitToHeight="true"
@@ -126,22 +135,7 @@
                     <FlowPane fx:id="cardsFlowPane" hgap="20" vgap="20"
                               style="-fx-background-color: transparent; -fx-padding: 10;">
 
-                        <!-- Example Card (will be populated dynamically) -->
-                        <VBox alignment="CENTER" spacing="10"
-                              style="-fx-background-color: #1A1D21; -fx-background-radius: 10; -fx-padding: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 5);">
-                            <ImageView fitWidth="150" fitHeight="210" preserveRatio="true"
-                                       style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 5, 0, 0, 2);">
-                                <image>
-                                    <Image url="https://images.pokemontcg.io/xy1/1.png" backgroundLoading="true"/>
-                                </image>
-                            </ImageView>
-                            <Label text="Card Name"
-                                   style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-wrap-text: true; -fx-text-alignment: center;"
-                                   maxWidth="150"/>
-                            <Label text="Set • Rarity"
-                                   style="-fx-text-fill: lightgray; -fx-font-size: 12px;"
-                                   maxWidth="150"/>
-                        </VBox>
+                        <!-- Cards will be populated dynamically -->
 
                     </FlowPane>
                 </content>

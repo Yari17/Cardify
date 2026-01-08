@@ -1,17 +1,17 @@
 package view.factory;
 
-import controller.CollectorHomePageController;
+import controller.CollectorHPController;
 import controller.LoginController;
 import controller.RegistrationController;
-import controller.StoreHomePageController;
-import view.collectorhomepage.ICollectorHomePageView;
+import controller.StoreHPController;
+import view.collectorhomepage.ICollectorHPView;
 import view.login.ILoginView;
 import view.registration.IRegistrationView;
-import view.storehomepage.IStoreHomePageView;
+import view.storehomepage.IStoreHPView;
 
 public interface IViewFactory {
     ILoginView createLoginView(LoginController controller);
     IRegistrationView createRegistrationView(RegistrationController controller);
-    ICollectorHomePageView createCollectorHomePageView(CollectorHomePageController controller);
-    IStoreHomePageView createStoreHomePageView(StoreHomePageController controller);
+    ICollectorHPView createCollectorHomePageView(CollectorHPController controller);
+    IStoreHPView createStoreHomePageView(StoreHPController controller);
 }
