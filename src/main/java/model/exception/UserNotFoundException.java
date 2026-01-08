@@ -1,4 +1,4 @@
-package model.dao.exception;
+package model.exception;
 
 public class UserNotFoundException extends DaoException {
     public UserNotFoundException(String username) {

@@ -7,11 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/**
- * ConfigurationManager gestisce la configurazione iniziale dell'applicazione.
- * Responsabilità: raccogliere le scelte dell'utente per interfaccia e persistenza.
- * Principio GRASP: Information Expert - conosce come configurare l'app.
- */
 public class ConfigurationManager {
     private static final Map<String, String> INTERFACE_OPTIONS = new HashMap<>();
     private static final Map<String, String> PERSISTENCE_OPTIONS = new HashMap<>();
@@ -30,10 +25,6 @@ public class ConfigurationManager {
         this.inputManager = inputManager;
     }
 
-    /**
-     * Chiede all'utente di scegliere l'interfaccia.
-     * @return "JavaFX" o "CLI"
-     */
     public String chooseInterface() {
         return promptChoice(
             "=== CARDIFY - Scegli Interfaccia ===",
@@ -43,9 +34,6 @@ public class ConfigurationManager {
         );
     }
 
-    /**
-     * Chiede all'utente di scegliere il tipo di persistenza.
-     */
     public void choosePersistence() {
         String persistenceType = promptChoice(
             "=== CARDIFY - Scegli Persistenza ===",
@@ -56,10 +44,6 @@ public class ConfigurationManager {
         AppConfig.setPersistenceType(persistenceType);
     }
 
-    /**
-     * Template method per gestire le scelte dell'utente.
-     * Elimina la duplicazione tra chooseInterface e choosePersistence.
-     */
     private String promptChoice(String title, String[] options, Map<String, String> mapping, Consumer<String> onSuccess) {
         while (true) {
             System.out.println("\n" + title);

@@ -28,10 +28,11 @@ public class CliStoreHomePageView implements IStoreHomePageView {
         boolean running = true;
         while (running) {
             System.out.println("\n=== CARDIFY STORE HOME PAGE ===");
-            System.out.println("1. Gestisci inventario");
-            System.out.println("2. Visualizza ordini");
-            System.out.println("3. Gestisci profilo store");
-            System.out.println("4. Logout");
+            System.out.println("1. Crea Evento");
+            System.out.println("2. Visualizza Scambi in Sospeso");
+            System.out.println("3. Registra Deposito");
+            System.out.println("4. Registra Ritiro");
+            System.out.println("5. Logout");
             System.out.println("0. Esci");
             System.out.print("Scegli un'opzione: ");
 
@@ -39,20 +40,23 @@ public class CliStoreHomePageView implements IStoreHomePageView {
 
             switch (choice) {
                 case "1":
-                    System.out.println("Funzionalità in sviluppo...");
+                    System.out.println("Crea Evento selezionato.");
                     break;
                 case "2":
-                    System.out.println("Funzionalità in sviluppo...");
+                    System.out.println("Visualizza Scambi in Sospeso selezionato.");
                     break;
                 case "3":
-                    System.out.println("Profilo Store: " + controller.getUsername());
+                    System.out.println("Registra Deposito selezionato.");
                     break;
                 case "4":
+                    System.out.println("Registra Ritiro selezionato.");
+                    break;
+                case "5":
                     controller.onLogoutRequested();
                     running = false;
                     break;
                 case "0":
-                    controller.onExitRequested();
+                    close();
                     running = false;
                     break;
                 default:
@@ -63,7 +67,7 @@ public class CliStoreHomePageView implements IStoreHomePageView {
 
     @Override
     public void close() {
-        
+        controller.onExitRequested();
     }
 
     @Override

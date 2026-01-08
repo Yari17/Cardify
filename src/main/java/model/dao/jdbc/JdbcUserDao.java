@@ -2,7 +2,10 @@ package model.dao.jdbc;
 
 import model.domain.User;
 import model.dao.UserDao;
-import model.dao.exception.*;
+import model.exception.AuthenticationException;
+import model.exception.DataPersistenceException;
+import model.exception.UserAlreadyExistsException;
+import model.exception.UserNotFoundException;
 
 import java.sql.*;
 import java.util.Optional;

@@ -1,7 +1,10 @@
 package view.collectorhomepage;
 
 import controller.CollectorHomePageController;
+import model.domain.card.Card;
 import view.InputManager;
+
+import java.util.List;
 
 public class CliCollectorHomePageView implements ICollectorHomePageView {
     private final InputManager inputManager;
@@ -17,6 +20,21 @@ public class CliCollectorHomePageView implements ICollectorHomePageView {
     }
 
     @Override
+    public String getSearchQuery() {
+        return "";
+    }
+
+    @Override
+    public void showCards(List<Card> cards) {
+
+    }
+
+    @Override
+    public void showCardDetails(Card card) {
+
+    }
+
+    @Override
     public void display() {
         if (controller == null) {
             System.out.println("ERROR: Controller not set");
@@ -29,7 +47,7 @@ public class CliCollectorHomePageView implements ICollectorHomePageView {
         while (running) {
             System.out.println("\n=== CARDIFY HOME PAGE ===");
             System.out.println("1. Gestisci collezione");
-            System.out.println("2. Scambia carte");
+            System.out.println("2. Effettua scambio");
             System.out.println("3. Visualizza profilo");
             System.out.println("4. Logout");
             System.out.println("0. Esci");
@@ -39,10 +57,10 @@ public class CliCollectorHomePageView implements ICollectorHomePageView {
 
             switch (choice) {
                 case "1":
-                    System.out.println("Funzionalità in sviluppo...");
+                    System.out.println("Gestisci collezione selezionato.");
                     break;
                 case "2":
-                    System.out.println("Funzionalità in sviluppo...");
+                    System.out.println("Effettua scambio selezionato.");
                     break;
                 case "3":
                     System.out.println("Profilo utente: " + controller.getUsername());

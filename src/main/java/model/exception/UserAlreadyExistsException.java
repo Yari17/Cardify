@@ -1,4 +1,4 @@
-package model.dao.exception;
+package model.exception;
 
 public class UserAlreadyExistsException extends DaoException {
     public UserAlreadyExistsException(String username) {

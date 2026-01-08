@@ -1,4 +1,4 @@
-package model.dao.exception;
+package model.exception;
 
 public class DataPersistenceException extends DaoException {
     public DataPersistenceException(String message, Throwable cause) {

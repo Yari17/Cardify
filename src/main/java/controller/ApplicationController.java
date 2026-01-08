@@ -57,7 +57,6 @@ public class ApplicationController {
         );
     }
 
-    // Metodi pubblici delegano al Navigator
     public void navigateToLogin() {
         navigator.navigateToLogin();
     }

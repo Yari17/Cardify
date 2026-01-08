@@ -14,13 +14,6 @@ import java.util.Deque;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Navigator gestisce tutta la navigazione tra le viste.
- * Principi GRASP:
- * - Information Expert: sa come creare e navigare tra le viste
- * - Low Coupling: separa la logica di navigazione dal controller principale
- * - Single Responsibility: unica responsabilità è la navigazione
- */
 public class Navigator {
     private static final Logger LOGGER = Logger.getLogger(Navigator.class.getName());
 
@@ -35,9 +28,6 @@ public class Navigator {
         this.applicationController = applicationController;
     }
 
-    /**
-     * Naviga alla schermata di login (aggiunge alla history).
-     */
     public void navigateToLogin() {
         try {
             LoginController controller = new LoginController(userDao, applicationController);
@@ -50,18 +40,12 @@ public class Navigator {
         }
     }
 
-    /**
-     * Effettua il logout: pulisce tutta la history e naviga al login.
-     */
     public void logout() {
         LOGGER.info("Logging out: clearing history and navigating to login");
         closeAll();
         navigateToLogin();
     }
 
-    /**
-     * Naviga alla schermata di registrazione.
-     */
     public void navigateToRegistration() {
         try {
             RegistrationController controller = new RegistrationController(userDao, applicationController);
@@ -74,9 +58,6 @@ public class Navigator {
         }
     }
 
-    /**
-     * Naviga alla home page del collezionista.
-     */
     public void navigateToCollectorHomePage(UserBean user) {
         try {
             CollectorHomePageController controller = new CollectorHomePageController(user.getUsername(), applicationController);
@@ -89,9 +70,6 @@ public class Navigator {
         }
     }
 
-    /**
-     * Naviga alla home page del negozio.
-     */
     public void navigateToStoreHomePage(UserBean user) {
         try {
             StoreHomePageController controller = new StoreHomePageController(user.getUsername(), applicationController);
@@ -139,12 +117,14 @@ public class Navigator {
             LOGGER.info("Cannot go back, already at root view");
         }
     }
+
     public void closeAll() {
         while (!viewStack.isEmpty()) {
             IView view = viewStack.removeLast();
             closeView(view);
         }
     }
+
     private void closeView(IView view) {
         if (view != null) {
             try {
@@ -154,8 +134,9 @@ public class Navigator {
             }
         }
     }
+
     private void handleNavigationError(Exception e) {
-        System.err.println("Errore di navigazione: " + e.getMessage());
+        LOGGER.log(Level.SEVERE, "Navigation error occurred", e);
         navigateToLogin();
     }
 }

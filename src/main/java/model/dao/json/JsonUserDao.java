@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.domain.User;
 import model.dao.UserDao;
-import model.dao.exception.*;
+import model.exception.DataPersistenceException;
+import model.exception.UserAlreadyExistsException;
+import model.exception.UserNotFoundException;
 
 import java.io.*;
 import java.util.*;

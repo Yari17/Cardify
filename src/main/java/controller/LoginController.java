@@ -44,6 +44,9 @@ public class LoginController {
         if (authenticatedUser.isPresent()) {
             User user = authenticatedUser.get();
             view.showSuccess("Login effettuato con successo! Benvenuto " + user.getName());
+
+            view.close();
+
             UserBean loggedInUserBean = new UserBean(user.getName(), null, user.getUserType());
             applicationController.handleRoleBasedNavigation(loggedInUserBean);
         } else {
