@@ -1,17 +1,19 @@
 package model.domain.card.adapter;
 
-import model.bean.CardBean;
-import model.bean.PokemonCardBean;
+import model.domain.card.Card;
+import model.domain.card.PokemonCard;
 import model.domain.CardGameType;
 import net.tcgdex.sdk.TCGdex;
-import net.tcgdex.sdk.models.Card;
 import net.tcgdex.sdk.models.CardResume;
 import net.tcgdex.sdk.models.Set;
+import net.tcgdex.sdk.models.SetResume;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class PokemonAdapter implements ICardApiAdapter<PokemonCardBean> {
+public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
     private final TCGdex api;
 
     public PokemonAdapter() {
@@ -19,47 +21,60 @@ public class PokemonAdapter implements ICardApiAdapter<PokemonCardBean> {
     }
 
     @Override
-    public List<CardBean> search(String query) {
+    public List<Card> search(String query) {
         return new ArrayList<>();
     }
 
     @Override
-    public List<CardBean> searchSet(String setID) {
+    public List<Card> searchSet(String setID) {
         try {
             Set set = api.fetchSet(setID);
+            assert set != null;
             List<CardResume> cards = set.getCards();
 
-            List<CardBean> cardBeans = new ArrayList<>();
+            List<Card> cardList = new ArrayList<>();
             for (CardResume cardResume : cards) {
                 String imageUrl = cardResume.getImage() != null ?
-                    cardResume.getImage() + "/high.png" : null;
+                        cardResume.getImage() + "/high.png" : null;
 
-                CardBean cardBean = new CardBean(
-                    cardResume.getId(),
-                    cardResume.getName(),
-                    imageUrl,
-                    CardGameType.POKEMON
+                Card card = new Card(
+                        cardResume.getId(),
+                        cardResume.getName(),
+                        imageUrl,
+                        CardGameType.POKEMON
                 );
-                cardBeans.add(cardBean);
+                cardList.add(card);
             }
 
-            return cardBeans;
+            return cardList;
         } catch (NullPointerException _) {
             return new ArrayList<>();
         }
     }
 
     @Override
-    public CardBean getCardById(String id) {
+    public Set getSetDetails(String setID) {
+        return api.fetchSet(setID);
+    }
+
+    @Override
+    public Card getCardById(String id) {
         return null;
     }
 
     @Override
-    public PokemonCardBean getCardDetails(String id) {
+    public PokemonCard getCardDetails(String id) {
         return null;
     }
 
-    private PokemonCardBean convertToPokemonCardBean(Card apiCard) {
-        return null;
+    @Override
+    public Map<String, String> getAllSets() {
+        SetResume[] setArray = api.fetchSets();
+        Map<String, String> setMap = new HashMap<>();
+
+        for (SetResume setResume : setArray) {
+            setMap.put(setResume.getId(), setResume.getName());
+        }
+        return setMap;
     }
 }

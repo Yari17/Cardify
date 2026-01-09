@@ -27,7 +27,7 @@ public class FXViewFactory implements IViewFactory {
     @Override
     public ILoginView createLoginView(LoginController controller) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/LoginPage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginPage.fxml"));
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
@@ -58,7 +58,7 @@ public class FXViewFactory implements IViewFactory {
     @Override
     public IRegistrationView createRegistrationView(RegistrationController controller) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/RegistrationDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RegistrationDialog.fxml"));
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
@@ -90,7 +90,7 @@ public class FXViewFactory implements IViewFactory {
     @Override
     public ICollectorHPView createCollectorHomePageView(CollectorHPController controller) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/CollectorHomePage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CollectorHomePage.fxml"));
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
@@ -122,7 +122,7 @@ public class FXViewFactory implements IViewFactory {
     @Override
     public IStoreHPView createStoreHomePageView(StoreHPController controller) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/StoreHomePage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/StoreHomePage.fxml"));
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 

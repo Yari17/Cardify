@@ -1,0 +1,213 @@
+/* ===== CARDIFY - GLOBAL THEME ===== */
+
+:root {
+    /* Sfondi */
+    -bg-main: #0B1622;       /* Header e sfondo pagina */
+    -bg-panel: #1E2530;      /* Sidebar filtri e area card */
+    -bg-input: #E5E7EB;      /* Sfondo barra di ricerca */
+
+    /* Accento (Bottoni, Checkbox, Slider, Link) */
+    -accent-color: #29B6F6;  /* Azzurro elettrico */
+    -accent-hover: #039BE5;  /* Versione più scura per l'hover */
+
+    /* Testo */
+    -text-primary: #FFFFFF;  /* Titoli e icone */
+    -text-secondary: #9CA3AF; /* Sottotitoli e testi minori */
+    -text-dark: #1F2937;     /* Testo dentro la barra di ricerca */
+}
+
+/* ===== BACKGROUND COLORS ===== */
+.bg-main {
+    -fx-background-color: #0B1622;
+}
+
+.bg-panel {
+    -fx-background-color: #1E2530;
+}
+
+.bg-input {
+    -fx-background-color: #E5E7EB;
+}
+
+/* ===== TEXT COLORS ===== */
+.text-primary {
+    -fx-text-fill: #FFFFFF;
+}
+
+.text-secondary {
+    -fx-text-fill: #9CA3AF;
+}
+
+.text-dark {
+    -fx-text-fill: #1F2937;
+}
+
+/* ===== BUTTONS ===== */
+.button-accent {
+    -fx-background-color: #29B6F6;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 10 20 10 20;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.button-accent:hover {
+    -fx-background-color: #039BE5;
+}
+
+.button-transparent {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+/* ===== TEXT FIELDS ===== */
+.text-field-custom {
+    -fx-background-color: #E5E7EB;
+    -fx-text-fill: #1F2937;
+    -fx-prompt-text-fill: #9CA3AF;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-font-size: 14px;
+    -fx-border-color: transparent;
+}
+
+.text-field-custom:focused {
+    -fx-border-color: #29B6F6;
+    -fx-border-width: 2;
+}
+
+/* ===== COMBOBOX ===== */
+.combo-box-custom {
+    -fx-background-color: #1E2530;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+}
+
+.combo-box-custom .list-cell {
+    -fx-background-color: #1E2530;
+    -fx-text-fill: #FFFFFF;
+}
+
+.combo-box-custom .list-cell:hover {
+    -fx-background-color: #29B6F6;
+}
+
+/* ===== LABELS ===== */
+.label-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+}
+
+.label-subtitle {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 16px;
+}
+
+.label-welcome {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+}
+
+/* ===== NAVIGATION BAR ===== */
+.nav-bar {
+    -fx-background-color: #0B1622;
+    -fx-padding: 15 20 15 20;
+}
+
+.nav-button-container {
+    -fx-cursor: hand;
+    -fx-padding: 8;
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+}
+
+.nav-button-container:hover {
+    -fx-background-color: rgba(41, 182, 246, 0.2);
+}
+
+.nav-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+}
+
+.nav-separator {
+    -fx-background-color: #1E2530;
+}
+
+/* ===== PROFILE PICTURE ===== */
+.profile-container {
+    -fx-background-color: #29B6F6;
+    -fx-background-radius: 25;
+    -fx-padding: 3;
+    -fx-cursor: hand;
+}
+
+.profile-container:hover {
+    -fx-background-color: #039BE5;
+    -fx-effect: dropshadow(gaussian, rgba(41, 182, 246, 0.6), 8, 0, 0, 0);
+}
+
+/* ===== CARDS ===== */
+.card-container {
+    -fx-background-color: #1E2530;
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 5);
+    -fx-cursor: hand;
+}
+
+.card-container:hover {
+    -fx-effect: dropshadow(gaussian, rgba(41, 182, 246, 0.5), 15, 0, 0, 5);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.card-game-label {
+    -fx-text-fill: #29B6F6;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-color: rgba(41, 182, 246, 0.2);
+    -fx-background-radius: 5;
+    -fx-padding: 5 10 5 10;
+}
+
+.card-name {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.card-id {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 12px;
+}
+
+/* ===== SCROLLPANE ===== */
+.scroll-pane-custom {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane-custom .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane-custom .scroll-bar {
+    -fx-background-color: #1E2530;
+}
+
+.scroll-pane-custom .scroll-bar .thumb {
+    -fx-background-color: #29B6F6;
+    -fx-background-radius: 5;
+}
+
+.scroll-pane-custom .scroll-bar .thumb:hover {
+    -fx-background-color: #039BE5;
+}
+

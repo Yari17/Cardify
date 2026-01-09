@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.collectorhomepage.FXCollectorHPView"
+            prefHeight="800.0" prefWidth="1400.0"
+            stylesheets="@../styles/theme.css"
+            styleClass="bg-main">
+
+    <!-- Top Navigation Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="nav-bar">
+
+            <!-- Left Navigation Icons with Labels -->
+            <!-- Collection Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="collectionButton" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/collection.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Collection" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Trade Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="tradeButton" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/trade.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Trade" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Logout Button -->
+            <VBox fx:id="logoutButtonContainer" alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="logoutButton" onAction="#onLogoutClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/logout.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Logout" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Separator -->
+            <Region prefWidth="10"/>
+            <Separator orientation="VERTICAL" prefHeight="50" styleClass="nav-separator"/>
+
+            <!-- Search Bar -->
+            <TextField fx:id="searchField" promptText="Search card by name"
+                       prefWidth="350" styleClass="text-field-custom"/>
+
+            <!-- Search Button -->
+            <Button text="Search" onAction="#onSearchClicked" styleClass="button-accent">
+                <graphic>
+                    <FontIcon iconLiteral="fas-search" iconSize="14" iconColor="white"/>
+                </graphic>
+            </Button>
+
+            <!-- Filter by Set -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Filter by Set:" styleClass="text-primary"
+                       style="-fx-font-size: 14px;"/>
+                <ComboBox fx:id="setComboBox" prefWidth="250" promptText="Select a set"
+                          onAction="#onSetSelected" styleClass="combo-box-custom"/>
+            </HBox>
+
+            <!-- Spacer -->
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- User Profile Section -->
+            <HBox spacing="12" alignment="CENTER">
+                <!-- Welcome Label -->
+                <Label fx:id="welcomeLabel" text="Benvenuto!" styleClass="label-welcome"/>
+
+                <!-- Profile Picture -->
+                <VBox alignment="CENTER" styleClass="profile-container">
+                    <ImageView fx:id="profileImageView" fitWidth="40" fitHeight="40" preserveRatio="true">
+                        <image>
+                            <javafx.scene.image.Image url="@../icons/collectorpp.png"/>
+                        </image>
+                    </ImageView>
+                </VBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- Main Content Area -->
+    <center>
+        <StackPane styleClass="bg-main">
+            <!-- Initial View - View Popular Cards Button -->
+            <VBox fx:id="initialViewBox" alignment="CENTER" spacing="30" styleClass="bg-main">
+                <VBox alignment="CENTER" spacing="20" styleClass="bg-panel"
+                      style="-fx-padding: 60; -fx-background-radius: 15; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, 0, 5);">
+                    <Label text="POPULAR CARDS" styleClass="label-title"
+                           style="-fx-font-family: 'Playfair Display', 'Georgia', serif;"/>
+                    <Label text="Discover the most popular cards in the community" styleClass="label-subtitle"
+                           style="-fx-font-style: italic;"/>
+                    <Button fx:id="viewPopularCardsButton" onAction="#onViewPopularCardsClicked"
+                            text="View Popular Cards" styleClass="button-accent"
+                            style="-fx-font-size: 18px; -fx-padding: 15 40 15 40; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0, 0, 3);">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-star" iconSize="18" iconColor="white"/>
+                        </graphic>
+                    </Button>
+                </VBox>
+            </VBox>
+
+            <!-- Cards Grid View -->
+            <VBox fx:id="cardsViewBox" spacing="20" styleClass="bg-main"
+                  style="-fx-padding: 20;" visible="false" managed="false">
+
+                <!-- Header -->
+                <HBox alignment="CENTER">
+                    <Label text="POPULAR CARDS" styleClass="label-title"
+                           style="-fx-font-size: 36px; -fx-font-family: 'Playfair Display', 'Georgia', serif; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 2);"/>
+                </HBox>
+
+                <!-- Cards Grid in ScrollPane -->
+                <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane-custom"
+                            VBox.vgrow="ALWAYS">
+                    <content>
+                        <FlowPane fx:id="cardsFlowPane" hgap="20" vgap="20" styleClass="bg-main"
+                                  style="-fx-padding: 10;">
+
+                            <!-- Cards will be populated dynamically -->
+
+                        </FlowPane>
+                    </content>
+                </ScrollPane>
+
+            </VBox>
+        </StackPane>
+    </center>
+
+</BorderPane>

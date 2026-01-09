@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.login.FXLoginView"
+            prefHeight="400.0" prefWidth="600.0"
+            stylesheets="@../styles/theme.css"
+            styleClass="bg-main">
+
+    <children>
+        <VBox spacing="15.0" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0"
+              AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0" alignment="CENTER">
+            <children>
+                <Label text="Cardify - Login" styleClass="label-title"
+                       style="-fx-font-size: 24px;"/>
+                <TextField fx:id="usernameField" promptText="Username"
+                           maxWidth="300.0" styleClass="text-field-custom"/>
+                <PasswordField fx:id="passwordField" promptText="Password"
+                               maxWidth="300.0" styleClass="text-field-custom"/>
+                <Button fx:id="loginButton" text="Login" maxWidth="300.0"
+                        onAction="#onLoginClicked" styleClass="button-accent"/>
+                <Button fx:id="registerButton" text="Registrati" maxWidth="300.0"
+                        onAction="#onRegisterClicked" styleClass="button-accent"/>
+                <Label fx:id="messageLabel" style="-fx-text-fill: #FF6B6B;"/>
+            </children>
+        </VBox>
+
+        <!-- Persistence indicator in bottom right corner -->
+        <Label fx:id="persistenceLabel"
+               text="Persistenza: File System (JSON)"
+               styleClass="text-secondary"
+               style="-fx-font-size: 10px;"
+               AnchorPane.bottomAnchor="5.0"
+               AnchorPane.rightAnchor="10.0"/>
+    </children>
+
+</AnchorPane>

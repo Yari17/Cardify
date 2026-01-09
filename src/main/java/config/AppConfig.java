@@ -11,7 +11,6 @@ public final class AppConfig {
     public static final String DEFAULT_DAO_TYPE = DAO_TYPE_JSON;
 
     public static final String POKEMON_GAME="POKEMON";
-    public static final String MAGIC_GAME="MAGIC";
 
 
     private static String currentPersistenceType = DEFAULT_DAO_TYPE;

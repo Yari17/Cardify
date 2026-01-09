@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -12,6 +13,7 @@ import controller.CollectorHPController;
 import model.bean.CardBean;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class FXCollectorHPView implements ICollectorHPView {
@@ -19,6 +21,9 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @FXML
     private Label welcomeLabel;
+
+    @FXML
+    private ImageView profileImageView;
 
     @FXML
     private TextField searchField;
@@ -65,8 +70,37 @@ public class FXCollectorHPView implements ICollectorHPView {
     @FXML
     private Button applyFiltersButton;
 
+    @FXML
+    private VBox initialViewBox;
+
+    @FXML
+    private VBox cardsViewBox;
+
+    @FXML
+    private Button viewPopularCardsButton;
+
+    @FXML
+    private ComboBox<String> setComboBox;
+
+    @FXML
+    private Button collectionButton;
+
+    @FXML
+    private Button tradeButton;
+
+    @FXML
+    private Button logoutButton;
+
+    @FXML
+    private VBox logoutButtonContainer;
+
     private CollectorHPController controller;
     private Stage stage;
+    private Map<String, String> setsIdToNameMap; // ID -> Nome del set
+
+    // Campi per gestire la ricerca unificata
+    private SearchType currentSearchType = SearchType.BY_NAME;
+    private String currentSearchQuery = "";
 
     public FXCollectorHPView() {
         // FXML fields will be injected by FXMLLoader
@@ -74,11 +108,6 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @FXML
     private void initialize() {
-        if (gameComboBox != null) {
-            gameComboBox.getItems().addAll("All", "Magic: The Gathering", "Pokemon TCG");
-            gameComboBox.setValue("All");
-        }
-
         if (languageComboBox != null) {
             languageComboBox.getItems().addAll("All", "English", "Italian", "Japanese", "French", "German");
             languageComboBox.setValue("All");
@@ -91,11 +120,17 @@ public class FXCollectorHPView implements ICollectorHPView {
         if (controller != null && welcomeLabel != null) {
             showWelcomeMessage(controller.getUsername());
         }
+        LOGGER.info("Controller set in FXCollectorHPView");
     }
 
     @Override
     public String getSearchQuery() {
-        return searchField != null ? searchField.getText() : "";
+        return currentSearchQuery;
+    }
+
+    @Override
+    public SearchType getSearchType() {
+        return currentSearchType;
     }
 
     @Override
@@ -122,13 +157,24 @@ public class FXCollectorHPView implements ICollectorHPView {
     }
 
     @Override
+    public void showCardOverview(CardBean card) {
+
+    }
+
+    @Override
     public void displayCards(List<CardBean> cards) {
-        if (cardsFlowPane == null) {
-            LOGGER.warning("cardsFlowPane is null, cannot display cards");
+        if (cards == null || cards.isEmpty()) {
+            LOGGER.warning("No cards to display");
             return;
         }
 
+        // Assicurati che il box delle carte sia visibile
         Platform.runLater(() -> {
+            initialViewBox.setVisible(false);
+            initialViewBox.setManaged(false);
+            cardsViewBox.setVisible(true);
+            cardsViewBox.setManaged(true);
+
             cardsFlowPane.getChildren().clear();
 
             for (CardBean card : cards) {
@@ -140,24 +186,11 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     private VBox createCardView(CardBean card) {
         VBox cardBox = new VBox(10);
-        cardBox.setStyle(
-            "-fx-background-color: #1F2933; " +
-            "-fx-background-radius: 10; " +
-            "-fx-padding: 15; " +
-            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 5); " +
-            "-fx-cursor: hand;"
-        );
+        cardBox.getStyleClass().add("card-container");
         cardBox.setPrefWidth(200);
 
         Label gameTypeLabel = new Label(card.getGameType().toString());
-        gameTypeLabel.setStyle(
-            "-fx-text-fill: #4CAF50; " +
-            "-fx-font-size: 12px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-background-color: rgba(76, 175, 80, 0.2); " +
-            "-fx-background-radius: 5; " +
-            "-fx-padding: 5 10 5 10;"
-        );
+        gameTypeLabel.getStyleClass().add("card-game-label");
 
         ImageView imageView = new ImageView();
         imageView.setFitWidth(180);
@@ -168,36 +201,22 @@ public class FXCollectorHPView implements ICollectorHPView {
             try {
                 Image image = new Image(card.getImageUrl(), true);
                 imageView.setImage(image);
-            } catch (Exception e) {
+            } catch (Exception _) {
                 LOGGER.warning(() -> "Failed to load image for card: " + card.getName());
                 imageView.setImage(null);
             }
         }
 
         Label nameLabel = new Label(card.getName());
-        nameLabel.setStyle(
-            "-fx-text-fill: white; " +
-            "-fx-font-size: 14px; " +
-            "-fx-font-weight: bold; " +
-            "-fx-wrap-text: true; " +
-            "-fx-max-width: 180;"
-        );
+        nameLabel.getStyleClass().add("card-name");
+        nameLabel.setStyle("-fx-wrap-text: true; -fx-max-width: 180;");
 
         Label idLabel = new Label("ID: " + card.getId());
-        idLabel.setStyle(
-            "-fx-text-fill: lightgray; " +
-            "-fx-font-size: 12px;"
-        );
+        idLabel.getStyleClass().add("card-id");
 
         cardBox.getChildren().addAll(gameTypeLabel, imageView, nameLabel, idLabel);
 
-        cardBox.setOnMouseEntered(e ->
-            cardBox.setStyle(cardBox.getStyle() + "-fx-scale-x: 1.05; -fx-scale-y: 1.05;")
-        );
-        cardBox.setOnMouseExited(e ->
-            cardBox.setStyle(cardBox.getStyle() + "-fx-scale-x: 1.0; -fx-scale-y: 1.0;")
-        );
-
+        // Hover effect is handled by CSS
         return cardBox;
     }
 
@@ -222,10 +241,150 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @FXML
     private void onSearchClicked() {
-        LOGGER.info("Search clicked - ITCGCard management not yet implemented");
+        if (controller == null || searchField == null) {
+            return;
+        }
+
+        String query = searchField.getText();
+        if (query == null || query.trim().isEmpty()) {
+            LOGGER.info("Search query is empty");
+            return;
+        }
+
+        // Imposta il tipo di ricerca e la query
+        currentSearchType = SearchType.BY_NAME;
+        currentSearchQuery = query.trim();
+
+        LOGGER.info("Search by name: " + currentSearchQuery);
+
+        // Il controller chiamerà getSearchQuery() e getSearchType()
+        // per ottenere i parametri di ricerca
+        // TODO: Implementare la ricerca per nome nel controller
+        LOGGER.warning("Search by name not yet implemented in controller");
+    }
+
+    @FXML
+    private void onViewPopularCardsClicked() {
+        if (controller != null) {
+            // Nascondi il box iniziale e mostra il box delle carte
+            initialViewBox.setVisible(false);
+            initialViewBox.setManaged(false);
+            cardsViewBox.setVisible(true);
+            cardsViewBox.setManaged(true);
+
+            // Carica le carte popolari
+            controller.loadPopularCards();
+        }
+    }
+
+    @Override
+    public void displayAvailableSets(Map<String, String> setsMap) {
+        LOGGER.info("displayAvailableSets called with map: " + (setsMap != null ? setsMap.size() + " sets" : "null"));
+
+        if (setsMap == null || setsMap.isEmpty()) {
+            LOGGER.warning("No sets available - map is " + (setsMap == null ? "null" : "empty"));
+            return;
+        }
+
+        // Salva la mappa per usarla quando l'utente seleziona un set
+        this.setsIdToNameMap = setsMap;
+
+        LOGGER.info("Set map contents: " + setsMap);
+
+        Platform.runLater(() -> {
+            LOGGER.info("Running on JavaFX thread - updating ComboBox");
+
+            if (setComboBox == null) {
+                LOGGER.severe("setComboBox is NULL!");
+                return;
+            }
+
+            setComboBox.getItems().clear();
+            setComboBox.getItems().add("Popular Cards (sv08.5)");
+
+            LOGGER.info("Added 'Popular Cards' option");
+
+            // Aggiungi i set mostrando il nome leggibile
+            int count = 0;
+            for (Map.Entry<String, String> entry : setsMap.entrySet()) {
+                String displayName = entry.getValue(); // Mostra solo il nome
+                setComboBox.getItems().add(displayName);
+                count++;
+                if (count <= 5) { // Log solo i primi 5 per non sovraccaricare
+                    LOGGER.info("Added set: " + entry.getKey() + " -> " + displayName);
+                }
+            }
+
+            LOGGER.info("Total sets added to ComboBox: " + count);
+            LOGGER.info("ComboBox items count: " + setComboBox.getItems().size());
+        });
+    }
+
+    @FXML
+    private void onSetSelected() {
+        String selectedSetName = setComboBox.getValue();
+        if (selectedSetName == null || selectedSetName.isEmpty() || controller == null) {
+            return;
+        }
+
+        // Caso speciale per le carte popolari
+        if (selectedSetName.equals("Popular Cards (sv08.5)")) {
+            currentSearchType = SearchType.BY_SET;
+            currentSearchQuery = "sv08.5";
+            LOGGER.info("Selected popular cards set");
+            controller.loadCardsFromSet("sv08.5");
+            return;
+        }
+
+        // Trova l'ID corrispondente al nome selezionato
+        if (setsIdToNameMap != null) {
+            String setId = setsIdToNameMap.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(selectedSetName))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+
+            if (setId != null) {
+                // Imposta il tipo di ricerca e la query (ID del set)
+                currentSearchType = SearchType.BY_SET;
+                currentSearchQuery = setId;
+
+                LOGGER.info("Set selected - Type: BY_SET, Query: " + setId + " (" + selectedSetName + ")");
+
+                // Carica le carte del set
+                controller.loadCardsFromSet(setId);
+            } else {
+                LOGGER.warning("Set ID not found for: " + selectedSetName);
+            }
+        }
     }
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    @FXML
+    private void onNavButtonHoverEnter(MouseEvent event) {
+        if (event.getSource() instanceof VBox container) {
+            container.setStyle(
+                "-fx-background-color: rgba(41, 182, 246, 0.2); " +
+                "-fx-background-radius: 8; " +
+                "-fx-scale-x: 1.1; " +
+                "-fx-scale-y: 1.1;"
+            );
+        }
+    }
+
+    @FXML
+    private void onNavButtonHoverExit(MouseEvent event) {
+        if (event.getSource() instanceof VBox container) {
+            container.setStyle(
+                "-fx-cursor: hand; " +
+                "-fx-padding: 8; " +
+                "-fx-background-color: transparent; " +
+                "-fx-scale-x: 1.0; " +
+                "-fx-scale-y: 1.0;"
+            );
+        }
     }
 }

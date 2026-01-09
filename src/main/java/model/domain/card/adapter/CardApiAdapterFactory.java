@@ -1,5 +1,7 @@
 package model.domain.card.adapter;
 
+import config.AppConfig;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,8 +14,7 @@ public class CardApiAdapterFactory {
     }
 
     static {
-        adapters.put("POKEMON", new PokemonAdapter());
-        adapters.put("MAGIC", new MagicAdapter());
+        adapters.put(AppConfig.POKEMON_GAME, new PokemonAdapter());
     }
 
     public static ICardApiAdapter getAdapter(String gameType) {

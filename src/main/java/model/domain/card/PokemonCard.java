@@ -1,21 +1,18 @@
-package model.bean;
+package model.domain.card;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import model.bean.PokemonCardBean;
 import model.domain.CardGameType;
 
 import java.util.List;
 import java.util.Map;
 
+public class PokemonCard extends Card {
 
-public class PokemonCardBean extends CardBean {
-
-    // Basic Info
     private String category;
     private String localId;
     private String illustrator;
     private String rarity;
 
-    // Set Information
     private String setId;
     private String setName;
     private String setLogo;
@@ -23,41 +20,72 @@ public class PokemonCardBean extends CardBean {
     private Integer setCardCountOfficial;
     private Integer setCardCountTotal;
 
-    // Variants
     private Boolean variantFirstEdition;
     private Boolean variantHolo;
     private Boolean variantNormal;
     private Boolean variantReverse;
     private Boolean variantWPromo;
 
-    // Pokemon Specific
     private Integer hp;
     private List<String> types;
     private String evolveFrom;
     private String description;
     private String stage;
 
-    // Battle Stats
     private List<Map<String, Object>> attacks;
     private List<Map<String, String>> weaknesses;
     private Integer retreat;
 
-    // Legal/Regulation
     private String regulationMark;
     private Boolean legalStandard;
     private Boolean legalExpanded;
 
-    // Costruttore di default per Jackson
-    public PokemonCardBean() {
-        super(null, null, null, CardGameType.POKEMON);
-    }
-
-    // Costruttore completo
-    public PokemonCardBean(String id, String name, String imageUrl) {
+    public PokemonCard(String id, String name, String imageUrl) {
         super(id, name, imageUrl, CardGameType.POKEMON);
     }
 
-    // ========== Getters & Setters ==========
+    @Override
+    public PokemonCardBean toBean() {
+        PokemonCardBean bean = new PokemonCardBean(
+                super.id,
+                super.name,
+                super.imageUrl
+        );
+
+        bean.setCategory(category);
+        bean.setLocalId(localId);
+        bean.setIllustrator(illustrator);
+        bean.setRarity(rarity);
+
+        bean.setSetId(setId);
+        bean.setSetName(setName);
+        bean.setSetLogo(setLogo);
+        bean.setSetSymbol(setSymbol);
+        bean.setSetCardCountOfficial(setCardCountOfficial);
+        bean.setSetCardCountTotal(setCardCountTotal);
+
+        bean.setVariantFirstEdition(variantFirstEdition);
+        bean.setVariantHolo(variantHolo);
+        bean.setVariantNormal(variantNormal);
+        bean.setVariantReverse(variantReverse);
+        bean.setVariantWPromo(variantWPromo);
+
+        bean.setHp(hp);
+        bean.setTypes(types);
+        bean.setEvolveFrom(evolveFrom);
+        bean.setDescription(description);
+        bean.setStage(stage);
+
+        bean.setAttacks(attacks);
+        bean.setWeaknesses(weaknesses);
+        bean.setRetreat(retreat);
+
+        bean.setRegulationMark(regulationMark);
+        bean.setLegalStandard(legalStandard);
+        bean.setLegalExpanded(legalExpanded);
+
+        return bean;
+    }
 
     public String getCategory() {
         return category;
@@ -267,11 +295,6 @@ public class PokemonCardBean extends CardBean {
         this.legalExpanded = legalExpanded;
     }
 
-    // ========== Utility Methods ==========
-
-    /**
-     * Restituisce il tipo principale della carta (primo della lista)
-     */
     public String getPrimaryType() {
         return types != null && !types.isEmpty() ? types.get(0) : "Unknown";
     }
@@ -280,9 +303,35 @@ public class PokemonCardBean extends CardBean {
         return Boolean.TRUE.equals(variantHolo);
     }
 
-
     public boolean isStandardLegal() {
         return Boolean.TRUE.equals(legalStandard);
     }
 
+    public boolean hasEvolution() {
+        return evolveFrom != null && !evolveFrom.isEmpty();
+    }
+
+    public int getAttackCount() {
+        return attacks != null ? attacks.size() : 0;
+    }
+
+    public int getWeaknessCount() {
+        return weaknesses != null ? weaknesses.size() : 0;
+    }
+
+    public boolean isBasicPokemon() {
+        return "BASIC".equalsIgnoreCase(stage);
+    }
+
+    @Override
+    public String toString() {
+        return "PokemonCard{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", hp=" + hp +
+                ", types=" + types +
+                ", rarity='" + rarity + '\'' +
+                ", set='" + setName + '\'' +
+                '}';
+    }
 }

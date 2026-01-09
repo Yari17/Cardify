@@ -1,0 +1,46 @@
+/* Navigation Bar Styles */
+
+.nav-button-container {
+    -fx-cursor: hand;
+    -fx-padding: 8;
+    -fx-background-color: transparent;
+    -fx-background-radius: 8;
+    -fx-transition: all 0.3s ease;
+}
+
+.nav-button-container:hover {
+    -fx-background-color: rgba(76, 175, 80, 0.2);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+.nav-label {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+}
+
+.nav-separator {
+    -fx-background-color: #3E4C59;
+}
+
+/* Profile Picture Styles */
+.profile-container {
+    -fx-background-color: white;
+    -fx-background-radius: 25;
+    -fx-padding: 2;
+    -fx-cursor: hand;
+}
+
+.profile-container:hover {
+    -fx-effect: dropshadow(gaussian, rgba(76, 175, 80, 0.6), 8, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
