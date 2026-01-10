@@ -81,29 +81,33 @@
                 </graphic>
             </Button>
 
-            <!-- Filter by Set -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Filter by Set:" styleClass="text-primary"
-                       style="-fx-font-size: 14px;"/>
-                <ComboBox fx:id="setComboBox" prefWidth="250" promptText="Select a set"
-                          onAction="#onSetSelected" styleClass="combo-box-custom"/>
-            </HBox>
+            <!-- Filter by Set as MenuButton -->
+            <MenuButton fx:id="setFilterButton" text="Filtra per set" styleClass="button-filter"
+                        style="-fx-font-size: 14px; -fx-padding: 8 16;">
+                <graphic>
+                    <FontIcon iconLiteral="fas-filter" iconSize="14" iconColor="white"/>
+                </graphic>
+            </MenuButton>
 
             <!-- Spacer -->
             <Region HBox.hgrow="ALWAYS"/>
 
             <!-- User Profile Section -->
             <HBox spacing="12" alignment="CENTER">
-                <!-- Welcome Label -->
-                <Label fx:id="welcomeLabel" text="Benvenuto!" styleClass="label-welcome"/>
 
-                <!-- Profile Picture -->
-                <VBox alignment="CENTER" styleClass="profile-container">
-                    <ImageView fx:id="profileImageView" fitWidth="40" fitHeight="40" preserveRatio="true">
-                        <image>
-                            <javafx.scene.image.Image url="@../icons/collectorpp.png"/>
-                        </image>
-                    </ImageView>
+                <!-- Profile Picture with Username -->
+                <VBox alignment="CENTER" spacing="5">
+                    <VBox alignment="CENTER" styleClass="profile-container">
+                        <ImageView fx:id="profileImageView" fitWidth="40" fitHeight="40" preserveRatio="false">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/collectorpp.png"/>
+                            </image>
+                            <clip>
+                                <javafx.scene.shape.Circle centerX="20" centerY="20" radius="20"/>
+                            </clip>
+                        </ImageView>
+                    </VBox>
+                    <Label fx:id="usernameLabel" text="Username" styleClass="profile-username"/>
                 </VBox>
             </HBox>
         </HBox>

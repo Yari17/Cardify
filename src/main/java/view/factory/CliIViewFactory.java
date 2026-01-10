@@ -1,10 +1,13 @@
 package view.factory;
 
+import controller.CollectionController;
 import controller.CollectorHPController;
 import controller.LoginController;
 import controller.RegistrationController;
 import controller.StoreHPController;
 import view.InputManager;
+import view.collection.CliCollectionView;
+import view.collection.ICollectionView;
 import view.collectorhomepage.CliCollectorHPView;
 import view.collectorhomepage.ICollectorHPView;
 import view.login.CliILoginView;
@@ -46,6 +49,13 @@ public class CliIViewFactory implements IViewFactory {
     @Override
     public IStoreHPView createStoreHomePageView(StoreHPController controller) {
         CliStoreHPView view = new CliStoreHPView(inputManager);
+        view.setController(controller);
+        return view;
+    }
+
+    @Override
+    public ICollectionView createCollectionView(CollectionController controller) {
+        CliCollectionView view = new CliCollectionView(inputManager);
         view.setController(controller);
         return view;
     }

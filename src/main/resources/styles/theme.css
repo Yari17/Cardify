@@ -1,20 +1,11 @@
 /* ===== CARDIFY - GLOBAL THEME ===== */
 
-:root {
-    /* Sfondi */
-    -bg-main: #0B1622;       /* Header e sfondo pagina */
-    -bg-panel: #1E2530;      /* Sidebar filtri e area card */
-    -bg-input: #E5E7EB;      /* Sfondo barra di ricerca */
-
-    /* Accento (Bottoni, Checkbox, Slider, Link) */
-    -accent-color: #29B6F6;  /* Azzurro elettrico */
-    -accent-hover: #039BE5;  /* Versione più scura per l'hover */
-
-    /* Testo */
-    -text-primary: #FFFFFF;  /* Titoli e icone */
-    -text-secondary: #9CA3AF; /* Sottotitoli e testi minori */
-    -text-dark: #1F2937;     /* Testo dentro la barra di ricerca */
-}
+/*
+ * Color Palette:
+ * - Sfondi: #0B1622 (main), #1E2530 (panel), #E5E7EB (input)
+ * - Accento: #29B6F6 (azzurro), #039BE5 (hover)
+ * - Testo: #FFFFFF (primary), #9CA3AF (secondary), #1F2937 (dark)
+ */
 
 /* ===== BACKGROUND COLORS ===== */
 .bg-main {
@@ -55,6 +46,61 @@
 
 .button-accent:hover {
     -fx-background-color: #039BE5;
+}
+
+.button-filter {
+    -fx-background-color: #ed4747;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 8 16 8 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+}
+
+.button-filter:hover {
+    -fx-background-color: #d63939;
+}
+
+.button-filter .label {
+    -fx-text-fill: #FFFFFF;
+}
+
+.button-filter .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.button-filter .arrow {
+    -fx-background-color: white;
+}
+
+/* Stile per il menu dropdown del filtro */
+.button-filter .context-menu {
+    -fx-background-color: #1E2530;
+    -fx-border-color: #ed4747;
+    -fx-border-width: 2;
+    -fx-background-radius: 5;
+    -fx-padding: 5;
+}
+
+.button-filter .context-menu .menu-item {
+    -fx-background-color: #1E2530;
+    -fx-text-fill: #FFFFFF;
+    -fx-padding: 8 15;
+}
+
+.button-filter .context-menu .menu-item:hover {
+    -fx-background-color: #ed4747;
+    -fx-text-fill: #FFFFFF;
+}
+
+.button-filter .context-menu .menu-item:focused {
+    -fx-background-color: #ed4747;
+    -fx-text-fill: #FFFFFF;
+}
+
+.button-filter .context-menu .menu-item .label {
+    -fx-text-fill: #FFFFFF;
 }
 
 .button-transparent {
@@ -142,14 +188,28 @@
 /* ===== PROFILE PICTURE ===== */
 .profile-container {
     -fx-background-color: #29B6F6;
-    -fx-background-radius: 25;
+    -fx-background-radius: 50%;
     -fx-padding: 3;
     -fx-cursor: hand;
+    -fx-min-width: 46px;
+    -fx-min-height: 46px;
+    -fx-max-width: 46px;
+    -fx-max-height: 46px;
 }
 
 .profile-container:hover {
     -fx-background-color: #039BE5;
     -fx-effect: dropshadow(gaussian, rgba(41, 182, 246, 0.6), 8, 0, 0, 0);
+}
+
+.profile-container .image-view {
+    -fx-background-radius: 50%;
+}
+
+.profile-username {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
 }
 
 /* ===== CARDS ===== */

@@ -10,20 +10,45 @@
         "name": "Chansey",
         "imageUrl": "https://assets.tcgdex.net/en/base/base4/3/high.png",
         "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true
+      },
+      {
+        "id": "base4-6",
+        "name": "Clefairy",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base4/6/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": false
+      },
+      {
+        "id": "base4-123",
+        "name": "Switch",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base4/123/high.png",
+        "gameType": "POKEMON",
         "quantity": 1,
         "isTradable": false
       }
     ],
     "createdAt": "2026-01-10T01:12:10.668730",
-    "lastModified": "2026-01-10T12:03:42.956157"
+    "lastModified": "2026-01-10T12:25:53.442666"
   },
   {
     "id": 2,
     "owner": "user1",
-    "setId": "tk-xy-latia",
-    "setName": "XY trainer Kit (Latias)",
-    "cards": [],
-    "createdAt": "2026-01-10T11:56:24.720984",
-    "lastModified": "2026-01-10T11:56:24.721115"
+    "setId": "swsh10.5",
+    "setName": "Pokémon GO",
+    "cards": [
+      {
+        "id": "swsh10.5-076",
+        "name": "Dragonite V",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/076/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false
+      }
+    ],
+    "createdAt": "2026-01-10T12:43:41.859465",
+    "lastModified": "2026-01-10T15:25:42.696180"
   }
 ]

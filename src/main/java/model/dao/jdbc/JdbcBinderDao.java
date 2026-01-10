@@ -42,10 +42,25 @@ public class JdbcBinderDao implements IBinderDao {
             )
         """;
 
+        String createBinderCardsTable = """
+            CREATE TABLE IF NOT EXISTS binder_cards (
+                id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                binder_id BIGINT NOT NULL,
+                card_id VARCHAR(255) NOT NULL,
+                card_name VARCHAR(255),
+                card_image_url VARCHAR(512),
+                game_type VARCHAR(50),
+                quantity INT DEFAULT 1,
+                is_tradable BOOLEAN DEFAULT FALSE,
+                FOREIGN KEY (binder_id) REFERENCES binders(id) ON DELETE CASCADE
+            )
+        """;
+
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(createBindersTable);
-            LOGGER.info("Binders table initialized");
+            stmt.execute(createBinderCardsTable);
+            LOGGER.info("Binders and binder_cards tables initialized");
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error initializing binders database", e);
         }
@@ -61,7 +76,9 @@ public class JdbcBinderDao implements IBinderDao {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return Optional.of(mapResultSetToBinder(rs));
+                Binder binder = mapResultSetToBinder(rs);
+                loadBinderCards(conn, binder);
+                return Optional.of(binder);
             }
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to get binder with id: " + id, e);
@@ -80,7 +97,9 @@ public class JdbcBinderDao implements IBinderDao {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                binders.add(mapResultSetToBinder(rs));
+                Binder binder = mapResultSetToBinder(rs);
+                loadBinderCards(conn, binder);
+                binders.add(binder);
             }
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to get all binders", e);
@@ -127,22 +146,28 @@ public class JdbcBinderDao implements IBinderDao {
             WHERE id = ?
         """;
 
-        try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
 
-            pstmt.setString(1, binder.getOwner());
-            pstmt.setString(2, binder.getSetId());
-            pstmt.setString(3, binder.getSetName());
-            pstmt.setString(4, binder.getSetLogo());
-            pstmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
-            pstmt.setLong(6, binder.getId());
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setString(1, binder.getOwner());
+                pstmt.setString(2, binder.getSetId());
+                pstmt.setString(3, binder.getSetName());
+                pstmt.setString(4, binder.getSetLogo());
+                pstmt.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+                pstmt.setLong(6, binder.getId());
 
-            int rowsUpdated = pstmt.executeUpdate();
-            if (rowsUpdated == 0) {
-                throw new DataPersistenceException("No binder found with id: " + binder.getId(),
-                    new SQLException("Update affected 0 rows"));
+                int rowsUpdated = pstmt.executeUpdate();
+                if (rowsUpdated == 0) {
+                    throw new DataPersistenceException("No binder found with id: " + binder.getId(),
+                        new SQLException("Update affected 0 rows"));
+                }
             }
 
+            // Update cards
+            updateBinderCards(conn, binder);
+
+            conn.commit();
             LOGGER.info(() -> "Binder updated: " + binder.getSetName());
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to update binder: " + binder.getSetName(), e);
@@ -201,7 +226,9 @@ public class JdbcBinderDao implements IBinderDao {
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                binders.add(mapResultSetToBinder(rs));
+                Binder binder = mapResultSetToBinder(rs);
+                loadBinderCards(conn, binder);
+                binders.add(binder);
             }
 
             LOGGER.info(() -> "Retrieved " + binders.size() + " binders for owner: " + owner);
@@ -213,12 +240,6 @@ public class JdbcBinderDao implements IBinderDao {
     }
 
     @Override
-    public void addCardToBinder(String binderId, String cardId) {
-        // TODO: Implementare quando avremo la tabella delle carte nei binder
-        LOGGER.warning("addCardToBinder not yet implemented - requires cards table");
-    }
-
-    @Override
     public void createBinder(String owner, String setId, String setName) {
         Binder binder = new Binder(owner, setId, setName);
         save(binder);
@@ -226,6 +247,83 @@ public class JdbcBinderDao implements IBinderDao {
 
     @Override
     public void deleteBinder(String binderId) {
+        try {
+            long id = Long.parseLong(binderId);
+            String sql = "DELETE FROM binders WHERE id = ?";
 
+            try (Connection conn = getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                pstmt.setLong(1, id);
+                int rowsDeleted = pstmt.executeUpdate();
+
+                if (rowsDeleted == 0) {
+                    LOGGER.warning(() -> "No binder found to delete with id: " + binderId);
+                } else {
+                    LOGGER.info(() -> "Binder deleted: " + binderId);
+                }
+            }
+        } catch (NumberFormatException e) {
+            throw new DataPersistenceException("Invalid binder ID format: " + binderId, e);
+        } catch (SQLException e) {
+            throw new DataPersistenceException("Failed to delete binder: " + binderId, e);
+        }
+    }
+
+    /**
+     * Loads all cards belonging to a binder from the database.
+     */
+    private void loadBinderCards(Connection conn, Binder binder) throws SQLException {
+        String sql = "SELECT * FROM binder_cards WHERE binder_id = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, binder.getId());
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                model.bean.CardBean card = new model.bean.CardBean(
+                    rs.getString("card_id"),
+                    rs.getString("card_name"),
+                    rs.getString("card_image_url"),
+                    model.domain.CardGameType.valueOf(rs.getString("game_type"))
+                );
+                card.setQuantity(rs.getInt("quantity"));
+                card.setTradable(rs.getBoolean("is_tradable"));
+
+                binder.addCard(card);
+            }
+        }
+    }
+
+    /**
+     * Updates the cards in a binder by deleting all existing cards and inserting the current ones.
+     */
+    private void updateBinderCards(Connection conn, Binder binder) throws SQLException {
+        // Delete existing cards
+        String deleteSql = "DELETE FROM binder_cards WHERE binder_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(deleteSql)) {
+            pstmt.setLong(1, binder.getId());
+            pstmt.executeUpdate();
+        }
+
+        // Insert current cards
+        String insertSql = """
+            INSERT INTO binder_cards (binder_id, card_id, card_name, card_image_url, game_type, quantity, is_tradable)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
+            for (model.bean.CardBean card : binder.getCards()) {
+                pstmt.setLong(1, binder.getId());
+                pstmt.setString(2, card.getId());
+                pstmt.setString(3, card.getName());
+                pstmt.setString(4, card.getImageUrl());
+                pstmt.setString(5, card.getGameType().toString());
+                pstmt.setInt(6, card.getQuantity());
+                pstmt.setBoolean(7, card.isTradable());
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        }
     }
 }

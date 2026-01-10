@@ -15,7 +15,6 @@ import model.domain.Binder;
 import model.domain.card.Card;
 import model.domain.card.CardProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
-import view.IView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,11 +22,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-public class FXCollectionView implements IView {
+public class FXCollectionView implements ICollectionView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectionView.class.getName());
 
+
     @FXML
-    private Label welcomeLabel;
+    private Label usernameLabel;
 
     @FXML
     private ImageView profileImageView;
@@ -40,6 +40,7 @@ public class FXCollectionView implements IView {
 
     private CollectionController controller;
     private Stage stage;
+    private CardProvider cardProvider;
 
     // Track currently displayed binders to enable partial refresh
     private Map<String, Binder> currentBinders;
@@ -57,8 +58,8 @@ public class FXCollectionView implements IView {
     }
 
     public void setWelcomeMessage(String username) {
-        if (welcomeLabel != null) {
-            welcomeLabel.setText("La tua Collezione");
+        if (usernameLabel != null) {
+            usernameLabel.setText(username);
         }
     }
 
@@ -71,7 +72,8 @@ public class FXCollectionView implements IView {
             return;
         }
 
-        // Store current binders for partial refresh
+        // Store cardProvider and current binders for partial refresh
+        this.cardProvider = cardProvider;
         this.currentBinders = new HashMap<>(bindersBySet);
 
         setsContainer.getChildren().clear();
@@ -129,10 +131,32 @@ public class FXCollectionView implements IView {
         Label setNameLabel = new Label(binder.getSetName());
         setNameLabel.getStyleClass().add("set-name-label");
 
-        Label statsLabel = new Label(binder.getCardCount() + " carte possedute");
+        // Carica tutte le carte del set per calcolare le mancanti
+        int totalCards = 0;
+        try {
+            List<Card> allCards = cardProvider.searchPokemonSet(setId);
+            totalCards = allCards.size();
+        } catch (Exception e) {
+            LOGGER.warning("Could not load total cards for set: " + setId);
+        }
+
+        int ownedCards = binder.getCardCount();
+        int missingCards = totalCards - ownedCards;
+
+        Label statsLabel = new Label(ownedCards + " carte possedute");
         statsLabel.getStyleClass().add("set-stats-label");
 
-        header.getChildren().addAll(setNameLabel, statsLabel);
+        Label missingLabel = new Label(missingCards + " mancanti");
+        missingLabel.setStyle("-fx-text-fill: #ed4747; -fx-font-size: 16px; -fx-font-weight: bold;");
+
+        // Spacer per spingere il bottone elimina a destra
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        // Bottone elimina set
+        Button deleteButton = createDeleteButton(setId, binder.getSetName());
+
+        header.getChildren().addAll(setNameLabel, statsLabel, missingLabel, spacer, deleteButton);
 
         // Griglia delle carte
         FlowPane cardsGrid = new FlowPane();
@@ -175,6 +199,9 @@ public class FXCollectionView implements IView {
         tile.setSpacing(0);
         tile.setPadding(new Insets(0));
 
+        // Store card ID in userData for updates
+        tile.setUserData(card.getId());
+
         // Stili base
         if (isOwned) {
             tile.getStyleClass().addAll("card-tile", "card-owned");
@@ -214,18 +241,31 @@ public class FXCollectionView implements IView {
             StackPane.setMargin(addButton, new Insets(0, 0, 5, 0));
             imageContainer.getChildren().add(addButton);
         } else {
-            // Se posseduta: mostra controlli completi
+            // Se posseduta: mostra controlli completi SOLO su hover
             VBox controls = createCardControls(setId, card, ownedCard);
+            controls.setVisible(false); // Inizialmente nascosti
             StackPane.setAlignment(controls, Pos.BOTTOM_CENTER);
             StackPane.setMargin(controls, new Insets(0, 0, 5, 0));
             imageContainer.getChildren().add(controls);
+
+            // Mostra controlli solo su hover
+            tile.setOnMouseEntered(_ -> {
+                controls.setVisible(true);
+                tile.getStyleClass().add("card-hover");
+            });
+            tile.setOnMouseExited(_ -> {
+                controls.setVisible(false);
+                tile.getStyleClass().remove("card-hover");
+            });
         }
 
         tile.getChildren().add(imageContainer);
 
-        // Hover effect
-        tile.setOnMouseEntered(_ -> tile.getStyleClass().add("card-hover"));
-        tile.setOnMouseExited(_ -> tile.getStyleClass().remove("card-hover"));
+        // Hover effect per carte non possedute
+        if (!isOwned) {
+            tile.setOnMouseEntered(_ -> tile.getStyleClass().add("card-hover"));
+            tile.setOnMouseExited(_ -> tile.getStyleClass().remove("card-hover"));
+        }
 
         return tile;
     }
@@ -248,6 +288,54 @@ public class FXCollectionView implements IView {
         });
 
         return addButton;
+    }
+
+    /**
+     * Crea il pulsante per eliminare un binder con dialog di conferma
+     */
+    private Button createDeleteButton(String setId, String setName) {
+        Button deleteButton = new Button();
+        FontIcon trashIcon = new FontIcon("fas-trash-alt");
+        trashIcon.setIconSize(20);
+        trashIcon.setIconColor(javafx.scene.paint.Color.web("#EF5350"));
+        deleteButton.setGraphic(trashIcon);
+        deleteButton.getStyleClass().add("button-danger");
+        deleteButton.setStyle("-fx-background-color: transparent; -fx-padding: 8; -fx-cursor: hand;");
+
+        deleteButton.setOnAction(_ -> showDeleteConfirmationDialog(setId, setName));
+
+        return deleteButton;
+    }
+
+    /**
+     * Mostra dialog di conferma per l'eliminazione di un binder
+     */
+    private void showDeleteConfirmationDialog(String setId, String setName) {
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Conferma Eliminazione");
+        confirmDialog.setHeaderText("Eliminare il set \"" + setName + "\"?");
+        confirmDialog.setContentText(
+            "Questa azione eliminerà il set e tutte le carte associate.\n" +
+            "L'operazione non può essere annullata.\n\n" +
+            "Sei sicuro di voler continuare?"
+        );
+
+        ButtonType buttonTypeYes = new ButtonType("Sì, Elimina", ButtonBar.ButtonData.OK_DONE);
+        ButtonType buttonTypeNo = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        confirmDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
+
+        // Stile per il dialog
+        DialogPane dialogPane = confirmDialog.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/styles/theme.css").toExternalForm());
+        dialogPane.getStyleClass().add("dialog-pane");
+
+        Optional<ButtonType> result = confirmDialog.showAndWait();
+        if (result.isPresent() && result.get() == buttonTypeYes) {
+            if (controller != null) {
+                controller.deleteBinder(setId);
+            }
+        }
     }
 
     /**
@@ -423,6 +511,62 @@ public class FXCollectionView implements IView {
     public void setSaveButtonVisible(boolean visible) {
         if (saveButton != null) {
             saveButton.setVisible(visible);
+        }
+    }
+
+    /**
+     * Aggiorna una singola carta nel set senza refreshare tutta la collezione
+     */
+    public void updateCardInSet(String setId, String cardId) {
+        if (setsContainer == null || currentBinders == null) {
+            return;
+        }
+
+        // Find the set section
+        for (javafx.scene.Node node : setsContainer.getChildren()) {
+            if (node instanceof VBox setSection) {
+                // Check if this is the right set by looking at the set name in header
+                if (setSection.getChildren().size() > 1 &&
+                    setSection.getChildren().get(1) instanceof FlowPane cardsGrid) {
+
+                    // Find and update the specific card
+                    for (javafx.scene.Node cardNode : cardsGrid.getChildren()) {
+                        if (cardNode instanceof VBox cardTile &&
+                            cardTile.getUserData() != null &&
+                            cardTile.getUserData().equals(cardId)) {
+
+                            // Rebuild this card tile
+                            Binder binder = currentBinders.get(setId);
+                            if (binder != null) {
+                                try {
+                                    List<Card> allCards = cardProvider.searchPokemonSet(setId);
+                                    Card card = allCards.stream()
+                                        .filter(c -> c.getId().equals(cardId))
+                                        .findFirst()
+                                        .orElse(null);
+
+                                    if (card != null) {
+                                        Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
+                                            .collect(java.util.stream.Collectors.toMap(CardBean::getId, c -> c));
+
+                                        CardBean ownedCard = ownedCardsMap.get(cardId);
+                                        boolean isOwned = ownedCard != null;
+
+                                        VBox newCardTile = createCardTile(card, setId, isOwned, ownedCard);
+                                        int index = cardsGrid.getChildren().indexOf(cardTile);
+                                        cardsGrid.getChildren().set(index, newCardTile);
+
+                                        LOGGER.info(() -> "Updated card " + cardId + " in UI");
+                                    }
+                                } catch (Exception e) {
+                                    LOGGER.warning("Failed to update card in UI: " + e.getMessage());
+                                }
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
         }
     }
 

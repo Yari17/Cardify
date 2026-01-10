@@ -5,7 +5,7 @@ import model.dao.IBinderDao;
 import model.domain.Binder;
 import model.domain.card.Card;
 import model.domain.card.CardProvider;
-import view.collection.FXCollectionView;
+import view.collection.ICollectionView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +19,7 @@ public class CollectionController {
     private final Navigator navigator;
     private final IBinderDao binderDao;
     private final CardProvider cardProvider;
-    private FXCollectionView view;
+    private ICollectionView view;
 
     // Cache locale dei binder dell'utente: setId -> Binder
     private Map<String, Binder> cachedBinders;
@@ -38,7 +38,7 @@ public class CollectionController {
         this.hasUnsavedChanges = false;
     }
 
-    public void setView(FXCollectionView view) {
+    public void setView(ICollectionView view) {
         this.view = view;
         if (view != null) {
             view.setWelcomeMessage(username);
@@ -122,6 +122,35 @@ public class CollectionController {
     }
 
     /**
+     * Elimina un binder dalla collezione
+     */
+    public void deleteBinder(String setId) {
+        try {
+            Binder binder = cachedBinders.get(setId);
+            if (binder == null) {
+                LOGGER.warning(() -> "Binder not found for setId: " + setId);
+                return;
+            }
+
+            binderDao.deleteBinder(String.valueOf(binder.getId()));
+
+            LOGGER.info(() -> "Deleted set: " + binder.getSetName() + " for user: " + username);
+
+            // Ricarica la collezione
+            loadUserCollection();
+
+            if (view != null) {
+                view.showSuccess("Set \"" + binder.getSetName() + "\" eliminato dalla collezione!");
+            }
+        } catch (Exception e) {
+            LOGGER.severe("Error deleting set: " + e.getMessage());
+            if (view != null) {
+                view.showError("Errore nell'eliminazione del set");
+            }
+        }
+    }
+
+    /**
      * Aggiunge una carta al set (o incrementa la quantità se già posseduta)
      */
     public void addCardToSet(String setId, Card card) {
@@ -130,7 +159,7 @@ public class CollectionController {
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
-                LOGGER.warning("Set not found for setId: " + setId);
+                LOGGER.warning(() -> "Set not found for setId: " + setId);
                 return;
             }
 
@@ -161,7 +190,8 @@ public class CollectionController {
             hasUnsavedChanges = true;
             if (view != null) {
                 view.setSaveButtonVisible(true);
-                // DO NOT refresh display - wait for save button
+                // Update only the specific card in the UI
+                view.updateCardInSet(setId, card.getId());
             }
         } catch (Exception e) {
             LOGGER.severe("Error adding card: " + e.getMessage());
@@ -180,7 +210,7 @@ public class CollectionController {
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
-                LOGGER.warning("Set not found for setId: " + setId);
+                LOGGER.warning(() -> "Set not found for setId: " + setId);
                 return;
             }
 
@@ -206,7 +236,8 @@ public class CollectionController {
                 hasUnsavedChanges = true;
                 if (view != null) {
                     view.setSaveButtonVisible(true);
-                    // DO NOT refresh display - wait for save button
+                    // Update only the specific card in the UI
+                    view.updateCardInSet(setId, card.getId());
                 }
             }
         } catch (Exception e) {
@@ -226,7 +257,7 @@ public class CollectionController {
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
-                LOGGER.warning("Set not found for setId: " + setId);
+                LOGGER.warning(() -> "Set not found for setId: " + setId);
                 return;
             }
 
@@ -244,7 +275,7 @@ public class CollectionController {
                 hasUnsavedChanges = true;
                 if (view != null) {
                     view.setSaveButtonVisible(true);
-                    // DO NOT refresh display - wait for save button
+                    // DO NOT update UI for tradable toggle - it's already updated by the checkbox
                 }
 
                 LOGGER.info(() -> "Set card " + cardId + " as " + (tradable ? "tradable" : "not tradable"));

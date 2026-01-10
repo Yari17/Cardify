@@ -18,11 +18,24 @@ public class ConfigurationManager {
         return mapInterfaceChoice(choice);
     }
 
+    public String choosePersistence() {
+        String choice = view.getPersistenceChoice();
+        return mapPersistenceChoice(choice);
+    }
+
     private String mapInterfaceChoice(String choice) {
         return switch (choice) {
             case "1" -> "JavaFX";
             case "2" -> "CLI";
             default -> null;
+        };
+    }
+
+    private String mapPersistenceChoice(String choice) {
+        return switch (choice) {
+            case "1" -> "JSON";    // Standard - persistenza su file
+            case "2" -> "DEMO";    // Demo - dati in memoria
+            default -> "JSON";     // Default a JSON se non specificato
         };
     }
 }

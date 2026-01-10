@@ -82,16 +82,20 @@
 
             <!-- User Profile Section -->
             <HBox spacing="12" alignment="CENTER">
-                <!-- Welcome Label -->
-                <Label fx:id="welcomeLabel" text="Benvenuto!" styleClass="label-welcome"/>
 
-                <!-- Profile Picture -->
-                <VBox alignment="CENTER" styleClass="profile-container">
-                    <ImageView fx:id="profileImageView" fitWidth="40" fitHeight="40" preserveRatio="true">
-                        <image>
-                            <javafx.scene.image.Image url="@../icons/collectorpp.png"/>
-                        </image>
-                    </ImageView>
+                <!-- Profile Picture with Username -->
+                <VBox alignment="CENTER" spacing="5">
+                    <VBox alignment="CENTER" styleClass="profile-container">
+                        <ImageView fx:id="profileImageView" fitWidth="40" fitHeight="40" preserveRatio="false">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/collectorpp.png"/>
+                            </image>
+                            <clip>
+                                <javafx.scene.shape.Circle centerX="20" centerY="20" radius="20"/>
+                            </clip>
+                        </ImageView>
+                    </VBox>
+                    <Label fx:id="usernameLabel" text="Username" styleClass="profile-username"/>
                 </VBox>
             </HBox>
         </HBox>

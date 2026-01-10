@@ -5,7 +5,6 @@ import model.dao.IUserDao;
 import model.dao.factory.DaoFactory;
 import view.IView;
 import view.collectorhomepage.ICollectorHPView;
-import view.factory.FXViewFactory;
 import view.factory.IViewFactory;
 import view.login.ILoginView;
 import view.registration.IRegistrationView;
@@ -94,8 +93,7 @@ public class Navigator {
             model.dao.IBinderDao binderDao = getDaoFactory().createBinderDao();
 
             CollectionController controller = new CollectionController(username, this, binderDao);
-            FXViewFactory factory = (FXViewFactory) viewFactory;
-            view.collection.FXCollectionView collectionView = factory.createCollectionView(controller);
+            view.collection.ICollectionView collectionView = viewFactory.createCollectionView(controller);
             controller.setView(collectionView);
             displayView(collectionView);
         } catch (Exception e) {

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ICardApiAdapter<T> {
-    List<Card> search(String query);
+    List<Card> searchCardsByName(String name);
     List<Card> searchSet(String setID);
     Object getSetDetails(String setID);
     Card getCardById(String id);

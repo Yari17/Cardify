@@ -1,6 +1,7 @@
 package controller;
 
 import model.bean.CardBean;
+import model.bean.PokemonCardBean;
 import model.domain.card.Card;
 import model.domain.card.CardProvider;
 import view.collectorhomepage.ICollectorHPView;
@@ -39,6 +40,28 @@ public class CollectorHPController {
             }
         } catch (Exception e) {
             LOGGER.severe(() -> "Error loading cards from set " + setId + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * Cerca carte Pokemon per nome e le visualizza nella view.
+     *
+     * @param name nome della carta da cercare
+     */
+    public void searchCardsByName(String name) {
+        try {
+            LOGGER.info(() -> "Searching for cards with name: " + name);
+            List<Card> cards = cardProvider.searchPokemonCardsByName(name);
+            LOGGER.info(() -> "Found " + cards.size() + " cards matching '" + name + "'");
+
+            if (view != null) {
+                List<CardBean> cardBeans = cards.stream()
+                    .map(Card::toBean)
+                    .toList();
+                view.displayCards(cardBeans);
+            }
+        } catch (Exception e) {
+            LOGGER.severe(() -> "Error searching cards by name '" + name + "': " + e.getMessage());
         }
     }
 
@@ -109,6 +132,24 @@ public class CollectorHPController {
             view.close();
         }
         navigator.logout();
+    }
+    public void showCardDetails(CardBean card) {
+        LOGGER.info(() -> "Opening card details for: " + card.getName() + " (ID: " + card.getId() + ")");
+
+        if (view != null) {
+            // Carica i dettagli completi della carta
+            model.domain.card.PokemonCard detailedCard = cardProvider.getPokemonCardDetails(card.getId());
+
+            if (detailedCard != null) {
+                // Converti in bean con tutti i dettagli
+                PokemonCardBean detailedBean = detailedCard.toBean();
+                view.showCardOverview(detailedBean);
+            } else {
+                // Fallback: mostra il bean base se non si riescono a caricare i dettagli
+                LOGGER.warning(() -> "Could not load detailed info for card: " + card.getId());
+                view.showCardOverview(card);
+            }
+        }
     }
 
     public void onExitRequested() {

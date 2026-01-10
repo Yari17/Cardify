@@ -10,6 +10,7 @@ import controller.LoginController;
 import controller.RegistrationController;
 import controller.StoreHPController;
 import view.collection.FXCollectionView;
+import view.collection.ICollectionView;
 import view.collectorhomepage.FXCollectorHPView;
 import view.collectorhomepage.ICollectorHPView;
 import view.login.ILoginView;
@@ -153,7 +154,8 @@ public class FXViewFactory implements IViewFactory {
         }
     }
 
-    public FXCollectionView createCollectionView(CollectionController controller) {
+    @Override
+    public ICollectionView createCollectionView(CollectionController controller) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CollectionPage.fxml"));
             Parent root = loader.load();

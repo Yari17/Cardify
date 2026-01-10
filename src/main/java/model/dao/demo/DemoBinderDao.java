@@ -121,12 +121,6 @@ public class DemoBinderDao implements IBinderDao {
     }
 
     @Override
-    public void addCardToBinder(String binderId, String cardId) {
-        // TODO: Implementare quando avremo la gestione delle carte nei binder
-        LOGGER.warning("addCardToBinder not yet implemented");
-    }
-
-    @Override
     public void createBinder(String owner, String setId, String setName) {
         Binder binder = new Binder(owner, setId, setName);
         save(binder);
@@ -134,7 +128,19 @@ public class DemoBinderDao implements IBinderDao {
 
     @Override
     public void deleteBinder(String binderId) {
+        try {
+            long id = Long.parseLong(binderId);
+            Optional<Binder> binderOpt = get(id);
 
+            if (binderOpt.isPresent()) {
+                delete(binderOpt.get());
+                LOGGER.info("Binder deleted from demo: " + binderId);
+            } else {
+                LOGGER.warning("No binder found to delete with id: " + binderId);
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.warning("Invalid binder ID format: " + binderId);
+        }
     }
 }
 
