@@ -131,5 +131,10 @@ public class DemoBinderDao implements IBinderDao {
         Binder binder = new Binder(owner, setId, setName);
         save(binder);
     }
+
+    @Override
+    public void deleteBinder(String binderId) {
+
+    }
 }
 

@@ -21,11 +21,21 @@ public class CollectionController {
     private final CardProvider cardProvider;
     private FXCollectionView view;
 
+    // Cache locale dei binder dell'utente: setId -> Binder
+    private Map<String, Binder> cachedBinders;
+
+    // Mappa per tracciare i binder modificati: setId -> Binder
+    private final Map<String, Binder> pendingChanges;
+    private boolean hasUnsavedChanges;
+
     public CollectionController(String username, Navigator navigator, IBinderDao binderDao) {
         this.username = username;
         this.navigator = navigator;
         this.binderDao = binderDao;
         this.cardProvider = new CardProvider();
+        this.cachedBinders = new HashMap<>();
+        this.pendingChanges = new HashMap<>();
+        this.hasUnsavedChanges = false;
     }
 
     public void setView(FXCollectionView view) {
@@ -51,6 +61,16 @@ public class CollectionController {
             Map<String, Binder> bindersBySet = new HashMap<>();
             for (Binder binder : userBinders) {
                 bindersBySet.put(binder.getSetId(), binder);
+            }
+
+            // Update the cached binders
+            this.cachedBinders = new HashMap<>(bindersBySet);
+
+            // Clear pending changes since we're loading fresh data
+            pendingChanges.clear();
+            hasUnsavedChanges = false;
+            if (view != null) {
+                view.setSaveButtonVisible(false);
             }
 
             if (view != null) {
@@ -106,11 +126,8 @@ public class CollectionController {
      */
     public void addCardToSet(String setId, Card card) {
         try {
-            List<Binder> userBinders = binderDao.getUserBinders(username);
-            Binder binder = userBinders.stream()
-                    .filter(b -> b.getSetId().equals(setId))
-                    .findFirst()
-                    .orElse(null);
+            // Use cached binder instead of reloading from database
+            Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
                 LOGGER.warning("Set not found for setId: " + setId);
@@ -139,10 +156,13 @@ public class CollectionController {
                 LOGGER.info(() -> "Added card " + card.getName() + " to set " + setId);
             }
 
-            binderDao.update(binder, null);
-
-            // Ricarica la collezione
-            loadUserCollection();
+            // Track pending changes instead of persisting immediately
+            pendingChanges.put(setId, binder);
+            hasUnsavedChanges = true;
+            if (view != null) {
+                view.setSaveButtonVisible(true);
+                // DO NOT refresh display - wait for save button
+            }
         } catch (Exception e) {
             LOGGER.severe("Error adding card: " + e.getMessage());
             if (view != null) {
@@ -156,11 +176,8 @@ public class CollectionController {
      */
     public void removeCardFromSet(String setId, Card card) {
         try {
-            List<Binder> userBinders = binderDao.getUserBinders(username);
-            Binder binder = userBinders.stream()
-                    .filter(b -> b.getSetId().equals(setId))
-                    .findFirst()
-                    .orElse(null);
+            // Use cached binder instead of reloading from database
+            Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
                 LOGGER.warning("Set not found for setId: " + setId);
@@ -184,11 +201,14 @@ public class CollectionController {
                     LOGGER.info(() -> "Removed card " + card.getName() + " from set " + setId);
                 }
 
-                binderDao.update(binder, null);
+                // Track pending changes instead of persisting immediately
+                pendingChanges.put(setId, binder);
+                hasUnsavedChanges = true;
+                if (view != null) {
+                    view.setSaveButtonVisible(true);
+                    // DO NOT refresh display - wait for save button
+                }
             }
-
-            // Ricarica la collezione
-            loadUserCollection();
         } catch (Exception e) {
             LOGGER.severe("Error removing card: " + e.getMessage());
             if (view != null) {
@@ -202,11 +222,8 @@ public class CollectionController {
      */
     public void toggleCardTradable(String setId, String cardId, boolean tradable) {
         try {
-            List<Binder> userBinders = binderDao.getUserBinders(username);
-            Binder binder = userBinders.stream()
-                    .filter(b -> b.getSetId().equals(setId))
-                    .findFirst()
-                    .orElse(null);
+            // Use cached binder instead of reloading from database
+            Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
                 LOGGER.warning("Set not found for setId: " + setId);
@@ -221,13 +238,68 @@ public class CollectionController {
 
             if (cardToUpdate != null) {
                 cardToUpdate.setTradable(tradable);
-                binderDao.update(binder, null);
+
+                // Track pending changes instead of persisting immediately
+                pendingChanges.put(setId, binder);
+                hasUnsavedChanges = true;
+                if (view != null) {
+                    view.setSaveButtonVisible(true);
+                    // DO NOT refresh display - wait for save button
+                }
 
                 LOGGER.info(() -> "Set card " + cardId + " as " + (tradable ? "tradable" : "not tradable"));
             }
         } catch (Exception e) {
             LOGGER.severe("Error toggling tradable: " + e.getMessage());
         }
+    }
+
+    /**
+     * Salva tutte le modifiche pendenti in persistenza
+     */
+    public void saveChanges() {
+        if (!hasUnsavedChanges || pendingChanges.isEmpty()) {
+            LOGGER.info("No changes to save");
+            return;
+        }
+
+        try {
+            int savedCount = 0;
+            for (Map.Entry<String, Binder> entry : pendingChanges.entrySet()) {
+                Binder binder = entry.getValue();
+                binderDao.update(binder, null);
+                savedCount++;
+                LOGGER.info(() -> "Saved changes for set: " + binder.getSetName());
+            }
+
+            final int finalSavedCount = savedCount;
+
+            // Clear pending changes after successful save
+            pendingChanges.clear();
+            hasUnsavedChanges = false;
+
+            if (view != null) {
+                view.setSaveButtonVisible(false);
+                view.showSuccess("Salvate " + finalSavedCount + " modifiche con successo!");
+            }
+
+            LOGGER.info(() -> "Successfully saved " + finalSavedCount + " binder changes");
+
+            // Reload the collection to refresh the UI with saved data
+            loadUserCollection();
+        } catch (Exception e) {
+            LOGGER.severe("Error saving changes: " + e.getMessage());
+            if (view != null) {
+                view.showError("Errore nel salvataggio delle modifiche");
+            }
+        }
+    }
+
+    /**
+     * Verifica se ci sono modifiche non salvate
+     */
+    public boolean hasUnsavedChanges() {
+        return hasUnsavedChanges;
     }
 
     public void navigateToHome() {

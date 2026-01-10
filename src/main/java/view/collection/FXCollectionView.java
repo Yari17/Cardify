@@ -17,6 +17,7 @@ import model.domain.card.CardProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
 import view.IView;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,11 +35,18 @@ public class FXCollectionView implements IView {
     @FXML
     private VBox setsContainer;
 
+    @FXML
+    private Button saveButton;
+
     private CollectionController controller;
     private Stage stage;
 
+    // Track currently displayed binders to enable partial refresh
+    private Map<String, Binder> currentBinders;
+
     public FXCollectionView() {
         // FXML fields will be injected by FXMLLoader
+        this.currentBinders = new HashMap<>();
     }
 
     public void setController(CollectionController controller) {
@@ -62,6 +70,9 @@ public class FXCollectionView implements IView {
             LOGGER.warning("setsContainer is null");
             return;
         }
+
+        // Store current binders for partial refresh
+        this.currentBinders = new HashMap<>(bindersBySet);
 
         setsContainer.getChildren().clear();
 
@@ -243,18 +254,19 @@ public class FXCollectionView implements IView {
      * Crea i controlli per una carta posseduta (quantità, scambiabile, +/-)
      */
     private VBox createCardControls(String setId, Card card, CardBean ownedCard) {
-        VBox controls = new VBox(3);
+        VBox controls = new VBox(5);
         controls.setAlignment(Pos.CENTER);
-        controls.setPadding(new Insets(5));
+        controls.setPadding(new Insets(8));
+        controls.setMaxWidth(110);
         controls.getStyleClass().add("card-controls");
 
-        HBox topRow = new HBox(5);
+        HBox topRow = new HBox(8);
         topRow.setAlignment(Pos.CENTER);
 
         // Pulsante - (rimuovi carta)
         Button minusButton = new Button();
         FontIcon minusIcon = new FontIcon("fas-minus-circle");
-        minusIcon.setIconSize(20);
+        minusIcon.setIconSize(22);
         minusIcon.setIconColor(javafx.scene.paint.Color.web("#EF5350"));
         minusButton.setGraphic(minusIcon);
         minusButton.getStyleClass().add("card-control-button");
@@ -269,12 +281,13 @@ public class FXCollectionView implements IView {
         Label quantityLabel = new Label(String.valueOf(quantity));
         quantityLabel.getStyleClass().add("card-quantity-label");
         quantityLabel.setStyle("-fx-background-color: #29B6F6; -fx-text-fill: white; " +
-                              "-fx-padding: 3 8; -fx-background-radius: 12; -fx-font-weight: bold;");
+                              "-fx-padding: 5 10; -fx-background-radius: 12; -fx-font-weight: bold; " +
+                              "-fx-font-size: 14px; -fx-min-width: 40px;");
 
         // Pulsante + (aggiungi altra copia)
         Button plusButton = new Button();
         FontIcon plusIcon = new FontIcon("fas-plus-circle");
-        plusIcon.setIconSize(20);
+        plusIcon.setIconSize(22);
         plusIcon.setIconColor(javafx.scene.paint.Color.web("#66BB6A"));
         plusButton.setGraphic(plusIcon);
         plusButton.getStyleClass().add("card-control-button");
@@ -289,7 +302,7 @@ public class FXCollectionView implements IView {
         // Checkbox scambiabile (usa lo stato reale da CardBean)
         CheckBox tradableCheckbox = new CheckBox("Scambiabile");
         tradableCheckbox.getStyleClass().add("card-tradable-checkbox");
-        tradableCheckbox.setStyle("-fx-text-fill: white; -fx-font-size: 10px;");
+        tradableCheckbox.setStyle("-fx-text-fill: white; -fx-font-size: 11px;");
         if (ownedCard != null) {
             tradableCheckbox.setSelected(ownedCard.isTradable());
         }
@@ -402,6 +415,24 @@ public class FXCollectionView implements IView {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    /**
+     * Imposta la visibilità del pulsante Save
+     */
+    public void setSaveButtonVisible(boolean visible) {
+        if (saveButton != null) {
+            saveButton.setVisible(visible);
+        }
+    }
+
+
+    @FXML
+    private void onSaveClicked() {
+        LOGGER.info("Save button clicked");
+        if (controller != null) {
+            controller.saveChanges();
+        }
     }
 
     @Override

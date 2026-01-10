@@ -245,6 +245,11 @@ public class JsonBinderDao implements IBinderDao {
         save(binder);
     }
 
+    @Override
+    public void deleteBinder(String binderId) {
+
+    }
+
     // Adapter per LocalDateTime con Gson
     private static class LocalDateTimeAdapter extends com.google.gson.TypeAdapter<LocalDateTime> {
         @Override
