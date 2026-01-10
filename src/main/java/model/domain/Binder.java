@@ -2,17 +2,121 @@ package model.domain;
 
 import model.bean.CardBean;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Binder {
-    private int id;
-    private String ownerUsername;
-    private CardGameType type; 
-    private List<CardBean> ITCGCards;
+    private long id;
+    private String owner;
+    private String setId;
+    private String setName;
+    private String setLogo;
+    private List<CardBean> cards;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastModified;
 
-    public Binder(CardGameType type) {
-        this.type = type;
-        this.ITCGCards = new ArrayList<>();
+    public Binder() {
+        this.cards = new ArrayList<>();
+        this.createdAt = LocalDateTime.now();
+        this.lastModified = LocalDateTime.now();
+    }
+
+    public Binder(String owner, String setId, String setName) {
+        this();
+        this.owner = owner;
+        this.setId = setId;
+        this.setName = setName;
+    }
+
+    // Getters and Setters
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getSetId() {
+        return setId;
+    }
+
+    public void setSetId(String setId) {
+        this.setId = setId;
+    }
+
+    public String getSetName() {
+        return setName;
+    }
+
+    public void setSetName(String setName) {
+        this.setName = setName;
+    }
+
+    public String getSetLogo() {
+        return setLogo;
+    }
+
+    public void setSetLogo(String setLogo) {
+        this.setLogo = setLogo;
+    }
+
+    public List<CardBean> getCards() {
+        return new ArrayList<>(cards);
+    }
+
+    public void setCards(List<CardBean> cards) {
+        this.cards = cards != null ? new ArrayList<>(cards) : new ArrayList<>();
+        updateLastModified();
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(LocalDateTime lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    // Business methods
+    public void addCard(CardBean card) {
+        if (card != null) {
+            this.cards.add(card);
+            updateLastModified();
+        }
+    }
+
+    public void removeCard(String cardId) {
+        this.cards.removeIf(card -> card.getId().equals(cardId));
+        updateLastModified();
+    }
+
+    public boolean hasCard(String cardId) {
+        return this.cards.stream().anyMatch(card -> card.getId().equals(cardId));
+    }
+
+    public int getCardCount() {
+        return this.cards.size();
+    }
+
+    private void updateLastModified() {
+        this.lastModified = LocalDateTime.now();
     }
 }

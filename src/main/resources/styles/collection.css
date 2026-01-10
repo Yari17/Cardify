@@ -1,0 +1,187 @@
+/* Collection Page - Sets and Cards Styles */
+
+/* Sezione set */
+.set-section {
+    -fx-background-color: #1E2530;
+    -fx-background-radius: 12;
+    -fx-border-color: #3E4C59;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+}
+
+/* Nome del set */
+.set-name-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Statistiche del set */
+.set-stats-label {
+    -fx-text-fill: #29B6F6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+/* Tile carta base */
+.card-tile {
+    -fx-background-color: #1E2530;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 5, 0, 0, 2);
+}
+
+/* Carta POSSEDUTA - Verde e visibile */
+.card-owned {
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 3;
+}
+
+/* Carta NON posseduta - Grigia e scura */
+.card-not-owned {
+    -fx-border-color: #3E4C59;
+    -fx-border-width: 2;
+    -fx-background-color: #151B24;
+}
+
+/* Hover su carta */
+.card-hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Hover specifico per carte possedute */
+.card-owned.card-hover {
+    -fx-border-color: #66BB6A;
+    -fx-border-width: 4;
+    -fx-effect: dropshadow(gaussian, rgba(76, 175, 80, 0.8), 12, 0.6, 0, 0);
+}
+
+/* Hover specifico per carte non possedute */
+.card-not-owned.card-hover {
+    -fx-border-color: #29B6F6;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(41, 182, 246, 0.6), 10, 0.5, 0, 0);
+}
+
+/* Pulsante + per aggiungere carta non posseduta */
+.card-add-button {
+    -fx-background-color: rgba(41, 182, 246, 0.9);
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 0, 2);
+}
+
+.card-add-button:hover {
+    -fx-background-color: rgba(41, 182, 246, 1);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+/* Container controlli carta */
+.card-controls {
+    -fx-background-color: rgba(30, 37, 48, 0.95);
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);
+}
+
+/* Pulsanti +/- controllo carta */
+.card-control-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.card-control-button:hover {
+    -fx-scale-x: 1.2;
+    -fx-scale-y: 1.2;
+}
+
+/* Label quantità */
+.card-quantity-label {
+    -fx-min-width: 35px;
+    -fx-alignment: center;
+}
+
+/* Checkbox scambiabile */
+.card-tradable-checkbox {
+    -fx-cursor: hand;
+}
+
+.card-tradable-checkbox .box {
+    -fx-background-color: #3E4C59;
+    -fx-border-color: #29B6F6;
+    -fx-border-width: 2;
+    -fx-border-radius: 3;
+}
+
+.card-tradable-checkbox:selected .box {
+    -fx-background-color: #29B6F6;
+}
+
+.card-tradable-checkbox .mark {
+    -fx-background-color: white;
+}
+
+/* Label benvenuto nella navbar */
+.label-welcome {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+}
+
+/* ScrollPane custom */
+.scroll-pane-custom {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane-custom .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane-custom .scroll-bar:vertical {
+    -fx-background-color: #1E2530;
+}
+
+.scroll-pane-custom .scroll-bar:horizontal {
+    -fx-background-color: #1E2530;
+}
+
+.scroll-pane-custom .scroll-bar .thumb {
+    -fx-background-color: #29B6F6;
+    -fx-background-radius: 5;
+}
+
+.scroll-pane-custom .scroll-bar .thumb:hover {
+    -fx-background-color: #039BE5;
+}
+
+/* Dialog styles */
+.dialog-pane {
+    -fx-background-color: #1E2530;
+}
+
+.dialog-pane .label {
+    -fx-text-fill: #FFFFFF;
+}
+
+.dialog-pane .combo-box {
+    -fx-background-color: #0B1622;
+    -fx-text-fill: #FFFFFF;
+}
+
+.dialog-pane .button {
+    -fx-background-color: #29B6F6;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: #039BE5;
+}
+

@@ -1,5 +1,14 @@
 /* Navigation Bar Styles */
 
+/* Navigation Bar Container */
+.nav-bar {
+    -fx-background-color: #1A2332; /* Sfondo distintivo più scuro del bg-main (#0B1622) */
+    -fx-padding: 15 20 15 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 2);
+    -fx-border-color: #29B6F6;
+    -fx-border-width: 0 0 2 0; /* Bordo inferiore azzurro per enfatizzare la separazione */
+}
+
 .nav-button-container {
     -fx-cursor: hand;
     -fx-padding: 8;

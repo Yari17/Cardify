@@ -1,7 +1,7 @@
 package controller;
 
 import model.bean.UserBean;
-import model.dao.UserDao;
+import model.dao.IUserDao;
 import view.registration.IRegistrationView;
 
 import java.util.logging.Level;
@@ -11,10 +11,10 @@ public class RegistrationController {
     private static final Logger LOGGER = Logger.getLogger(RegistrationController.class.getName());
 
     private IRegistrationView view;
-    private final UserDao userDao;
+    private final IUserDao userDao;
     private final Navigator navigator;
 
-    public RegistrationController(UserDao userDao, Navigator navigator) {
+    public RegistrationController(IUserDao userDao, Navigator navigator) {
         this.userDao = userDao;
         this.navigator = navigator;
     }

@@ -2,8 +2,8 @@ package model.dao.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import model.dao.IUserDao;
 import model.domain.User;
-import model.dao.UserDao;
 import model.exception.DataPersistenceException;
 import model.exception.UserAlreadyExistsException;
 import model.exception.UserNotFoundException;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-public class JsonUserDao implements UserDao {
+public class JsonUserDao implements IUserDao {
     private static final Logger LOGGER = Logger.getLogger(JsonUserDao.class.getName());
     private final Map<String, User> users;
     private final Map<String, String> credentials; 
@@ -111,6 +111,68 @@ public class JsonUserDao implements UserDao {
         User newUser = new User(username, 0, 0);
         newUser.setUserType(userType); 
         users.put(username, newUser);
+        saveToJson();
+    }
+
+    // ========== Implementazione metodi IDao<User> ==========
+
+    @Override
+    public Optional<User> get(long id) {
+        // Gli User sono indicizzati per username, non per ID numerico
+        // Cerca l'utente che ha questo ID
+        return users.values().stream()
+                .filter(user -> user.getId() == id)
+                .findFirst();
+    }
+
+    @Override
+    public List<User> getAll() {
+        return new ArrayList<>(users.values());
+    }
+
+    @Override
+    public void save(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        String username = user.getUsername();
+        if (users.containsKey(username)) {
+            throw new UserAlreadyExistsException(username);
+        }
+
+        users.put(username, user);
+        saveToJson();
+    }
+
+    @Override
+    public void update(User user, String[] params) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        String username = user.getUsername();
+        if (!users.containsKey(username)) {
+            throw new UserNotFoundException(username);
+        }
+
+        users.put(username, user);
+        saveToJson();
+    }
+
+    @Override
+    public void delete(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+
+        String username = user.getUsername();
+        if (!users.containsKey(username)) {
+            throw new UserNotFoundException(username);
+        }
+
+        users.remove(username);
+        credentials.remove(username);
         saveToJson();
     }
 }

@@ -8,6 +8,7 @@ public final class AppConfig {
 
     public static final String DAO_TYPE_JSON = "json";
     public static final String DAO_TYPE_JDBC = "jdbc";
+    public static final String DAO_TYPE_MEMORY = "demo";
     public static final String DEFAULT_DAO_TYPE = DAO_TYPE_JSON;
 
     public static final String POKEMON_GAME="POKEMON";
@@ -24,8 +25,10 @@ public final class AppConfig {
     }
 
     public static String getPersistenceLabel() {
-        return DAO_TYPE_JDBC.equals(currentPersistenceType)
-            ? "Persistenza: Database (JDBC)"
-            : "Persistenza: File System (JSON)";
+        return switch (currentPersistenceType) {
+            case DAO_TYPE_JDBC -> "Persistenza: Database (JDBC)";
+            case DAO_TYPE_MEMORY -> "Persistenza: In-Memory (Demo Mode)";
+            default -> "Persistenza: File System (JSON)";
+        };
     }
 }

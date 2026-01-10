@@ -4,10 +4,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import controller.CollectionController;
 import controller.CollectorHPController;
 import controller.LoginController;
 import controller.RegistrationController;
 import controller.StoreHPController;
+import view.collection.FXCollectionView;
 import view.collectorhomepage.FXCollectorHPView;
 import view.collectorhomepage.ICollectorHPView;
 import view.login.ILoginView;
@@ -148,6 +150,37 @@ public class FXViewFactory implements IViewFactory {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to load StoreHomePage.fxml", e);
             throw new IllegalStateException("Cannot create StoreHomePageView: FXML file not found or invalid", e);
+        }
+    }
+
+    public FXCollectionView createCollectionView(CollectionController controller) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CollectionPage.fxml"));
+            Parent root = loader.load();
+            Object fxmlController = loader.getController();
+
+            if (!(fxmlController instanceof FXCollectionView)) {
+                String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
+                throw new IllegalStateException(
+                    "FXML controller is not FXCollectionView. Found: " + controllerClass
+                );
+            }
+
+            FXCollectionView fxController = (FXCollectionView) fxmlController;
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Cardify - My Collection");
+            fxController.setStage(stage);
+
+            // Set controller
+            fxController.setController(controller);
+
+            return fxController;
+
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to load CollectionPage.fxml", e);
+            throw new IllegalStateException("Cannot create CollectionView: FXML file not found or invalid", e);
         }
     }
 }

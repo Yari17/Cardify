@@ -24,16 +24,4 @@ public interface ICollectorHPView extends IView {
 
     void displayAvailableSets(Map<String, String> setsMap);
 
-    /**
-     * Restituisce la query di ricerca dell'utente.
-     * Può essere un nome di carta o un ID di set a seconda del tipo di ricerca.
-     * @return la query di ricerca (nome carta o ID set)
-     */
-    String getSearchQuery();
-
-    /**
-     * Restituisce il tipo di ricerca corrente.
-     * @return BY_NAME per ricerca per nome, BY_SET per ricerca per set
-     */
-    SearchType getSearchType();
 }

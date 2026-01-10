@@ -124,16 +124,6 @@ public class FXCollectorHPView implements ICollectorHPView {
     }
 
     @Override
-    public String getSearchQuery() {
-        return currentSearchQuery;
-    }
-
-    @Override
-    public SearchType getSearchType() {
-        return currentSearchType;
-    }
-
-    @Override
     public void display() {
         if (stage != null) {
             stage.show();
@@ -224,6 +214,14 @@ public class FXCollectorHPView implements ICollectorHPView {
     private void onLogoutClicked() {
         if (controller != null) {
             controller.onLogoutRequested();
+        }
+    }
+
+    @FXML
+    private void onCollectionClicked() {
+        LOGGER.info("Collection button clicked - navigating to collection page");
+        if (controller != null) {
+            controller.navigateToCollection();
         }
     }
 

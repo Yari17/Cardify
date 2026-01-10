@@ -21,11 +21,7 @@ public class CliConfigurationView implements IConfigurationView {
     @Override
     public void display() {
         displayInterfaceSelection();
-        displayPersistenceSelection();
-
-        if (controller != null) {
-            controller.applyConfiguration();
-        }
+        // Persistenza JSON usata di default - nessuna selezione richiesta
     }
 
     private void displayInterfaceSelection() {
@@ -40,25 +36,6 @@ public class CliConfigurationView implements IConfigurationView {
             if ("1".equals(interfaceChoice) || "2".equals(interfaceChoice)) {
                 String interfaceType = "1".equals(interfaceChoice) ? "JavaFX" : "CLI";
                 showInterfaceSelected(interfaceType);
-                break;
-            } else {
-                showInvalidChoice();
-            }
-        }
-    }
-
-    private void displayPersistenceSelection() {
-        while (true) {
-            System.out.println("\n=== CARDIFY - Scegli Persistenza ===");
-            System.out.println("1) JSON (File System)");
-            System.out.println("2) JDBC (Database)");
-            System.out.print("Scelta (1-2): ");
-
-            this.persistenceChoice = inputManager.readString().trim();
-
-            if ("1".equals(persistenceChoice) || "2".equals(persistenceChoice)) {
-                String persistenceType = "1".equals(persistenceChoice) ? "JSON" : "JDBC";
-                showPersistenceSelected(persistenceType);
                 break;
             } else {
                 showInvalidChoice();

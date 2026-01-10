@@ -1,9 +1,11 @@
 package controller;
 
 import model.bean.UserBean;
-import model.dao.UserDao;
+import model.dao.IUserDao;
+import model.dao.factory.DaoFactory;
 import view.IView;
 import view.collectorhomepage.ICollectorHPView;
+import view.factory.FXViewFactory;
 import view.factory.IViewFactory;
 import view.login.ILoginView;
 import view.registration.IRegistrationView;
@@ -18,12 +20,18 @@ public class Navigator {
     private static final Logger LOGGER = Logger.getLogger(Navigator.class.getName());
 
     private final Deque<IView> viewStack = new ArrayDeque<>();
-    private final UserDao userDao;
+    private final IUserDao userDao;
     private final IViewFactory viewFactory;
+    private final DaoFactory daoFactory;
 
-    public Navigator(UserDao userDao, IViewFactory viewFactory) {
+    public Navigator(IUserDao userDao, IViewFactory viewFactory, DaoFactory daoFactory) {
         this.userDao = userDao;
         this.viewFactory = viewFactory;
+        this.daoFactory = daoFactory;
+    }
+
+    private DaoFactory getDaoFactory() {
+        return daoFactory;
     }
 
     public void navigateToLogin() {
@@ -79,6 +87,23 @@ public class Navigator {
             handleNavigationError(e);
         }
     }
+
+    public void navigateToCollection(String username) {
+        try {
+            // Ottieni il BinderDao dalla factory
+            model.dao.IBinderDao binderDao = getDaoFactory().createBinderDao();
+
+            CollectionController controller = new CollectionController(username, this, binderDao);
+            FXViewFactory factory = (FXViewFactory) viewFactory;
+            view.collection.FXCollectionView collectionView = factory.createCollectionView(controller);
+            controller.setView(collectionView);
+            displayView(collectionView);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to collection page", e);
+            handleNavigationError(e);
+        }
+    }
+
 
     public void handleRoleBasedNavigation(UserBean loggedInUser) {
         if (UserBean.USER_TYPE_COLLECTOR.equals(loggedInUser.getUserType())) {

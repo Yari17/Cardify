@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.collection.FXCollectionView"
+            prefHeight="800.0" prefWidth="1400.0"
+            stylesheets="@../styles/theme.css, @../styles/navbar.css, @../styles/collection.css"
+            styleClass="bg-main">
+
+    <!-- Top Navigation Bar -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="nav-bar">
+
+            <!-- Left Navigation Icons with Labels -->
+            <!-- Home Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="homeButton" onAction="#onHomeClicked" styleClass="button-transparent">
+                    <graphic>
+                        <org.kordamp.ikonli.javafx.FontIcon iconLiteral="fas-home" iconSize="32" iconColor="white"/>
+                    </graphic>
+                </Button>
+                <Label text="Home" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Collection Button (ACTIVE) -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  style="-fx-effect: dropshadow(gaussian, rgba(41, 182, 246, 0.8), 15, 0.7, 0, 0); -fx-background-color: rgba(41, 182, 246, 0.15); -fx-background-radius: 8;">
+                <Button fx:id="collectionButton" onAction="#onCollectionClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/collection.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Collection" styleClass="nav-label" style="-fx-font-weight: bold;"/>
+            </VBox>
+
+            <!-- Trade Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="tradeButton" onAction="#onTradeClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/trade.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Trade" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Logout Button -->
+            <VBox fx:id="logoutButtonContainer" alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="logoutButton" onAction="#onLogoutClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/logout.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Logout" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Spacer -->
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- User Profile Section -->
+            <HBox spacing="12" alignment="CENTER">
+                <!-- Welcome Label -->
+                <Label fx:id="welcomeLabel" text="Benvenuto!" styleClass="label-welcome"/>
+
+                <!-- Profile Picture -->
+                <VBox alignment="CENTER" styleClass="profile-container">
+                    <ImageView fx:id="profileImageView" fitWidth="40" fitHeight="40" preserveRatio="true">
+                        <image>
+                            <javafx.scene.image.Image url="@../icons/collectorpp.png"/>
+                        </image>
+                    </ImageView>
+                </VBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- Main Content Area -->
+    <center>
+        <VBox styleClass="bg-main" spacing="20" style="-fx-padding: 20;">
+
+            <!-- Header -->
+            <HBox alignment="CENTER">
+                <Label text="MY COLLECTION"
+                       styleClass="label-title"
+                       style="-fx-font-size: 36px; -fx-font-family: 'Playfair Display', 'Georgia', serif; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 2);"/>
+            </HBox>
+
+            <!-- Sets and Cards Container -->
+            <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane-custom" VBox.vgrow="ALWAYS"
+                        style="-fx-background: transparent; -fx-background-color: transparent;">
+                <content>
+                    <VBox fx:id="setsContainer"
+                          spacing="30"
+                          style="-fx-padding: 20; -fx-background-color: transparent;">
+
+                        <!-- I set e le relative carte verranno aggiunti dinamicamente -->
+
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+        </VBox>
+    </center>
+
+</BorderPane>

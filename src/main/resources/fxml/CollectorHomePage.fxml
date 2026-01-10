@@ -10,7 +10,7 @@
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="view.collectorhomepage.FXCollectorHPView"
             prefHeight="800.0" prefWidth="1400.0"
-            stylesheets="@../styles/theme.css"
+            stylesheets="@../styles/theme.css, @../styles/navbar.css"
             styleClass="bg-main">
 
     <!-- Top Navigation Bar -->
@@ -22,7 +22,7 @@
             <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
                   onMouseEntered="#onNavButtonHoverEnter"
                   onMouseExited="#onNavButtonHoverExit">
-                <Button fx:id="collectionButton" styleClass="button-transparent">
+                <Button fx:id="collectionButton" onAction="#onCollectionClicked" styleClass="button-transparent">
                     <graphic>
                         <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                             <image>

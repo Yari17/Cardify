@@ -27,16 +27,6 @@ public class CliCollectorHPView implements ICollectorHPView {
     }
 
     @Override
-    public String getSearchQuery() {
-        return currentSearchQuery;
-    }
-
-    @Override
-    public SearchType getSearchType() {
-        return currentSearchType;
-    }
-
-    @Override
     public void display() {
         if (controller == null) {
             System.out.println("ERROR: Controller not set");
@@ -122,66 +112,115 @@ public class CliCollectorHPView implements ICollectorHPView {
             return;
         }
 
-        System.out.println("\n╔════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                        POPULAR CARDS                               ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════════╝");
-        System.out.println("\nTotale carte: " + cards.size());
+        // Sistema di paginazione interattivo
+        int cardsPerPage = 10;
+        int currentPage = 0;
+        int totalPages = (int) Math.ceil((double) cards.size() / cardsPerPage);
+        boolean browsing = true;
 
-        for (int i = 0; i < cards.size(); i++) {
-            CardBean card = cards.get(i);
-            System.out.println("\n" + (i + 1) + ". ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            System.out.println("   Nome:      " + card.getName());
-            System.out.println("   ID:        " + card.getId());
-            System.out.println("   Gioco:     " + card.getGameType());
-            System.out.println("   Immagine:  " + (card.getImageUrl() != null ? "✓ Disponibile" : "✗ Non disponibile"));
+        while (browsing) {
+            // Mostra header
+            System.out.println("\n╔════════════════════════════════════════════════════════════════════╗");
+            System.out.println("║                        CARTE TROVATE                               ║");
+            System.out.println("╚════════════════════════════════════════════════════════════════════╝");
+            System.out.println("Totale carte: " + cards.size() + " | Pagina " + (currentPage + 1) + " di " + totalPages);
+            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-            if ((i + 1) % 10 == 0 && (i + 1) < cards.size()) {
-                System.out.print("\nPremi INVIO per vedere altre carte...");
-                inputManager.readString();
+            // Calcola range per la pagina corrente
+            int start = currentPage * cardsPerPage;
+            int end = Math.min(start + cardsPerPage, cards.size());
+
+            // Mostra le carte della pagina corrente
+            for (int i = start; i < end; i++) {
+                CardBean card = cards.get(i);
+                System.out.println("\n" + (i + 1) + ". ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                System.out.println("   Nome:      " + card.getName());
+                System.out.println("   ID:        " + card.getId());
+                System.out.println("   Gioco:     " + card.getGameType());
+                System.out.println("   Immagine:  " + (card.getImageUrl() != null ? "✓ Disponibile" : "✗ Non disponibile"));
+            }
+
+            System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
+            // Mostra opzioni disponibili
+            System.out.println("\n📋 OPZIONI:");
+            System.out.println("   • Inserisci il numero (1-" + cards.size() + ") per vedere i dettagli della carta");
+            if (currentPage < totalPages - 1) {
+                System.out.println("   • Premi 'N' per vedere le carte successive");
+            }
+            if (currentPage > 0) {
+                System.out.println("   • Premi 'P' per vedere le carte precedenti");
+            }
+            System.out.println("   • Premi '0' per tornare alla homepage");
+            System.out.print("\n➤ Scelta: ");
+
+            String choice = inputManager.readString().trim();
+
+            if ("0".equals(choice)) {
+                browsing = false;
+            } else if ("N".equalsIgnoreCase(choice)) {
+                if (currentPage < totalPages - 1) {
+                    currentPage++;
+                } else {
+                    System.out.println("⚠ Sei già all'ultima pagina");
+                    System.out.print("Premi INVIO per continuare...");
+                    inputManager.readString();
+                }
+            } else if ("P".equalsIgnoreCase(choice)) {
+                if (currentPage > 0) {
+                    currentPage--;
+                } else {
+                    System.out.println("⚠ Sei già alla prima pagina");
+                    System.out.print("Premi INVIO per continuare...");
+                    inputManager.readString();
+                }
+            } else {
+                // Prova a interpretare come numero di carta
+                try {
+                    int cardIndex = Integer.parseInt(choice) - 1;
+                    if (cardIndex >= 0 && cardIndex < cards.size()) {
+                        CardBean selectedCard = cards.get(cardIndex);
+                        showCardDetails(selectedCard);
+                    } else {
+                        System.out.println("⚠ Numero carta non valido. Deve essere tra 1 e " + cards.size());
+                        System.out.print("Premi INVIO per continuare...");
+                        inputManager.readString();
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠ Input non valido. Inserisci un numero, N, P o 0");
+                    System.out.print("Premi INVIO per continuare...");
+                    inputManager.readString();
+                }
             }
         }
+    }
 
+    private void showCardDetails(CardBean card) {
+        System.out.println("\n╔════════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                      DETTAGLI CARTA                                ║");
+        System.out.println("╚════════════════════════════════════════════════════════════════════╝");
+        System.out.println("\n📇 Nome:        " + card.getName());
+        System.out.println("🆔 ID:          " + card.getId());
+        System.out.println("🎮 Gioco:       " + card.getGameType());
+        System.out.println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
         System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.print("\nPremi INVIO per tornare alla lista...");
+        inputManager.readString();
     }
 
     private void showPopularCardsMenu() {
         if (currentCards == null) {
-            System.out.println("\nCaricamento carte popolari in corso...");
+            System.out.println("\n🔄 Caricamento carte popolari in corso...");
             if (controller != null) {
                 controller.loadPopularCards();
             }
         }
 
+        // displayCards gestisce tutta la navigazione e visualizzazione
         if (currentCards != null && !currentCards.isEmpty()) {
             displayCards(currentCards);
-
-            boolean inCardMenu = true;
-            while (inCardMenu) {
-                System.out.println("\nOpzioni:");
-                System.out.println("- Inserisci il numero della carta per vedere i dettagli");
-                System.out.println("- Premi 0 per tornare al menu principale");
-                System.out.print("Scelta: ");
-
-                String choice = inputManager.readString();
-
-                if ("0".equals(choice)) {
-                    inCardMenu = false;
-                } else {
-                    try {
-                        int cardIndex = Integer.parseInt(choice) - 1;
-                        if (cardIndex >= 0 && cardIndex < currentCards.size()) {
-                            CardBean selectedCard = currentCards.get(cardIndex);
-                            showCardOverview(selectedCard);
-                        } else {
-                            System.out.println("Numero carta non valido. Riprova.");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Input non valido. Inserisci un numero.");
-                    }
-                }
-            }
         } else {
-            System.out.println("\nNessuna carta disponibile.");
+            System.out.println("\n⚠ Nessuna carta disponibile.");
             System.out.print("Premi INVIO per continuare...");
             inputManager.readString();
         }
@@ -285,23 +324,21 @@ public class CliCollectorHPView implements ICollectorHPView {
                         currentSearchType = SearchType.BY_SET;
                         currentSearchQuery = setId;
 
-                        System.out.println("\n✓ Set selezionato - Tipo: BY_SET, Query: " + setId + " (" + setName + ")");
+                        System.out.println("\n🔄 Caricamento carte dal set: " + setName + " (" + setId + ")");
 
                         if (controller != null) {
                             controller.loadCardsFromSet(setId);
                         }
 
-                        // Mostra le carte caricate
+                        // displayCards gestisce la visualizzazione e la navigazione
                         if (currentCards != null && !currentCards.isEmpty()) {
                             displayCards(currentCards);
-                            System.out.print("\nPremi INVIO per continuare...");
-                            inputManager.readString();
                         }
                     } else {
-                        System.out.println("Numero set non valido. Riprova.");
+                        System.out.println("⚠ Numero set non valido. Riprova.");
                     }
                 } catch (NumberFormatException e) {
-                    System.out.println("Input non valido. Inserisci un numero o N/P.");
+                    System.out.println("⚠ Input non valido. Inserisci un numero o N/P.");
                 }
             }
         }

@@ -95,6 +95,14 @@ public class CollectorHPController {
         return username;
     }
 
+    public void navigateToCollection() {
+        LOGGER.info(() -> "Navigating to collection page for user: " + username);
+        if (view != null) {
+            view.close();
+        }
+        navigator.navigateToCollection(username);
+    }
+
     public void onLogoutRequested() {
         LOGGER.info(() -> "User " + username + " logging out");
         if (view != null) {

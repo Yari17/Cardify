@@ -1,7 +1,7 @@
 package controller;
 
 import model.bean.UserBean;
-import model.dao.UserDao;
+import model.dao.IUserDao;
 import model.domain.User;
 import view.login.ILoginView;
 
@@ -10,10 +10,10 @@ import java.util.Optional;
 public class LoginController {
 
     private ILoginView view;
-    private final UserDao userDao;
+    private final IUserDao userDao;
     private final Navigator navigator;
 
-    public LoginController(UserDao userDao, Navigator navigator) {
+    public LoginController(IUserDao userDao, Navigator navigator) {
         this.userDao = userDao;
         this.navigator = navigator;
     }
