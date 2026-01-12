@@ -18,7 +18,7 @@ public class CardProvider {
         return searchSet(AppConfig.POKEMON_GAME, setId);
     }
 
-    public Map<String,String> getPokemonSets() {
+    public Map<String, String> getPokemonSets() {
         ICardApiAdapter<?> adapter = CardApiAdapterFactory.getAdapter(AppConfig.POKEMON_GAME);
         return adapter.getAllSets();
     }
@@ -27,7 +27,7 @@ public class CardProvider {
      * Cerca carte per nome utilizzando l'API del gioco specificato.
      *
      * @param gameType tipo di gioco (es: "pokemon", "magic", "yugioh")
-     * @param name nome della carta da cercare
+     * @param name     nome della carta da cercare
      * @return lista di carte che corrispondono al nome cercato
      */
     public List<Card> searchCardsByName(String gameType, String name) {
@@ -47,13 +47,16 @@ public class CardProvider {
 
     /**
      * Ottiene i dettagli completi di una carta specifica.
-     * Metodo generico scalabile per tutte le tipologie di carte (Pokemon, Magic, YuGiOh, etc.).
+     * Metodo generico scalabile per tutte le tipologie di carte (Pokemon, Magic,
+     * YuGiOh, etc.).
      *
      * @param gameType tipo di gioco (es: "pokemon", "magic", "yugioh")
-     * @param cardId ID della carta
-     * @param <T> tipo specifico di carta (PokemonCard, MagicCard, YuGiOhCard, etc.)
+     * @param cardId   ID della carta
+     * @param <T>      tipo specifico di carta (PokemonCard, MagicCard, YuGiOhCard,
+     *                 etc.)
      * @return carta con tutti i dettagli, o null se non trovata
      */
+    @SuppressWarnings("unchecked")
     public <T extends Card> T getCardDetails(String gameType, String cardId) {
         ICardApiAdapter<?> adapter = CardApiAdapterFactory.getAdapter(gameType);
         return (T) adapter.getCardDetails(cardId);

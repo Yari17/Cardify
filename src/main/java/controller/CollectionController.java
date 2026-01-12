@@ -4,7 +4,6 @@ import model.bean.CardBean;
 import model.dao.IBinderDao;
 import model.domain.Binder;
 import model.domain.card.Card;
-import model.domain.card.CardProvider;
 import view.collection.ICollectionView;
 
 import java.util.HashMap;
@@ -14,11 +13,12 @@ import java.util.logging.Logger;
 
 public class CollectionController {
     private static final Logger LOGGER = Logger.getLogger(CollectionController.class.getName());
+    private static final String SET_NOT_FOUND_MSG = "Set not found for setId: ";
 
     private final String username;
-    private final Navigator navigator;
+    private final ApplicationController navigationController;
     private final IBinderDao binderDao;
-    private final CardProvider cardProvider;
+    private final model.dao.ICardDao cardDao;
     private ICollectionView view;
 
     // Cache locale dei binder dell'utente: setId -> Binder
@@ -28,11 +28,12 @@ public class CollectionController {
     private final Map<String, Binder> pendingChanges;
     private boolean hasUnsavedChanges;
 
-    public CollectionController(String username, Navigator navigator, IBinderDao binderDao) {
+    public CollectionController(String username, ApplicationController navigationController, IBinderDao binderDao,
+            model.dao.ICardDao cardDao) {
         this.username = username;
-        this.navigator = navigator;
+        this.navigationController = navigationController;
         this.binderDao = binderDao;
-        this.cardProvider = new CardProvider();
+        this.cardDao = cardDao;
         this.cachedBinders = new HashMap<>();
         this.pendingChanges = new HashMap<>();
         this.hasUnsavedChanges = false;
@@ -74,7 +75,7 @@ public class CollectionController {
             }
 
             if (view != null) {
-                view.displayCollection(bindersBySet, cardProvider);
+                view.displayCollection(bindersBySet, cardDao);
             }
 
             LOGGER.info(() -> "Loaded collection with " + userBinders.size() + " sets for user: " + username);
@@ -86,12 +87,11 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Ottiene la lista dei set disponibili dal CardProvider
-     */
+    // ...
+
     public Map<String, String> getAvailableSets() {
         try {
-            return cardProvider.getPokemonSets();
+            return cardDao.getAllSets(config.AppConfig.POKEMON_GAME);
         } catch (Exception e) {
             LOGGER.severe("Error fetching available sets: " + e.getMessage());
             return Map.of();
@@ -159,7 +159,7 @@ public class CollectionController {
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
-                LOGGER.warning(() -> "Set not found for setId: " + setId);
+                LOGGER.warning(() -> SET_NOT_FOUND_MSG + setId);
                 return;
             }
 
@@ -176,11 +176,10 @@ public class CollectionController {
             } else {
                 // Aggiungi nuova carta
                 CardBean cardBean = new CardBean(
-                    card.getId(),
-                    card.getName(),
-                    card.getImageUrl(),
-                    card.getGameType()
-                );
+                        card.getId(),
+                        card.getName(),
+                        card.getImageUrl(),
+                        card.getGameType());
                 binder.addCard(cardBean);
                 LOGGER.info(() -> "Added card " + card.getName() + " to set " + setId);
             }
@@ -210,7 +209,7 @@ public class CollectionController {
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
-                LOGGER.warning(() -> "Set not found for setId: " + setId);
+                LOGGER.warning(() -> SET_NOT_FOUND_MSG + setId);
                 return;
             }
 
@@ -257,7 +256,7 @@ public class CollectionController {
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
-                LOGGER.warning(() -> "Set not found for setId: " + setId);
+                LOGGER.warning(() -> SET_NOT_FOUND_MSG + setId);
                 return;
             }
 
@@ -338,7 +337,8 @@ public class CollectionController {
         if (view != null) {
             view.close();
         }
-        navigator.navigateToCollectorHomePage(new model.bean.UserBean(username, "Collezionista"));
+        navigationController
+                .navigateToCollectorHomePage(new model.bean.UserBean(username, config.AppConfig.USER_TYPE_COLLECTOR));
     }
 
     public void navigateToTrade() {
@@ -346,6 +346,7 @@ public class CollectionController {
         if (view != null) {
             view.close();
         }
+        navigationController.navigateToTrade(username);
     }
 
     public void onLogoutRequested() {
@@ -353,6 +354,6 @@ public class CollectionController {
         if (view != null) {
             view.close();
         }
-        navigator.logout();
+        navigationController.logout();
     }
 }

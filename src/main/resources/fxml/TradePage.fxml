@@ -8,9 +8,9 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="view.collection.FXCollectionView"
+            fx:controller="view.trade.FXTradeView"
             prefHeight="800.0" prefWidth="1400.0"
-            stylesheets="@../styles/theme.css, @../styles/navbar.css, @../styles/collection.css"
+            stylesheets="@../styles/theme.css, @../styles/navbar.css"
             styleClass="bg-main">
 
     <!-- Top Navigation Bar -->
@@ -34,9 +34,11 @@
                 <Label text="Homepage" styleClass="nav-label"/>
             </VBox>
 
-            <!-- Collection Button (disabled when on collection page) -->
-            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container">
-                <Button fx:id="collectionButton" styleClass="button-transparent" disable="true">
+            <!-- Collection Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="collectionButton" onAction="#onCollectionClicked" styleClass="button-transparent">
                     <graphic>
                         <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                             <image>
@@ -45,14 +47,12 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Collection" styleClass="nav-label-disabled"/>
+                <Label text="Collection" styleClass="nav-label"/>
             </VBox>
 
-            <!-- Trade Button -->
-            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
-                  onMouseEntered="#onNavButtonHoverEnter"
-                  onMouseExited="#onNavButtonHoverExit">
-                <Button fx:id="tradeButton" onAction="#onTradeClicked" styleClass="button-transparent">
+            <!-- Trade Button (disabled when on trade page) -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container">
+                <Button fx:id="tradeButton" styleClass="button-transparent" disable="true">
                     <graphic>
                         <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                             <image>
@@ -61,7 +61,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Trade" styleClass="nav-label"/>
+                <Label text="Trade" styleClass="nav-label-disabled"/>
             </VBox>
 
             <!-- Logout Button -->
@@ -85,7 +85,6 @@
 
             <!-- User Profile Section -->
             <HBox spacing="12" alignment="CENTER">
-
                 <!-- Profile Picture with Username -->
                 <VBox alignment="CENTER" spacing="5">
                     <VBox alignment="CENTER" styleClass="profile-container">
@@ -104,40 +103,28 @@
         </HBox>
     </top>
 
-    <!-- Main Content Area -->
+    <!-- Center Content -->
     <center>
-        <VBox styleClass="bg-main" spacing="20" style="-fx-padding: 20;">
+        <SplitPane dividerPositions="0.5" styleClass="bg-main">
+            <!-- Left Side: Pending Trades -->
+            <VBox spacing="10" styleClass="bg-main">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                <Label text="Scambi In Attesa (Pending)" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <ListView fx:id="pendingTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
+            </VBox>
 
-            <!-- Header -->
-            <HBox alignment="CENTER_LEFT" spacing="20">
-                <Label text="MY COLLECTION"
-                       styleClass="label-title"
-                       style="-fx-font-size: 36px; -fx-font-family: 'Playfair Display', 'Georgia', serif; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 10, 0, 0, 2);"/>
-
-                <Region HBox.hgrow="ALWAYS"/>
-
-                <!-- Save Button -->
-                <Button fx:id="saveButton" text="💾 Salva Modifiche" onAction="#onSaveClicked"
-                        styleClass="button-accent"
-                        style="-fx-font-size: 16px; -fx-padding: 12 30; -fx-background-color: #66BB6A; -fx-font-weight: bold;"
-                        visible="false"/>
-            </HBox>
-
-            <!-- Sets and Cards Container -->
-            <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="scroll-pane-custom" VBox.vgrow="ALWAYS"
-                        style="-fx-background: transparent; -fx-background-color: transparent;">
-                <content>
-                    <VBox fx:id="setsContainer"
-                          spacing="30"
-                          style="-fx-padding: 20; -fx-background-color: transparent;">
-
-                        <!-- I set e le relative carte verranno aggiunti dinamicamente -->
-
-                    </VBox>
-                </content>
-            </ScrollPane>
-
-        </VBox>
+            <!-- Right Side: Scheduled Trades -->
+            <VBox spacing="10" styleClass="bg-main">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                <Label text="Scambi Programmati (Scheduled)" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <ListView fx:id="scheduledTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
+            </VBox>
+        </SplitPane>
     </center>
 
 </BorderPane>
+

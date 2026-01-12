@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import model.dao.IBinderDao;
 import model.domain.Binder;
-import model.exception.DataPersistenceException;
+import exception.DataPersistenceException;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -47,7 +47,7 @@ public class JsonBinderDao implements IBinderDao {
         if (parentDir != null && !parentDir.exists()) {
             boolean created = parentDir.mkdirs();
             if (!created) {
-                LOGGER.warning("Could not create parent directory: " + parentDir.getAbsolutePath());
+                LOGGER.log(Level.WARNING, "Could not create parent directory: {0}", parentDir.getAbsolutePath());
             }
         }
 
@@ -64,7 +64,8 @@ public class JsonBinderDao implements IBinderDao {
         }
 
         try (Reader reader = new FileReader(file)) {
-            Type listType = new TypeToken<List<Binder>>() {}.getType();
+            Type listType = new TypeToken<List<Binder>>() {
+            }.getType();
             List<Binder> binders = gson.fromJson(reader, listType);
 
             if (binders != null) {
@@ -74,7 +75,7 @@ public class JsonBinderDao implements IBinderDao {
                     bindersById.put(binder.getId(), binder);
 
                     bindersByOwner.computeIfAbsent(binder.getOwner(), _ -> new ArrayList<>())
-                                  .add(binder);
+                            .add(binder);
 
                     if (binder.getId() > maxId) {
                         maxId = binder.getId();
@@ -82,7 +83,7 @@ public class JsonBinderDao implements IBinderDao {
                 }
 
                 idGenerator.set(maxId);
-                LOGGER.info(() -> "Loaded " + binders.size() + " binders from JSON");
+                LOGGER.log(Level.INFO, "Loaded {0} binders from JSON", binders.size());
             }
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Error loading binders from JSON, starting fresh", e);
@@ -111,10 +112,6 @@ public class JsonBinderDao implements IBinderDao {
 
     @Override
     public void save(Binder binder) {
-        if (binder == null) {
-            throw new IllegalArgumentException("Binder cannot be null");
-        }
-
         // Genera un nuovo ID se non presente
         if (binder.getId() == 0) {
             binder.setId(idGenerator.incrementAndGet());
@@ -131,19 +128,17 @@ public class JsonBinderDao implements IBinderDao {
         // Salva in cache
         bindersById.put(binder.getId(), binder);
         bindersByOwner.computeIfAbsent(binder.getOwner(), _ -> new ArrayList<>())
-                      .add(binder);
+                .add(binder);
 
         // Persisti su file
         saveToJson();
 
-        LOGGER.info("Saved binder ID: " + binder.getId() + " for user: " + binder.getOwner());
+        LOGGER.log(Level.INFO, "Saved binder ID: {0} for user: {1}",
+                new Object[] { binder.getId(), binder.getOwner() });
     }
 
     @Override
     public void update(Binder binder, String[] params) {
-        if (binder == null) {
-            throw new IllegalArgumentException("Binder cannot be null");
-        }
 
         if (!bindersById.containsKey(binder.getId())) {
             throw new IllegalArgumentException("Binder not found with ID: " + binder.getId());
@@ -166,7 +161,7 @@ public class JsonBinderDao implements IBinderDao {
         // Persisti su file
         saveToJson();
 
-        LOGGER.info("Updated binder ID: " + binder.getId());
+        LOGGER.log(Level.INFO, "Updated binder ID: {0}", binder.getId());
     }
 
     @Override
@@ -190,38 +185,7 @@ public class JsonBinderDao implements IBinderDao {
         // Persisti su file
         saveToJson();
 
-        LOGGER.info("Deleted binder ID: " + binder.getId());
-    }
-
-    // Metodi di utilità specifici per Binder
-
-    public List<Binder> findByOwner(String owner) {
-        List<Binder> binders = bindersByOwner.get(owner);
-        return binders != null ? new ArrayList<>(binders) : new ArrayList<>();
-    }
-
-    public Optional<Binder> findByOwnerAndSetId(String owner, String setId) {
-        List<Binder> ownerBinders = bindersByOwner.get(owner);
-        if (ownerBinders == null) {
-            return Optional.empty();
-        }
-
-        return ownerBinders.stream()
-                .filter(b -> b.getSetId().equals(setId))
-                .findFirst();
-    }
-
-    public boolean exists(String owner, String setId) {
-        return findByOwnerAndSetId(owner, setId).isPresent();
-    }
-
-    public void deleteByOwner(String owner) {
-        List<Binder> ownerBinders = bindersByOwner.remove(owner);
-        if (ownerBinders != null) {
-            ownerBinders.forEach(binder -> bindersById.remove(binder.getId()));
-            saveToJson();
-            LOGGER.info(() -> "Deleted all binders for owner: " + owner);
-        }
+        LOGGER.log(Level.INFO, "Deleted binder ID: {0}", binder.getId());
     }
 
     @Override
@@ -247,9 +211,9 @@ public class JsonBinderDao implements IBinderDao {
 
             if (binderOpt.isPresent()) {
                 delete(binderOpt.get());
-                LOGGER.info(() -> "Binder deleted: " + binderId);
+                LOGGER.log(Level.INFO, "Binder deleted: {0}", binderId);
             } else {
-                LOGGER.warning(() -> "No binder found to delete with id: " + binderId);
+                LOGGER.log(Level.WARNING, "No binder found to delete with id: {0}", binderId);
             }
         } catch (NumberFormatException e) {
             throw new DataPersistenceException("Invalid binder ID format: " + binderId, e);

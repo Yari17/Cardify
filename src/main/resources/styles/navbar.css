@@ -23,6 +23,36 @@
     -fx-scale-y: 1.1;
 }
 
+/* Disabled navigation buttons (e.g., homepage when on homepage, collection when on collection) */
+.nav-button-container .button-transparent:disabled {
+    -fx-opacity: 0.6;
+    -fx-cursor: default;
+}
+
+.nav-button-container .button-transparent:disabled .image-view {
+    -fx-opacity: 0.6;
+}
+
+/* Remove hover effects from containers with disabled buttons */
+.nav-button-container:has(.button-transparent:disabled) {
+    -fx-cursor: default;
+    -fx-padding: 8;
+}
+
+.nav-button-container:has(.button-transparent:disabled):hover {
+    -fx-background-color: transparent;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+/* Disabled label style */
+.nav-button-container .nav-label-disabled {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+    -fx-opacity: 0.7;
+}
+
 .nav-button {
     -fx-background-color: transparent;
     -fx-cursor: hand;

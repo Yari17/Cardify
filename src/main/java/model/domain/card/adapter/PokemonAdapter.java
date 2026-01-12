@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import model.domain.CardGameType;
 import model.domain.card.Card;
 import model.domain.card.PokemonCard;
-import model.domain.CardGameType;
 import net.tcgdex.sdk.TCGdex;
 import net.tcgdex.sdk.models.CardResume;
 import net.tcgdex.sdk.models.Set;
@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
+    private static final Logger LOGGER = Logger.getLogger(PokemonAdapter.class.getName());
     private final TCGdex api;
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     private static final String IMAGE_FIELD = "image";
@@ -122,9 +124,11 @@ public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
     @Override
     public PokemonCard getCardDetails(String id) {
         try {
+            LOGGER.info("Fetching card details for ID: " + id);
             net.tcgdex.sdk.models.Card card = api.fetchCard(id);
 
             if (card == null) {
+                LOGGER.warning("API returned null for card ID: " + id);
                 return null;
             }
 
@@ -136,21 +140,24 @@ public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
             pokemonCard.setCategory(card.getCategory());
             pokemonCard.setLocalId(card.getLocalId());
             pokemonCard.setIllustrator(card.getIllustrator());
-            pokemonCard.setRarity(card.getRarity()); // getRarity() restituisce già String
+            pokemonCard.setRarity(card.getRarity());
 
-            // Imposta i dati del set (SetResume contiene solo id, name, logo, symbol)
-            pokemonCard.setSetId(card.getSet().getId());
-            pokemonCard.setSetName(card.getSet().getName());
-            pokemonCard.setSetLogo(card.getSet().getLogo());
-            pokemonCard.setSetSymbol(card.getSet().getSymbol());
-            // cardCountOfficial e cardCountTotal non sono disponibili in SetResume
+            // Imposta i dati del set (con null-check)
+            if (card.getSet() != null) {
+                pokemonCard.setSetId(card.getSet().getId());
+                pokemonCard.setSetName(card.getSet().getName());
+                pokemonCard.setSetLogo(card.getSet().getLogo());
+                pokemonCard.setSetSymbol(card.getSet().getSymbol());
+            }
 
-            // Imposta le varianti
-            pokemonCard.setVariantFirstEdition(card.getVariants().getFirstEdition());
-            pokemonCard.setVariantHolo(card.getVariants().getHolo());
-            pokemonCard.setVariantNormal(card.getVariants().getNormal());
-            pokemonCard.setVariantReverse(card.getVariants().getReverse());
-            pokemonCard.setVariantWPromo(card.getVariants().getWPromo());
+            // Imposta le varianti (con null-check)
+            if (card.getVariants() != null) {
+                pokemonCard.setVariantFirstEdition(card.getVariants().getFirstEdition());
+                pokemonCard.setVariantHolo(card.getVariants().getHolo());
+                pokemonCard.setVariantNormal(card.getVariants().getNormal());
+                pokemonCard.setVariantReverse(card.getVariants().getReverse());
+                pokemonCard.setVariantWPromo(card.getVariants().getWPromo());
+            }
 
             // Imposta i dati del Pokemon (se disponibili)
             pokemonCard.setHp(card.getHp());
@@ -159,37 +166,50 @@ public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
             pokemonCard.setDescription(card.getDescription());
             pokemonCard.setStage(card.getStage());
 
-            // Converti attacks da List<CardAttack> a List<Map<String, Object>>
-            List<Map<String, Object>> attacksList = new ArrayList<>();
-            for (var attack : card.getAttacks()) {
-                Map<String, Object> attackMap = new HashMap<>();
-                attackMap.put("name", attack.getName());
-                attackMap.put("cost", attack.getCost());
-                attackMap.put("damage", attack.getDamage());
-                attackMap.put("effect", attack.getEffect());
-                attacksList.add(attackMap);
+            // Converti attacks da List<CardAttack> a List<Map<String, Object>> (con null-check)
+            if (card.getAttacks() != null && !card.getAttacks().isEmpty()) {
+                List<Map<String, Object>> attacksList = new ArrayList<>();
+                for (var attack : card.getAttacks()) {
+                    if (attack != null) {
+                        Map<String, Object> attackMap = new HashMap<>();
+                        attackMap.put("name", attack.getName());
+                        attackMap.put("cost", attack.getCost());
+                        attackMap.put("damage", attack.getDamage());
+                        attackMap.put("effect", attack.getEffect());
+                        attacksList.add(attackMap);
+                    }
+                }
+                pokemonCard.setAttacks(attacksList);
             }
-            pokemonCard.setAttacks(attacksList);
 
-            // Converti weaknesses da List<CardWeakRes> a List<Map<String, String>>
-            List<Map<String, String>> weaknessesList = new ArrayList<>();
-            for (var weakness : card.getWeaknesses()) {
-                Map<String, String> weaknessMap = new HashMap<>();
-                weaknessMap.put("type", weakness.getType());
-                weaknessMap.put("value", weakness.getValue());
-                weaknessesList.add(weaknessMap);
+            // Converti weaknesses da List<CardWeakRes> a List<Map<String, String>> (con null-check)
+            if (card.getWeaknesses() != null && !card.getWeaknesses().isEmpty()) {
+                List<Map<String, String>> weaknessesList = new ArrayList<>();
+                for (var weakness : card.getWeaknesses()) {
+                    if (weakness != null) {
+                        Map<String, String> weaknessMap = new HashMap<>();
+                        weaknessMap.put("type", weakness.getType());
+                        weaknessMap.put("value", weakness.getValue());
+                        weaknessesList.add(weaknessMap);
+                    }
+                }
+                pokemonCard.setWeaknesses(weaknessesList);
             }
-            pokemonCard.setWeaknesses(weaknessesList);
 
             pokemonCard.setRetreat(card.getRetreat());
 
-            // Imposta i dati legali
+            // Imposta i dati legali (con null-check)
             pokemonCard.setRegulationMark(card.getRegulationMark());
-            pokemonCard.setLegalStandard(card.getLegal().getStandard());
-            pokemonCard.setLegalExpanded(card.getLegal().getExpanded());
+            if (card.getLegal() != null) {
+                pokemonCard.setLegalStandard(card.getLegal().getStandard());
+                pokemonCard.setLegalExpanded(card.getLegal().getExpanded());
+            }
 
+            LOGGER.info("Successfully loaded details for card: " + id);
             return pokemonCard;
-        } catch (Exception _) {
+        } catch (Exception e) {
+            LOGGER.severe("Error loading card details for ID '" + id + "': " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }

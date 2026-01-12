@@ -10,7 +10,8 @@ import model.dao.json.JsonUserDao;
  * Concrete Factory per la creazione di DAO basati su file JSON.
  *
  * Implementazione concreta dell'Abstract Factory DaoFactory.
- * Questa classe crea una famiglia coerente di DAO che persistono i dati su file JSON.
+ * Questa classe crea una famiglia coerente di DAO che persistono i dati su file
+ * JSON.
  *
  * Tutti i DAO creati da questa factory utilizzano la persistenza JSON,
  * garantendo coerenza nell'implementazione della persistenza.
@@ -37,5 +38,10 @@ public class JsonDaoFactory extends DaoFactory {
     @Override
     public IBinderDao createBinderDao() {
         return new JsonBinderDao(DatabaseConfig.BINDERS_JSON_PATH);
+    }
+
+    @Override
+    public model.dao.ICardDao createCardDao() {
+        return new model.dao.json.JsonCardDao(config.DatabaseConfig.CARDS_JSON_PATH);
     }
 }

@@ -6,8 +6,8 @@ public class UserBean {
     private static final int MIN_USERNAME_LENGTH = 3;
     private static final int MIN_PASSWORD_LENGTH = 6;
 
-    public static final String USER_TYPE_COLLECTOR = "Collezionista";
-    public static final String USER_TYPE_STORE = "Store";
+    public static final String USER_TYPE_COLLECTOR = config.AppConfig.USER_TYPE_COLLECTOR;
+    public static final String USER_TYPE_STORE = config.AppConfig.USER_TYPE_STORE;
 
     private String username;
     private String password;
@@ -19,7 +19,7 @@ public class UserBean {
     public UserBean(String username, String password) {
         this.username = username;
         this.password = password;
-        this.userType = USER_TYPE_COLLECTOR; 
+        this.userType = USER_TYPE_COLLECTOR;
     }
 
     public UserBean(String username, String password, String userType) {
@@ -58,19 +58,19 @@ public class UserBean {
 
     public boolean isUsernameValid() {
         return username != null
-            && !username.trim().isEmpty()
-            && username.length() >= MIN_USERNAME_LENGTH;
+                && !username.trim().isEmpty()
+                && username.length() >= MIN_USERNAME_LENGTH;
     }
 
     public boolean isPasswordValid() {
         return password != null
-            && !password.trim().isEmpty()
-            && password.length() >= MIN_PASSWORD_LENGTH;
+                && !password.trim().isEmpty()
+                && password.length() >= MIN_PASSWORD_LENGTH;
     }
 
     public boolean isUserTypeValid() {
         return userType != null
-            && (USER_TYPE_COLLECTOR.equals(userType) || USER_TYPE_STORE.equals(userType));
+                && (USER_TYPE_COLLECTOR.equals(userType) || USER_TYPE_STORE.equals(userType));
     }
 
     public String getValidationError() {
@@ -94,13 +94,15 @@ public class UserBean {
             return "Devi selezionare un tipo di utente (Collezionista o Store)";
         }
 
-        return null; 
+        return null;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UserBean userBean = (UserBean) o;
         return Objects.equals(username, userBean.username);
     }
@@ -113,6 +115,6 @@ public class UserBean {
     @Override
     public String toString() {
         return "UserBean{username='" + username + "', userType='" + userType + "'}";
-        
+
     }
 }

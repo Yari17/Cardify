@@ -3,6 +3,7 @@ package view.storehomepage;
 import controller.StoreHPController;
 import view.InputManager;
 
+@SuppressWarnings("java:S106")
 public class CliStoreHPView implements IStoreHPView {
     private final InputManager inputManager;
     private StoreHPController controller;

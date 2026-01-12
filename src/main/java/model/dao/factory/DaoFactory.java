@@ -6,11 +6,14 @@ import model.dao.IUserDao;
 /**
  * Abstract Factory pattern per la creazione di famiglie di DAO.
  *
- * Questo pattern fornisce un'interfaccia per creare famiglie di oggetti correlati
+ * Questo pattern fornisce un'interfaccia per creare famiglie di oggetti
+ * correlati
  * (UserDao, BinderDao, ecc.) senza specificare le loro classi concrete.
  *
- * Ogni implementazione concreta (JsonDaoFactory, JdbcDaoFactory, DemoDaoFactory)
- * garantisce che tutti i DAO creati appartengano alla stessa "famiglia" di persistenza.
+ * Ogni implementazione concreta (JsonDaoFactory, JdbcDaoFactory,
+ * DemoDaoFactory)
+ * garantisce che tutti i DAO creati appartengano alla stessa "famiglia" di
+ * persistenza.
  *
  * Pattern: Abstract Factory
  * - DaoFactory: Abstract Factory
@@ -19,6 +22,7 @@ import model.dao.IUserDao;
  * - JsonUserDao, JdbcUserDao, JsonBinderDao, ecc.: Concrete Products
  *
  * Uso:
+ * 
  * <pre>
  * DaoFactory factory = DaoFactory.getFactory(PersistenceType.JSON);
  * IUserDao userDao = factory.createUserDao();
@@ -59,6 +63,14 @@ public abstract class DaoFactory {
      * @return istanza di IBinderDao
      */
     public abstract IBinderDao createBinderDao();
+
+    /**
+     * Factory method per creare un CardDao.
+     * Restituisce un DAO per l'accesso ai dati delle carte (con caching).
+     *
+     * @return istanza di ICardDao
+     */
+    public abstract model.dao.ICardDao createCardDao();
 
     /**
      * Enum che definisce i tipi di persistenza disponibili.

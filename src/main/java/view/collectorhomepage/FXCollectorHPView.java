@@ -1,8 +1,23 @@
 package view.collectorhomepage;
 
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import controller.CollectorHPController;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -10,15 +25,16 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import controller.CollectorHPController;
 import model.bean.CardBean;
-
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 public class FXCollectorHPView implements ICollectorHPView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectorHPView.class.getName());
+    private static final String POPULAR_CARDS_LABEL = "Popular Cards (" + config.AppConfig.DEFAULT_SET_ID + ")";
+    private static final String NO_IMAGE_STYLE = "-fx-text-fill: #9CA3AF; -fx-font-size: 12px;";
+    private static final String HOVER_STYLE = "-fx-background-color: rgba(41, 182, 246, 0.2); -fx-background-radius: 8; -fx-scale-x: 1.1; -fx-scale-y: 1.1;";
+    private static final String NORMAL_STYLE = "-fx-cursor: hand; -fx-padding: 8; -fx-background-color: transparent; -fx-scale-x: 1.0; -fx-scale-y: 1.0;";
+    private static final String VARIANT_LABEL_STYLE = "-fx-background-color: #AB47BC; -fx-text-fill: white; -fx-padding: 4 10; -fx-background-radius: 12; -fx-font-size: 11px;";
+    private static final String EFFECT_LITERAL = "effect";
 
     @FXML
     private Label usernameLabel;
@@ -84,6 +100,9 @@ public class FXCollectorHPView implements ICollectorHPView {
     private MenuButton setFilterButton;
 
     @FXML
+    private Button homepageButton;
+
+    @FXML
     private Button collectionButton;
 
     @FXML
@@ -145,345 +164,346 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @Override
     public void showCardOverview(CardBean card) {
-        // Crea un dialog modale per mostrare i dettagli della carta
+        Dialog<Void> dialog = createBaseDialog();
+        VBox content = createDialogContent(card);
+        ScrollPane scrollPane = createDialogScrollPane(content);
+
+        dialog.getDialogPane().setContent(scrollPane);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+        dialog.show();
+    }
+
+    private Dialog<Void> createBaseDialog() {
         Dialog<Void> dialog = new Dialog<>();
         dialog.setTitle("Dettagli Carta");
         dialog.initOwner(stage);
+        dialog.getDialogPane().setStyle("-fx-background-color: #1E2530;");
+        dialog.getDialogPane().getStylesheets().add(getClass().getResource("/styles/theme.css").toExternalForm());
+        dialog.getDialogPane().setMinWidth(400);
+        dialog.getDialogPane().setMaxHeight(700);
+        return dialog;
+    }
 
-        // Crea il contenuto del dialog con scroll per contenuti lunghi
+    private ScrollPane createDialogScrollPane(VBox content) {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        scrollPane.setContent(content);
+        return scrollPane;
+    }
 
+    private VBox createDialogContent(CardBean card) {
         VBox content = new VBox(15);
         content.setPadding(new javafx.geometry.Insets(20));
         content.setAlignment(javafx.geometry.Pos.CENTER);
         content.setStyle("-fx-background-color: #1E2530;");
 
-        // Titolo con nome carta
+        content.getChildren().addAll(
+                createTitleLabel(card),
+                createGameTypeLabel(card),
+                createImageContainer(card),
+                createIdLabel(card));
+
+        if (card instanceof model.bean.PokemonCardBean pokemonCard) {
+            content.getChildren().add(createPokemonDetailsBox(pokemonCard));
+        }
+
+        if (card.isTradable()) {
+            content.getChildren().add(createTradableInfo());
+        }
+
+        return content;
+    }
+
+    private Label createTitleLabel(CardBean card) {
         Label titleLabel = new Label(card.getName());
         titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+        return titleLabel;
+    }
 
-        // Game type badge
+    private Label createGameTypeLabel(CardBean card) {
         Label gameTypeLabel = new Label(card.getGameType().toString());
         gameTypeLabel.setStyle("-fx-background-color: #29B6F6; -fx-text-fill: white; " +
-                              "-fx-padding: 5 15; -fx-background-radius: 15; -fx-font-weight: bold;");
+                "-fx-padding: 5 15; -fx-background-radius: 15; -fx-font-weight: bold;");
+        return gameTypeLabel;
+    }
 
-        // Immagine della carta (più grande)
+    private Label createIdLabel(CardBean card) {
+        Label idLabel = new Label("ID: " + card.getId());
+        idLabel.setStyle(NO_IMAGE_STYLE);
+        return idLabel;
+    }
+
+    private VBox createImageContainer(CardBean card) {
+        VBox imageContainer = new VBox(5);
+        imageContainer.setAlignment(javafx.geometry.Pos.CENTER);
+
         ImageView cardImageView = new ImageView();
         cardImageView.setFitWidth(300);
         cardImageView.setFitHeight(420);
         cardImageView.setPreserveRatio(true);
 
+        boolean imageLoaded = false;
         if (card.getImageUrl() != null && !card.getImageUrl().isEmpty()) {
             try {
                 Image cardImage = new Image(card.getImageUrl(), true);
-                cardImageView.setImage(cardImage);
-            } catch (Exception e) {
-                LOGGER.warning("Failed to load card image in dialog");
+                if (cardImage != null && !cardImage.isError()) {
+                    cardImageView.setImage(cardImage);
+                    imageLoaded = true;
+                }
+            } catch (Exception _) {
+                LOGGER.log(java.util.logging.Level.WARNING, "Failed to load card image in dialog: {0}",
+                        card.getImageUrl());
             }
         }
 
-        // ID della carta
-        Label idLabel = new Label("ID: " + card.getId());
-        idLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 12px;");
+        if (!imageLoaded) {
+            setupPlaceholderImage(cardImageView, imageContainer);
+        } else {
+            imageContainer.getChildren().add(cardImageView);
+        }
+        return imageContainer;
+    }
 
-        content.getChildren().addAll(titleLabel, gameTypeLabel, cardImageView, idLabel);
+    private void setupPlaceholderImage(ImageView cardImageView, VBox imageContainer) {
+        try {
+            Image placeholderImage = new Image(getClass().getResourceAsStream("/icons/nocardimage.svg"));
+            cardImageView.setImage(placeholderImage);
+            cardImageView.setFitWidth(200);
+            cardImageView.setFitHeight(280);
 
-        // Dettagli specifici per PokemonCard
-        if (card instanceof model.bean.PokemonCardBean pokemonCard) {
-            VBox detailsBox = new VBox(10);
-            detailsBox.setStyle("-fx-background-color: rgba(41, 182, 246, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
+            Label noImageLabel = new Label("Sorry, no image available");
+            noImageLabel.setStyle(NO_IMAGE_STYLE + " -fx-font-style: italic;");
+            imageContainer.getChildren().addAll(cardImageView, noImageLabel);
+        } catch (Exception _) {
+            LOGGER.warning("Failed to load placeholder image");
+            imageContainer.getChildren().add(cardImageView);
+        }
+    }
 
-            // HP e Tipo
-            if (pokemonCard.getHp() != null || (pokemonCard.getTypes() != null && !pokemonCard.getTypes().isEmpty())) {
-                HBox hpTypeBox = new HBox(20);
-                hpTypeBox.setAlignment(javafx.geometry.Pos.CENTER);
+    private VBox createPokemonDetailsBox(model.bean.PokemonCardBean pokemonCard) {
+        VBox detailsBox = new VBox(10);
+        detailsBox
+                .setStyle("-fx-background-color: rgba(41, 182, 246, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
 
-                if (pokemonCard.getHp() != null) {
-                    Label hpLabel = new Label("❤️ HP: " + pokemonCard.getHp());
-                    hpLabel.setStyle("-fx-text-fill: #EF5350; -fx-font-size: 16px; -fx-font-weight: bold;");
-                    hpTypeBox.getChildren().add(hpLabel);
-                }
+        addIfNotNull(detailsBox, createHpTypeBox(pokemonCard));
+        addIfNotNull(detailsBox, createStageBox(pokemonCard));
+        addIfNotNull(detailsBox, createLabel("⭐ Rarità: " + pokemonCard.getRarity(),
+                "-fx-text-fill: #FFD700; -fx-font-size: 14px; -fx-font-weight: bold;"));
+        addIfNotNull(detailsBox,
+                createLabel("📦 Set: " + pokemonCard.getSetName(), "-fx-text-fill: #9CA3AF; -fx-font-size: 13px;"));
+        addIfNotNull(detailsBox, createLabel("🎨 Illustratore: " + pokemonCard.getIllustrator(),
+                NO_IMAGE_STYLE + " -fx-font-style: italic;"));
+        addIfNotNull(detailsBox, createLabel("📋 Categoria: " + pokemonCard.getCategory(),
+                NO_IMAGE_STYLE));
 
-                if (pokemonCard.getTypes() != null && !pokemonCard.getTypes().isEmpty()) {
-                    Label typeLabel = new Label("⚡ " + String.join(", ", pokemonCard.getTypes()));
-                    typeLabel.setStyle("-fx-text-fill: #FFA726; -fx-font-size: 16px; -fx-font-weight: bold;");
-                    hpTypeBox.getChildren().add(typeLabel);
-                }
+        // Additional sections
+        addIfNotNull(detailsBox, createWeaknessRetreatBox(pokemonCard));
+        addIfNotNull(detailsBox, createDescriptionBox(pokemonCard));
+        addIfNotNull(detailsBox, createAttacksBox(pokemonCard));
+        addIfNotNull(detailsBox, createLegalBox(pokemonCard));
+        addIfNotNull(detailsBox, createVariantsBox(pokemonCard));
 
-                detailsBox.getChildren().add(hpTypeBox);
-            }
+        return detailsBox;
+    }
 
-            // Stage e Evoluzione
-            if (pokemonCard.getStage() != null || pokemonCard.getEvolveFrom() != null) {
-                HBox stageBox = new HBox(15);
-                stageBox.setAlignment(javafx.geometry.Pos.CENTER);
+    private void addIfNotNull(VBox parent, javafx.scene.Node node) {
+        if (node != null) {
+            parent.getChildren().add(node);
+        }
+    }
 
-                if (pokemonCard.getStage() != null) {
-                    Label stageLabel = new Label("Stage: " + pokemonCard.getStage());
-                    stageLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
-                    stageBox.getChildren().add(stageLabel);
-                }
+    private Label createLabel(String text, String style) {
+        if (text == null || text.contains("null"))
+            return null;
+        Label label = new Label(text);
+        label.setStyle(style);
+        return label;
+    }
 
-                if (pokemonCard.getEvolveFrom() != null) {
-                    Label evolveLabel = new Label("Evolve da: " + pokemonCard.getEvolveFrom());
-                    evolveLabel.setStyle("-fx-text-fill: #66BB6A; -fx-font-size: 14px;");
-                    stageBox.getChildren().add(evolveLabel);
-                }
+    private HBox createHpTypeBox(model.bean.PokemonCardBean pokemonCard) {
+        if (pokemonCard.getHp() == null && (pokemonCard.getTypes() == null || pokemonCard.getTypes().isEmpty()))
+            return null;
 
-                detailsBox.getChildren().add(stageBox);
-            }
+        HBox box = new HBox(20);
+        box.setAlignment(javafx.geometry.Pos.CENTER);
+        if (pokemonCard.getHp() != null) {
+            box.getChildren().add(createLabel("❤️ HP: " + pokemonCard.getHp(),
+                    "-fx-text-fill: #EF5350; -fx-font-size: 16px; -fx-font-weight: bold;"));
+        }
+        if (pokemonCard.getTypes() != null && !pokemonCard.getTypes().isEmpty()) {
+            box.getChildren().add(createLabel("⚡ " + String.join(", ", pokemonCard.getTypes()),
+                    "-fx-text-fill: #FFA726; -fx-font-size: 16px; -fx-font-weight: bold;"));
+        }
+        return box;
+    }
 
-            // Rarità
-            if (pokemonCard.getRarity() != null) {
-                Label rarityLabel = new Label("⭐ Rarità: " + pokemonCard.getRarity());
-                rarityLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-size: 14px; -fx-font-weight: bold;");
-                detailsBox.getChildren().add(rarityLabel);
-            }
+    private HBox createStageBox(model.bean.PokemonCardBean pokemonCard) {
+        if (pokemonCard.getStage() == null && pokemonCard.getEvolveFrom() == null)
+            return null;
 
-            // Set
-            if (pokemonCard.getSetName() != null) {
-                Label setLabel = new Label("📦 Set: " + pokemonCard.getSetName());
-                setLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 13px;");
-                detailsBox.getChildren().add(setLabel);
-            }
+        HBox box = new HBox(15);
+        box.setAlignment(javafx.geometry.Pos.CENTER);
+        if (pokemonCard.getStage() != null) {
+            box.getChildren()
+                    .add(createLabel("Stage: " + pokemonCard.getStage(), "-fx-text-fill: white; -fx-font-size: 14px;"));
+        }
+        if (pokemonCard.getEvolveFrom() != null) {
+            box.getChildren().add(createLabel("Evolve da: " + pokemonCard.getEvolveFrom(),
+                    "-fx-text-fill: #66BB6A; -fx-font-size: 14px;"));
+        }
+        return box;
+    }
 
-            // Illustratore
-            if (pokemonCard.getIllustrator() != null) {
-                Label illustratorLabel = new Label("🎨 Illustratore: " + pokemonCard.getIllustrator());
-                illustratorLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 12px; -fx-font-style: italic;");
-                detailsBox.getChildren().add(illustratorLabel);
-            }
+    private VBox createWeaknessRetreatBox(model.bean.PokemonCardBean pokemonCard) {
+        boolean hasWeakness = pokemonCard.getWeaknesses() != null && !pokemonCard.getWeaknesses().isEmpty();
+        boolean hasRetreat = pokemonCard.getRetreat() != null;
 
-            // Categoria
-            if (pokemonCard.getCategory() != null) {
-                Label categoryLabel = new Label("📋 Categoria: " + pokemonCard.getCategory());
-                categoryLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 12px;");
-                detailsBox.getChildren().add(categoryLabel);
-            }
+        if (!hasWeakness && !hasRetreat)
+            return null;
 
-            content.getChildren().add(detailsBox);
+        VBox box = new VBox(10);
+        box.setStyle("-fx-background-color: rgba(255, 152, 0, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
 
-            // Debolezze e Costo Ritirata
-            if ((pokemonCard.getWeaknesses() != null && !pokemonCard.getWeaknesses().isEmpty()) ||
-                pokemonCard.getRetreat() != null) {
-
-                VBox weaknessBox = new VBox(10);
-                weaknessBox.setStyle("-fx-background-color: rgba(255, 152, 0, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
-
-                // Debolezze
-                if (pokemonCard.getWeaknesses() != null && !pokemonCard.getWeaknesses().isEmpty()) {
-                    Label weaknessTitleLabel = new Label("⚠️ Debolezze");
-                    weaknessTitleLabel.setStyle("-fx-text-fill: #FF9800; -fx-font-size: 14px; -fx-font-weight: bold;");
-                    weaknessBox.getChildren().add(weaknessTitleLabel);
-
-                    for (Map<String, String> weakness : pokemonCard.getWeaknesses()) {
-                        String type = weakness.get("type");
-                        String value = weakness.get("value");
-
-                        Label weaknessLabel = new Label("🔸 " + type + " " + value);
-                        weaknessLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px;");
-                        weaknessBox.getChildren().add(weaknessLabel);
-                    }
-                }
-
-                // Costo ritirata
-                if (pokemonCard.getRetreat() != null) {
-                    String retreatText = "🏃 Costo Ritirata: ";
-                    for (int i = 0; i < pokemonCard.getRetreat(); i++) {
-                        retreatText += "⚪ ";
-                    }
-                    retreatText += "(" + pokemonCard.getRetreat() + ")";
-
-                    Label retreatLabel = new Label(retreatText);
-                    retreatLabel.setStyle("-fx-text-fill: #FFB74D; -fx-font-size: 13px; -fx-font-weight: bold;");
-                    weaknessBox.getChildren().add(retreatLabel);
-                }
-
-                content.getChildren().add(weaknessBox);
-            }
-
-            // Descrizione
-            if (pokemonCard.getDescription() != null && !pokemonCard.getDescription().isEmpty()) {
-                VBox descriptionBox = new VBox(5);
-                descriptionBox.setStyle("-fx-background-color: rgba(76, 175, 80, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
-
-                Label descTitleLabel = new Label("📖 Descrizione");
-                descTitleLabel.setStyle("-fx-text-fill: #66BB6A; -fx-font-size: 14px; -fx-font-weight: bold;");
-
-                Label descTextLabel = new Label(pokemonCard.getDescription());
-                descTextLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-wrap-text: true;");
-                descTextLabel.setMaxWidth(350);
-                descTextLabel.setWrapText(true);
-
-                descriptionBox.getChildren().addAll(descTitleLabel, descTextLabel);
-                content.getChildren().add(descriptionBox);
-            }
-
-            // Attacchi
-            if (pokemonCard.getAttacks() != null && !pokemonCard.getAttacks().isEmpty()) {
-                VBox attacksBox = new VBox(10);
-                attacksBox.setStyle("-fx-background-color: rgba(239, 83, 80, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
-
-                Label attacksTitleLabel = new Label("⚔️ Attacchi (" + pokemonCard.getAttacks().size() + ")");
-                attacksTitleLabel.setStyle("-fx-text-fill: #EF5350; -fx-font-size: 14px; -fx-font-weight: bold;");
-                attacksBox.getChildren().add(attacksTitleLabel);
-
-                for (Map<String, Object> attack : pokemonCard.getAttacks()) {
-                    VBox attackBox = new VBox(3);
-                    attackBox.setStyle("-fx-padding: 5; -fx-border-color: rgba(239, 83, 80, 0.3); " +
-                                     "-fx-border-width: 0 0 0 3; -fx-border-insets: 0;");
-
-                    String attackName = attack.get("name") != null ? attack.get("name").toString() : "Unknown";
-                    String damage = attack.get("damage") != null ? attack.get("damage").toString() : "";
-
-                    Label nameLabel = new Label(attackName + (damage.isEmpty() ? "" : " - " + damage));
-                    nameLabel.setStyle("-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;");
-
-                    attackBox.getChildren().add(nameLabel);
-
-                    // Costo energetico
-                    if (attack.get("cost") != null) {
-                        Label costLabel = new Label("💎 Costo: " + attack.get("cost").toString());
-                        costLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 11px;");
-                        attackBox.getChildren().add(costLabel);
-                    }
-
-                    // Effetto
-                    if (attack.get("effect") != null && !attack.get("effect").toString().isEmpty()) {
-                        Label effectLabel = new Label(attack.get("effect").toString());
-                        effectLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 11px; -fx-wrap-text: true;");
-                        effectLabel.setMaxWidth(330);
-                        effectLabel.setWrapText(true);
-                        attackBox.getChildren().add(effectLabel);
-                    }
-
-                    attacksBox.getChildren().add(attackBox);
-                }
-
-                content.getChildren().add(attacksBox);
-            }
-
-            // Legalità e Regulation Mark
-            VBox legalBox = new VBox(8);
-            legalBox.setStyle("-fx-background-color: rgba(100, 181, 246, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
-
-            Label legalTitleLabel = new Label("⚖️ Legalità e Regolamento");
-            legalTitleLabel.setStyle("-fx-text-fill: #64B5F6; -fx-font-size: 14px; -fx-font-weight: bold;");
-            legalBox.getChildren().add(legalTitleLabel);
-
-            HBox legalStatusBox = new HBox(15);
-            legalStatusBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-            if (pokemonCard.getLegalStandard() != null) {
-                Label standardLabel = new Label(pokemonCard.getLegalStandard() ? "✅ Standard" : "❌ Standard");
-                standardLabel.setStyle("-fx-text-fill: " + (pokemonCard.getLegalStandard() ? "#66BB6A" : "#EF5350") +
-                                     "; -fx-font-size: 12px; -fx-font-weight: bold;");
-                legalStatusBox.getChildren().add(standardLabel);
-            }
-
-            if (pokemonCard.getLegalExpanded() != null) {
-                Label expandedLabel = new Label(pokemonCard.getLegalExpanded() ? "✅ Expanded" : "❌ Expanded");
-                expandedLabel.setStyle("-fx-text-fill: " + (pokemonCard.getLegalExpanded() ? "#66BB6A" : "#EF5350") +
-                                     "; -fx-font-size: 12px; -fx-font-weight: bold;");
-                legalStatusBox.getChildren().add(expandedLabel);
-            }
-
-            if (!legalStatusBox.getChildren().isEmpty()) {
-                legalBox.getChildren().add(legalStatusBox);
-            }
-
-            if (pokemonCard.getRegulationMark() != null) {
-                Label regMarkLabel = new Label("📍 Regulation Mark: " + pokemonCard.getRegulationMark());
-                regMarkLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 12px;");
-                legalBox.getChildren().add(regMarkLabel);
-            }
-
-            if (legalBox.getChildren().size() > 1) {
-                content.getChildren().add(legalBox);
-            }
-
-            // Varianti
-            if (pokemonCard.getVariantHolo() != null || pokemonCard.getVariantReverse() != null ||
-                pokemonCard.getVariantNormal() != null || pokemonCard.getVariantFirstEdition() != null) {
-
-                VBox variantsBox = new VBox(8);
-                variantsBox.setStyle("-fx-background-color: rgba(156, 39, 176, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
-
-                Label variantsTitleLabel = new Label("✨ Varianti Disponibili");
-                variantsTitleLabel.setStyle("-fx-text-fill: #AB47BC; -fx-font-size: 14px; -fx-font-weight: bold;");
-                variantsBox.getChildren().add(variantsTitleLabel);
-
-                FlowPane variantsFlow = new FlowPane();
-                variantsFlow.setHgap(10);
-                variantsFlow.setVgap(5);
-
-                if (Boolean.TRUE.equals(pokemonCard.getVariantNormal())) {
-                    Label normalLabel = new Label("⭐ Normal");
-                    normalLabel.setStyle("-fx-background-color: #AB47BC; -fx-text-fill: white; " +
-                                       "-fx-padding: 4 10; -fx-background-radius: 12; -fx-font-size: 11px;");
-                    variantsFlow.getChildren().add(normalLabel);
-                }
-
-                if (Boolean.TRUE.equals(pokemonCard.getVariantHolo())) {
-                    Label holoLabel = new Label("💫 Holo");
-                    holoLabel.setStyle("-fx-background-color: #AB47BC; -fx-text-fill: white; " +
-                                     "-fx-padding: 4 10; -fx-background-radius: 12; -fx-font-size: 11px;");
-                    variantsFlow.getChildren().add(holoLabel);
-                }
-
-                if (Boolean.TRUE.equals(pokemonCard.getVariantReverse())) {
-                    Label reverseLabel = new Label("🔄 Reverse");
-                    reverseLabel.setStyle("-fx-background-color: #AB47BC; -fx-text-fill: white; " +
-                                        "-fx-padding: 4 10; -fx-background-radius: 12; -fx-font-size: 11px;");
-                    variantsFlow.getChildren().add(reverseLabel);
-                }
-
-                if (Boolean.TRUE.equals(pokemonCard.getVariantFirstEdition())) {
-                    Label firstEdLabel = new Label("1️⃣ First Edition");
-                    firstEdLabel.setStyle("-fx-background-color: #AB47BC; -fx-text-fill: white; " +
-                                        "-fx-padding: 4 10; -fx-background-radius: 12; -fx-font-size: 11px;");
-                    variantsFlow.getChildren().add(firstEdLabel);
-                }
-
-                if (!variantsFlow.getChildren().isEmpty()) {
-                    variantsBox.getChildren().add(variantsFlow);
-                    content.getChildren().add(variantsBox);
-                }
+        if (hasWeakness) {
+            box.getChildren().add(
+                    createLabel("⚠️ Debolezze", "-fx-text-fill: #FF9800; -fx-font-size: 14px; -fx-font-weight: bold;"));
+            for (Map<String, String> weakness : pokemonCard.getWeaknesses()) {
+                box.getChildren().add(createLabel("🔸 " + weakness.get("type") + " " + weakness.get("value"),
+                        "-fx-text-fill: white; -fx-font-size: 13px;"));
             }
         }
 
-        // Informazioni inventario - RIMOSSO quantità posseduta
-        VBox infoBox = new VBox(10);
-        infoBox.setAlignment(javafx.geometry.Pos.CENTER);
-
-        if (card.isTradable()) {
-            Label tradableLabel = new Label("🔄 Disponibile per scambio");
-            tradableLabel.setStyle("-fx-text-fill: #66BB6A; -fx-font-size: 14px; -fx-font-weight: bold;");
-            infoBox.getChildren().add(tradableLabel);
+        if (hasRetreat) {
+            String retreatText = "🏃 Costo Ritirata: " + "⚪ ".repeat(pokemonCard.getRetreat()) + "("
+                    + pokemonCard.getRetreat() + ")";
+            box.getChildren().add(
+                    createLabel(retreatText, "-fx-text-fill: #FFB74D; -fx-font-size: 13px; -fx-font-weight: bold;"));
         }
+        return box;
+    }
 
-        if (!infoBox.getChildren().isEmpty()) {
-            content.getChildren().add(infoBox);
+    private VBox createDescriptionBox(model.bean.PokemonCardBean pokemonCard) {
+        String desc = pokemonCard.getDescription();
+        if (desc == null || desc.isEmpty())
+            return null;
+
+        VBox box = new VBox(5);
+        box.setStyle("-fx-background-color: rgba(76, 175, 80, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
+        box.getChildren().add(
+                createLabel("📖 Descrizione", "-fx-text-fill: #66BB6A; -fx-font-size: 14px; -fx-font-weight: bold;"));
+
+        Label descLabel = createLabel(desc, "-fx-text-fill: white; -fx-font-size: 13px; -fx-wrap-text: true;");
+        descLabel.setMaxWidth(350);
+        descLabel.setWrapText(true);
+        box.getChildren().add(descLabel);
+        return box;
+    }
+
+    private VBox createAttacksBox(model.bean.PokemonCardBean pokemonCard) {
+        if (pokemonCard.getAttacks() == null || pokemonCard.getAttacks().isEmpty())
+            return null;
+
+        VBox box = new VBox(10);
+        box.setStyle("-fx-background-color: rgba(239, 83, 80, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
+        box.getChildren().add(createLabel("⚔️ Attacchi (" + pokemonCard.getAttacks().size() + ")",
+                "-fx-text-fill: #EF5350; -fx-font-size: 14px; -fx-font-weight: bold;"));
+
+        for (Map<String, Object> attack : pokemonCard.getAttacks()) {
+            VBox attackBox = new VBox(3);
+            attackBox.setStyle(
+                    "-fx-padding: 5; -fx-border-color: rgba(239, 83, 80, 0.3); -fx-border-width: 0 0 0 3; -fx-border-insets: 0;");
+
+            String name = (String) attack.getOrDefault("name", "Unknown");
+            String damage = (String) attack.getOrDefault("damage", "");
+            attackBox.getChildren().add(createLabel(name + (damage.isEmpty() ? "" : " - " + damage),
+                    "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"));
+
+            if (attack.get("cost") != null) {
+                attackBox.getChildren().add(
+                        createLabel("💎 Costo: " + attack.get("cost"), "-fx-text-fill: #9CA3AF; -fx-font-size: 11px;"));
+            }
+            if (attack.get(EFFECT_LITERAL) != null && !attack.get(EFFECT_LITERAL).toString().isEmpty()) {
+                Label effect = createLabel(attack.get(EFFECT_LITERAL).toString(),
+                        "-fx-text-fill: #9CA3AF; -fx-font-size: 11px; -fx-wrap-text: true;");
+                effect.setMaxWidth(330);
+                effect.setWrapText(true);
+                attackBox.getChildren().add(effect);
+            }
+            box.getChildren().add(attackBox);
         }
+        return box;
+    }
 
-        scrollPane.setContent(content);
-        dialog.getDialogPane().setContent(scrollPane);
-        dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+    private VBox createLegalBox(model.bean.PokemonCardBean pokemonCard) {
+        VBox box = new VBox(8);
+        box.setStyle("-fx-background-color: rgba(100, 181, 246, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
+        box.getChildren().add(createLabel("⚖️ Legalità e Regolamento",
+                "-fx-text-fill: #64B5F6; -fx-font-size: 14px; -fx-font-weight: bold;"));
 
-        // Applica stili al dialog pane
-        dialog.getDialogPane().setStyle("-fx-background-color: #1E2530;");
-        dialog.getDialogPane().getStylesheets().add(
-            getClass().getResource("/styles/theme.css").toExternalForm()
-        );
+        HBox statusBox = new HBox(15);
+        statusBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
-        // Imposta dimensioni minime per il dialog
-        dialog.getDialogPane().setMinWidth(400);
-        dialog.getDialogPane().setMaxHeight(700);
+        if (pokemonCard.getLegalStandard() != null) {
+            boolean legal = pokemonCard.getLegalStandard();
+            statusBox.getChildren().add(createLabel(legal ? "✅ Standard" : "❌ Standard", "-fx-text-fill: "
+                    + (legal ? "#66BB6A" : "#EF5350") + "; -fx-font-size: 12px; -fx-font-weight: bold;"));
+        }
+        if (pokemonCard.getLegalExpanded() != null) {
+            boolean legal = pokemonCard.getLegalExpanded();
+            statusBox.getChildren().add(createLabel(legal ? "✅ Expanded" : "❌ Expanded", "-fx-text-fill: "
+                    + (legal ? "#66BB6A" : "#EF5350") + "; -fx-font-size: 12px; -fx-font-weight: bold;"));
+        }
+        if (!statusBox.getChildren().isEmpty())
+            box.getChildren().add(statusBox);
 
-        // Mostra il dialog (non bloccante rispetto alla finestra principale)
-        dialog.show();
+        if (pokemonCard.getRegulationMark() != null) {
+            box.getChildren().add(createLabel("📍 Regulation Mark: " + pokemonCard.getRegulationMark(),
+                    NO_IMAGE_STYLE));
+        }
+        return box;
+    }
+
+    private VBox createVariantsBox(model.bean.PokemonCardBean pokemonCard) {
+        if (pokemonCard.getVariantNormal() == null && pokemonCard.getVariantHolo() == null
+                && pokemonCard.getVariantReverse() == null && pokemonCard.getVariantFirstEdition() == null)
+            return null;
+
+        VBox box = new VBox(8);
+        box.setStyle("-fx-background-color: rgba(156, 39, 176, 0.1); -fx-padding: 15; -fx-background-radius: 10;");
+        box.getChildren().add(createLabel("✨ Varianti Disponibili",
+                "-fx-text-fill: #AB47BC; -fx-font-size: 14px; -fx-font-weight: bold;"));
+
+        FlowPane flow = new FlowPane();
+        flow.setHgap(10);
+        flow.setVgap(5);
+
+        addVariantBadge(flow, pokemonCard.getVariantNormal(), "⭐ Normal");
+        addVariantBadge(flow, pokemonCard.getVariantHolo(), "💫 Holo");
+        addVariantBadge(flow, pokemonCard.getVariantReverse(), "🔄 Reverse");
+        addVariantBadge(flow, pokemonCard.getVariantFirstEdition(), "1️⃣ First Edition");
+
+        if (!flow.getChildren().isEmpty()) {
+            box.getChildren().add(flow);
+            return box;
+        }
+        return null;
+    }
+
+    private void addVariantBadge(FlowPane flow, Boolean isAvailable, String text) {
+        if (Boolean.TRUE.equals(isAvailable)) {
+            Label label = new Label(text);
+            label.setStyle(VARIANT_LABEL_STYLE);
+            flow.getChildren().add(label);
+        }
+    }
+
+    private VBox createTradableInfo() {
+        VBox box = new VBox(10);
+        box.setAlignment(javafx.geometry.Pos.CENTER);
+        box.getChildren().add(createLabel("🔄 Disponibile per scambio",
+                "-fx-text-fill: #66BB6A; -fx-font-size: 14px; -fx-font-weight: bold;"));
+        return box;
     }
 
     @Override
@@ -523,13 +543,29 @@ public class FXCollectorHPView implements ICollectorHPView {
         imageView.setFitHeight(250);
         imageView.setPreserveRatio(true);
 
+        boolean imageLoaded = false;
         if (card.getImageUrl() != null && !card.getImageUrl().isEmpty()) {
             try {
+                // Direct loading (background)
                 Image image = new Image(card.getImageUrl(), true);
-                imageView.setImage(image);
+                if (image != null && !image.isError()) {
+                    imageView.setImage(image);
+                    imageLoaded = true;
+                }
             } catch (Exception _) {
-                LOGGER.warning(() -> "Failed to load image for card: " + card.getName());
-                imageView.setImage(null);
+                LOGGER.log(java.util.logging.Level.WARNING, "Failed to load image for card: {0}", card.getName());
+            }
+        }
+
+        // Se l'immagine non è caricata, mostra placeholder
+        if (!imageLoaded) {
+            try {
+                Image placeholderImage = new Image(getClass().getResourceAsStream("/icons/nocardimage.svg"));
+                imageView.setImage(placeholderImage);
+                imageView.setFitWidth(120);
+                imageView.setFitHeight(180);
+            } catch (Exception _) {
+                LOGGER.warning("Failed to load placeholder image");
             }
         }
 
@@ -573,6 +609,14 @@ public class FXCollectorHPView implements ICollectorHPView {
     }
 
     @FXML
+    private void onTradeClicked() {
+        LOGGER.info("Trade button clicked - navigating to trade page");
+        if (controller != null) {
+            controller.navigateToTrade();
+        }
+    }
+
+    @FXML
     private void onExitClicked() {
         if (controller != null) {
             controller.onExitRequested();
@@ -604,7 +648,7 @@ public class FXCollectorHPView implements ICollectorHPView {
 
         // Cerca le carte per nome
         String searchName = query.trim();
-        LOGGER.info("Searching for cards with name: " + searchName);
+        LOGGER.log(java.util.logging.Level.INFO, "Searching for cards with name: {0}", searchName);
         controller.searchCardsByName(searchName);
     }
 
@@ -624,17 +668,19 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @Override
     public void displayAvailableSets(Map<String, String> setsMap) {
-        LOGGER.info("displayAvailableSets called with map: " + (setsMap != null ? setsMap.size() + " sets" : "null"));
+        LOGGER.log(java.util.logging.Level.INFO, "displayAvailableSets called with map: {0} sets",
+                (setsMap != null ? setsMap.size() : "null"));
 
         if (setsMap == null || setsMap.isEmpty()) {
-            LOGGER.warning("No sets available - map is " + (setsMap == null ? "null" : "empty"));
+            LOGGER.log(java.util.logging.Level.WARNING, "No sets available - map is {0}",
+                    (setsMap == null ? "null" : "empty"));
             return;
         }
 
         // Salva la mappa per usarla quando l'utente seleziona un set
         this.setsIdToNameMap = setsMap;
 
-        LOGGER.info("Set map contents: " + setsMap);
+        LOGGER.log(java.util.logging.Level.INFO, "Set map contents: {0}", setsMap);
 
         Platform.runLater(() -> {
             LOGGER.info("Running on JavaFX thread - updating MenuButton");
@@ -647,8 +693,8 @@ public class FXCollectorHPView implements ICollectorHPView {
             setFilterButton.getItems().clear();
 
             // Opzione "Popular Cards"
-            MenuItem popularItem = new MenuItem("Popular Cards (sv08.5)");
-            popularItem.setOnAction(_ -> onSetSelected("Popular Cards (sv08.5)"));
+            MenuItem popularItem = new MenuItem(POPULAR_CARDS_LABEL);
+            popularItem.setOnAction(_ -> onSetSelected(POPULAR_CARDS_LABEL));
             setFilterButton.getItems().add(popularItem);
 
             LOGGER.info("Added 'Popular Cards' option");
@@ -662,12 +708,13 @@ public class FXCollectorHPView implements ICollectorHPView {
                 setFilterButton.getItems().add(setItem);
                 count++;
                 if (count <= 5) { // Log solo i primi 5 per non sovraccaricare
-                    LOGGER.info("Added set: " + entry.getKey() + " -> " + displayName);
+                    LOGGER.log(java.util.logging.Level.INFO, "Added set: {0} -> {1}",
+                            new Object[] { entry.getKey(), displayName });
                 }
             }
 
-            LOGGER.info("Total sets added to MenuButton: " + count);
-            LOGGER.info("MenuButton items count: " + setFilterButton.getItems().size());
+            LOGGER.log(java.util.logging.Level.INFO, "Total sets added to MenuButton: {0}", count);
+            LOGGER.log(java.util.logging.Level.INFO, "MenuButton items count: {0}", setFilterButton.getItems().size());
         });
     }
 
@@ -686,26 +733,27 @@ public class FXCollectorHPView implements ICollectorHPView {
         cardsViewBox.setManaged(true);
 
         // Caso speciale per le carte popolari
-        if (selectedSetName.equals("Popular Cards (sv08.5)")) {
+        if (selectedSetName.equals(POPULAR_CARDS_LABEL)) {
             LOGGER.info("Selected popular cards set");
-            controller.loadCardsFromSet("sv08.5");
+            controller.loadCardsFromSet(config.AppConfig.DEFAULT_SET_ID);
             return;
         }
 
         // Trova l'ID corrispondente al nome selezionato
         if (setsIdToNameMap != null) {
             String setId = setsIdToNameMap.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(selectedSetName))
-                .map(Map.Entry::getKey)
-                .findFirst()
-                .orElse(null);
+                    .filter(entry -> entry.getValue().equals(selectedSetName))
+                    .map(Map.Entry::getKey)
+                    .findFirst()
+                    .orElse(null);
 
             if (setId != null) {
-                LOGGER.info("Set selected - Query: " + setId + " (" + selectedSetName + ")");
+                LOGGER.log(java.util.logging.Level.INFO, "Set selected - Query: {0} ({1})",
+                        new Object[] { setId, selectedSetName });
                 // Carica le carte del set
                 controller.loadCardsFromSet(setId);
             } else {
-                LOGGER.warning("Set ID not found for: " + selectedSetName);
+                LOGGER.log(java.util.logging.Level.WARNING, "Set ID not found for: {0}", selectedSetName);
             }
         }
     }
@@ -717,25 +765,14 @@ public class FXCollectorHPView implements ICollectorHPView {
     @FXML
     private void onNavButtonHoverEnter(MouseEvent event) {
         if (event.getSource() instanceof VBox container) {
-            container.setStyle(
-                "-fx-background-color: rgba(41, 182, 246, 0.2); " +
-                "-fx-background-radius: 8; " +
-                "-fx-scale-x: 1.1; " +
-                "-fx-scale-y: 1.1;"
-            );
+            container.setStyle(HOVER_STYLE);
         }
     }
 
     @FXML
     private void onNavButtonHoverExit(MouseEvent event) {
         if (event.getSource() instanceof VBox container) {
-            container.setStyle(
-                "-fx-cursor: hand; " +
-                "-fx-padding: 8; " +
-                "-fx-background-color: transparent; " +
-                "-fx-scale-x: 1.0; " +
-                "-fx-scale-y: 1.0;"
-            );
+            container.setStyle(NORMAL_STYLE);
         }
     }
 }

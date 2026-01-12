@@ -4,7 +4,6 @@ import controller.CollectionController;
 import model.bean.CardBean;
 import model.domain.Binder;
 import model.domain.card.Card;
-import model.domain.card.CardProvider;
 import view.InputManager;
 
 import java.util.ArrayList;
@@ -16,15 +15,20 @@ import java.util.logging.Logger;
  * CLI implementation of the Collection View.
  * Provides text-based interface for managing card collections.
  */
+@SuppressWarnings("java:S106")
 public class CliCollectionView implements ICollectionView {
     private static final Logger LOGGER = Logger.getLogger(CliCollectionView.class.getName());
     private static final String SEPARATOR = "━".repeat(80);
     private static final String THIN_SEPARATOR = "─".repeat(80);
+    private static final String INVALID_CHOICE = "Scelta non valida.";
+    private static final String INVALID_NUMBER = "Inserisci un numero valido.";
+    private static final String PRESS_ENTER = "\n[Premi INVIO per continuare...]";
+    private static final String CHOICE_PROMPT = "\nScelta: ";
 
     private final InputManager inputManager;
     private CollectionController controller;
     private Map<String, Binder> currentBinders;
-    private CardProvider currentCardProvider;
+    private model.dao.ICardDao cardDao;
     private String username;
     private boolean saveButtonVisible;
 
@@ -43,9 +47,9 @@ public class CliCollectionView implements ICollectionView {
     }
 
     @Override
-    public void displayCollection(Map<String, Binder> bindersBySet, CardProvider cardProvider) {
+    public void displayCollection(Map<String, Binder> bindersBySet, model.dao.ICardDao cardDao) {
         this.currentBinders = bindersBySet;
-        this.currentCardProvider = cardProvider;
+        this.cardDao = cardDao;
 
         clearScreen();
         showCollectionHeader();
@@ -117,17 +121,18 @@ public class CliCollectionView implements ICollectionView {
         for (Map.Entry<String, Binder> entry : currentBinders.entrySet()) {
             Binder binder = entry.getValue();
             try {
-                List<Card> allCards = currentCardProvider.searchPokemonSet(entry.getKey());
+                // TODO: Handle game type properly, for now forcing Pokemon
+                List<Card> allCards = cardDao.getSetCards(entry.getKey(), "pokemon");
                 int totalCards = allCards.size();
                 int ownedCards = binder.getCardCount();
                 int missingCards = totalCards - ownedCards;
 
                 System.out.printf("   [%d] %s - %d carte possedute, \u001B[31m%d mancanti\u001B[0m%n",
-                    index++, binder.getSetName(), ownedCards, missingCards);
+                        index++, binder.getSetName(), ownedCards, missingCards);
             } catch (Exception e) {
                 // Fallback se non si riesce a caricare il totale
                 System.out.printf("   [%d] %s - %d carte possedute%n",
-                    index++, binder.getSetName(), binder.getCardCount());
+                        index++, binder.getSetName(), binder.getCardCount());
             }
         }
         System.out.println();
@@ -143,7 +148,7 @@ public class CliCollectionView implements ICollectionView {
                 System.out.println("  3) 💾 SALVA Modifiche Pendenti");
             }
             System.out.println("  0) Torna alla Home");
-            System.out.print("\nScelta: ");
+            System.out.print(CHOICE_PROMPT);
 
             String choice = inputManager.readString().trim();
 
@@ -161,7 +166,7 @@ public class CliCollectionView implements ICollectionView {
                     }
                     return;
                 }
-                default -> System.out.println("Scelta non valida.");
+                default -> System.out.println(INVALID_CHOICE);
             }
         }
     }
@@ -182,7 +187,7 @@ public class CliCollectionView implements ICollectionView {
         String choice = inputManager.readString().trim();
 
         if ("0".equals(choice)) {
-            displayCollection(currentBinders, currentCardProvider);
+            displayCollection(currentBinders, cardDao);
             return;
         }
 
@@ -194,10 +199,10 @@ public class CliCollectionView implements ICollectionView {
                 Map.Entry<String, Binder> entry = bindersList.get(index);
                 manageSet(entry.getKey(), entry.getValue());
             } else {
-                showError("Scelta non valida.");
+                showError(INVALID_CHOICE);
             }
         } catch (NumberFormatException e) {
-            showError("Inserisci un numero valido.");
+            showError(INVALID_NUMBER);
         }
     }
 
@@ -209,7 +214,7 @@ public class CliCollectionView implements ICollectionView {
             System.out.println(SEPARATOR);
 
             try {
-                List<Card> allCards = currentCardProvider.searchPokemonSet(setId);
+                List<Card> allCards = cardDao.getSetCards(setId, "pokemon");
                 Map<String, CardBean> ownedCardsMap = new java.util.HashMap<>();
                 for (CardBean card : binder.getCards()) {
                     ownedCardsMap.put(card.getId(), card);
@@ -225,7 +230,7 @@ public class CliCollectionView implements ICollectionView {
                 System.out.println("  3) Gestisci Carta (quantità/scambiabile)");
                 System.out.println("  4) Elimina Set");
                 System.out.println("  0) Torna Indietro");
-                System.out.print("\nScelta: ");
+                System.out.print(CHOICE_PROMPT);
 
                 String choice = inputManager.readString().trim();
 
@@ -242,10 +247,10 @@ public class CliCollectionView implements ICollectionView {
                         }
                     }
                     case "0" -> {
-                        displayCollection(currentBinders, currentCardProvider);
+                        displayCollection(currentBinders, cardDao);
                         return;
                     }
-                    default -> System.out.println("Scelta non valida.");
+                    default -> System.out.println(INVALID_CHOICE);
                 }
             } catch (Exception e) {
                 showError("Errore nel caricamento delle carte del set.");
@@ -264,8 +269,8 @@ public class CliCollectionView implements ICollectionView {
         }
 
         long tradableCount = binder.getCards().stream()
-            .filter(CardBean::isTradable)
-            .count();
+                .filter(CardBean::isTradable)
+                .count();
         System.out.printf("  Carte scambiabili: %d%n", tradableCount);
         System.out.println();
     }
@@ -277,16 +282,20 @@ public class CliCollectionView implements ICollectionView {
         int count = 0;
         for (Card card : allCards) {
             CardBean owned = ownedCardsMap.get(card.getId());
-            String status = owned != null ?
-                String.format("[✓] x%d%s", owned.getQuantity(), owned.isTradable() ? " 🔄" : "") :
-                "[ ]";
+            String status;
+            if (owned != null) {
+                String tradableIndicator = owned.isTradable() ? " 🔄" : "";
+                status = String.format("[✓] x%d%s", owned.getQuantity(), tradableIndicator);
+            } else {
+                status = "[ ]";
+            }
 
             System.out.printf("  %-6s %s%n", status, card.getName());
             count++;
 
             // Paginazione ogni 15 carte
             if (count % 15 == 0 && count < allCards.size()) {
-                System.out.print("\n[Premi INVIO per continuare...]");
+                System.out.print(PRESS_ENTER);
                 inputManager.readString();
             }
         }
@@ -296,8 +305,8 @@ public class CliCollectionView implements ICollectionView {
     private void addCardToSet(String setId, List<Card> allCards, Map<String, CardBean> ownedCardsMap) {
         System.out.println("\nCarte non possedute:");
         List<Card> notOwnedCards = allCards.stream()
-            .filter(card -> !ownedCardsMap.containsKey(card.getId()))
-            .toList();
+                .filter(card -> !ownedCardsMap.containsKey(card.getId()))
+                .toList();
 
         if (notOwnedCards.isEmpty()) {
             System.out.println("  Possiedi già tutte le carte di questo set!");
@@ -308,7 +317,7 @@ public class CliCollectionView implements ICollectionView {
         for (int i = 0; i < notOwnedCards.size(); i++) {
             System.out.printf("  [%d] %s%n", i + 1, notOwnedCards.get(i).getName());
             if ((i + 1) % 15 == 0 && i < notOwnedCards.size() - 1) {
-                System.out.print("\n[Premi INVIO per continuare...]");
+                System.out.print(PRESS_ENTER);
                 inputManager.readString();
             }
         }
@@ -316,7 +325,8 @@ public class CliCollectionView implements ICollectionView {
         System.out.print("\nSeleziona carta da aggiungere (0 per annullare): ");
         String choice = inputManager.readString().trim();
 
-        if ("0".equals(choice)) return;
+        if ("0".equals(choice))
+            return;
 
         try {
             int index = Integer.parseInt(choice) - 1;
@@ -328,10 +338,10 @@ public class CliCollectionView implements ICollectionView {
                     pause();
                 }
             } else {
-                showError("Scelta non valida.");
+                showError(INVALID_CHOICE);
             }
         } catch (NumberFormatException e) {
-            showError("Inserisci un numero valido.");
+            showError(INVALID_NUMBER);
         }
     }
 
@@ -354,7 +364,8 @@ public class CliCollectionView implements ICollectionView {
         System.out.print("\nSeleziona carta da rimuovere (0 per annullare): ");
         String choice = inputManager.readString().trim();
 
-        if ("0".equals(choice)) return;
+        if ("0".equals(choice))
+            return;
 
         try {
             int index = Integer.parseInt(choice) - 1;
@@ -363,9 +374,9 @@ public class CliCollectionView implements ICollectionView {
 
                 // Trova la carta completa
                 Card fullCard = allCards.stream()
-                    .filter(c -> c.getId().equals(selectedCard.getId()))
-                    .findFirst()
-                    .orElse(null);
+                        .filter(c -> c.getId().equals(selectedCard.getId()))
+                        .findFirst()
+                        .orElse(null);
 
                 if (fullCard != null && controller != null) {
                     controller.removeCardFromSet(setId, fullCard);
@@ -373,10 +384,10 @@ public class CliCollectionView implements ICollectionView {
                     pause();
                 }
             } else {
-                showError("Scelta non valida.");
+                showError(INVALID_CHOICE);
             }
         } catch (NumberFormatException e) {
-            showError("Inserisci un numero valido.");
+            showError(INVALID_NUMBER);
         }
     }
 
@@ -393,14 +404,15 @@ public class CliCollectionView implements ICollectionView {
         for (int i = 0; i < ownedCards.size(); i++) {
             CardBean card = ownedCards.get(i);
             System.out.printf("  [%d] %s (x%d) %s%n",
-                i + 1, card.getName(), card.getQuantity(),
-                card.isTradable() ? "🔄" : "");
+                    i + 1, card.getName(), card.getQuantity(),
+                    card.isTradable() ? "🔄" : "");
         }
 
         System.out.print("\nSeleziona carta (0 per annullare): ");
         String choice = inputManager.readString().trim();
 
-        if ("0".equals(choice)) return;
+        if ("0".equals(choice))
+            return;
 
         try {
             int index = Integer.parseInt(choice) - 1;
@@ -408,10 +420,10 @@ public class CliCollectionView implements ICollectionView {
                 CardBean selectedCard = ownedCards.get(index);
                 manageCardQuantityAndTradable(setId, selectedCard, allCards);
             } else {
-                showError("Scelta non valida.");
+                showError(INVALID_CHOICE);
             }
         } catch (NumberFormatException e) {
-            showError("Inserisci un numero valido.");
+            showError(INVALID_NUMBER);
         }
     }
 
@@ -424,19 +436,21 @@ public class CliCollectionView implements ICollectionView {
         System.out.println("2) Diminuisci quantità");
         System.out.println("3) Toggle scambiabile");
         System.out.println("0) Annulla");
-        System.out.print("\nScelta: ");
+        System.out.print(CHOICE_PROMPT);
 
         String choice = inputManager.readString().trim();
 
-        if (controller == null) return;
+        if (controller == null)
+            return;
 
         // Trova la carta completa
         Card fullCard = allCards.stream()
-            .filter(c -> c.getId().equals(cardBean.getId()))
-            .findFirst()
-            .orElse(null);
+                .filter(c -> c.getId().equals(cardBean.getId()))
+                .findFirst()
+                .orElse(null);
 
-        if (fullCard == null) return;
+        if (fullCard == null)
+            return;
 
         switch (choice) {
             case "1" -> {
@@ -455,8 +469,7 @@ public class CliCollectionView implements ICollectionView {
                 System.out.println("✓ Stato scambiabile aggiornato! (Ricorda di salvare)");
                 pause();
             }
-            case "0" -> {}
-            default -> System.out.println("Scelta non valida.");
+            default -> System.out.println(INVALID_CHOICE);
         }
     }
 
@@ -495,7 +508,7 @@ public class CliCollectionView implements ICollectionView {
             System.out.printf("  [%d] %s%n", i + 1, setsList.get(i).getValue());
 
             if ((i + 1) % 20 == 0 && i < setsList.size() - 1) {
-                System.out.print("\n[Premi INVIO per continuare...]");
+                System.out.print(PRESS_ENTER);
                 inputManager.readString();
             }
         }
@@ -504,7 +517,7 @@ public class CliCollectionView implements ICollectionView {
         String choice = inputManager.readString().trim();
 
         if ("0".equals(choice)) {
-            displayCollection(currentBinders, currentCardProvider);
+            displayCollection(currentBinders, cardDao);
             return;
         }
 
@@ -514,15 +527,15 @@ public class CliCollectionView implements ICollectionView {
                 Map.Entry<String, String> selectedSet = setsList.get(index);
                 controller.createBinder(selectedSet.getKey(), selectedSet.getValue());
             } else {
-                showError("Scelta non valida.");
+                showError(INVALID_CHOICE);
             }
         } catch (NumberFormatException e) {
-            showError("Inserisci un numero valido.");
+            showError(INVALID_NUMBER);
         }
     }
 
     private void pause() {
-        System.out.print("\n[Premi INVIO per continuare...]");
+        System.out.print(PRESS_ENTER);
         inputManager.readString();
     }
 }

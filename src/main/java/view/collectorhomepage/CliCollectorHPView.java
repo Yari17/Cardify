@@ -7,15 +7,18 @@ import view.InputManager;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("java:S106")
 public class CliCollectorHPView implements ICollectorHPView {
+    private static final String SEPARATOR_LINE = "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━";
+    private static final String PRESS_ENTER_TO_CONTINUE = "Premi INVIO per continuare...";
+    private static final String NO_CARDS_AVAILABLE = "\nNessuna carta disponibile.";
+    private static final String HEADER_TOP_BORDER = "\n╔════════════════════════════════════════════════════════════════════╗";
+    private static final String HEADER_BOTTOM_BORDER = "╚════════════════════════════════════════════════════════════════════╝";
+
     private final InputManager inputManager;
     private CollectorHPController controller;
     private List<CardBean> currentCards;
     private Map<String, String> availableSets; // ID -> Nome del set
-
-    // Campi per gestire la ricerca unificata
-    private SearchType currentSearchType = SearchType.BY_NAME;
-    private String currentSearchQuery = "";
 
     public CliCollectorHPView(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -35,16 +38,7 @@ public class CliCollectorHPView implements ICollectorHPView {
 
         boolean running = true;
         while (running) {
-            System.out.println("\n=== CARDIFY HOME PAGE ===");
-            System.out.println("1. Visualizza carte popolari");
-            System.out.println("2. Cerca carte per nome");
-            System.out.println("3. Cerca carte per set");
-            System.out.println("4. Gestisci collezione");
-            System.out.println("5. Effettua scambio");
-            System.out.println("6. Visualizza profilo");
-            System.out.println("7. Logout");
-            System.out.println("0. Esci");
-            System.out.print("Scegli un'opzione: ");
+            printMainMenu();
 
             String choice = inputManager.readString();
 
@@ -108,7 +102,7 @@ public class CliCollectorHPView implements ICollectorHPView {
         this.currentCards = cards;
 
         if (cards == null || cards.isEmpty()) {
-            System.out.println("\nNessuna carta disponibile.");
+            System.out.println(NO_CARDS_AVAILABLE);
             return;
         }
 
@@ -119,91 +113,121 @@ public class CliCollectorHPView implements ICollectorHPView {
         boolean browsing = true;
 
         while (browsing) {
-            // Mostra header
-            System.out.println("\n╔════════════════════════════════════════════════════════════════════╗");
-            System.out.println("║                        CARTE TROVATE                               ║");
-            System.out.println("╚════════════════════════════════════════════════════════════════════╝");
-            System.out.println("Totale carte: " + cards.size() + " | Pagina " + (currentPage + 1) + " di " + totalPages);
-            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-
-            // Calcola range per la pagina corrente
-            int start = currentPage * cardsPerPage;
-            int end = Math.min(start + cardsPerPage, cards.size());
-
-            // Mostra le carte della pagina corrente
-            for (int i = start; i < end; i++) {
-                CardBean card = cards.get(i);
-                System.out.println("\n" + (i + 1) + ". ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-                System.out.println("   Nome:      " + card.getName());
-                System.out.println("   ID:        " + card.getId());
-                System.out.println("   Gioco:     " + card.getGameType());
-                System.out.println("   Immagine:  " + (card.getImageUrl() != null ? "✓ Disponibile" : "✗ Non disponibile"));
-            }
-
-            System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-
-            // Mostra opzioni disponibili
-            System.out.println("\n📋 OPZIONI:");
-            System.out.println("   • Inserisci il numero (1-" + cards.size() + ") per vedere i dettagli della carta");
-            if (currentPage < totalPages - 1) {
-                System.out.println("   • Premi 'N' per vedere le carte successive");
-            }
-            if (currentPage > 0) {
-                System.out.println("   • Premi 'P' per vedere le carte precedenti");
-            }
-            System.out.println("   • Premi '0' per tornare alla homepage");
-            System.out.print("\n➤ Scelta: ");
+            showPage(cards, currentPage, cardsPerPage, totalPages);
 
             String choice = inputManager.readString().trim();
+            int newPage = handleNavigationInput(choice, currentPage, totalPages, cards);
 
-            if ("0".equals(choice)) {
+            if (newPage == -2) { // Exit code
                 browsing = false;
-            } else if ("N".equalsIgnoreCase(choice)) {
-                if (currentPage < totalPages - 1) {
-                    currentPage++;
-                } else {
-                    System.out.println("⚠ Sei già all'ultima pagina");
-                    System.out.print("Premi INVIO per continuare...");
-                    inputManager.readString();
-                }
-            } else if ("P".equalsIgnoreCase(choice)) {
-                if (currentPage > 0) {
-                    currentPage--;
-                } else {
-                    System.out.println("⚠ Sei già alla prima pagina");
-                    System.out.print("Premi INVIO per continuare...");
-                    inputManager.readString();
-                }
-            } else {
-                // Prova a interpretare come numero di carta
-                try {
-                    int cardIndex = Integer.parseInt(choice) - 1;
-                    if (cardIndex >= 0 && cardIndex < cards.size()) {
-                        CardBean selectedCard = cards.get(cardIndex);
-                        showCardDetails(selectedCard);
-                    } else {
-                        System.out.println("⚠ Numero carta non valido. Deve essere tra 1 e " + cards.size());
-                        System.out.print("Premi INVIO per continuare...");
-                        inputManager.readString();
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("⚠ Input non valido. Inserisci un numero, N, P o 0");
-                    System.out.print("Premi INVIO per continuare...");
-                    inputManager.readString();
-                }
+            } else if (newPage != -1) { // Valid new page
+                currentPage = newPage;
             }
         }
     }
 
+    private void showPage(List<CardBean> cards, int currentPage, int cardsPerPage, int totalPages) {
+        // Mostra header
+        // Mostra header
+        System.out.println(HEADER_TOP_BORDER);
+        System.out.println("║                        CARTE TROVATE                               ║");
+        System.out.println(HEADER_BOTTOM_BORDER);
+        System.out.println("Totale carte: " + cards.size() + " | Pagina " + (currentPage + 1) + " di " + totalPages);
+        System.out.println(SEPARATOR_LINE);
+
+        // Calcola range per la pagina corrente
+        int start = currentPage * cardsPerPage;
+        int end = Math.min(start + cardsPerPage, cards.size());
+
+        // Mostra le carte della pagina corrente
+        for (int i = start; i < end; i++) {
+            CardBean card = cards.get(i);
+            System.out.println("\n" + (i + 1) + ". ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            System.out.println("   Nome:      " + card.getName());
+            System.out.println("   ID:        " + card.getId());
+            System.out.println("   Gioco:     " + card.getGameType());
+            System.out.println("   Immagine:  " + (card.getImageUrl() != null ? "✓ Disponibile" : "✗ Non disponibile"));
+        }
+
+        System.out.println("\n" + SEPARATOR_LINE);
+
+        // Mostra opzioni disponibili
+        System.out.println("\n📋 OPZIONI:");
+        System.out.println("   • Inserisci il numero (1-" + cards.size() + ") per vedere i dettagli della carta");
+        if (currentPage < totalPages - 1) {
+            System.out.println("   • Premi 'N' per vedere le carte successive");
+        }
+        if (currentPage > 0) {
+            System.out.println("   • Premi 'P' per vedere le carte precedenti");
+        }
+        System.out.println("   • Premi '0' per tornare alla homepage");
+        System.out.print("\n➤ Scelta: ");
+    }
+
+    /**
+     * Handles navigation input.
+     * Returns:
+     * -2 if user wants to exit (0)
+     * -1 if input was handled or invalid (stay on same page)
+     * >= 0 for the new page index
+     */
+    private int handleNavigationInput(String choice, int currentPage, int totalPages, List<CardBean> cards) {
+        if ("0".equals(choice)) {
+            return -2;
+        } else if ("N".equalsIgnoreCase(choice)) {
+            if (currentPage < totalPages - 1) {
+                return currentPage + 1;
+            } else {
+                System.out.println("⚠ Sei già all'ultima pagina");
+                System.out.print(PRESS_ENTER_TO_CONTINUE);
+                inputManager.readString();
+                return -1;
+            }
+        } else if ("P".equalsIgnoreCase(choice)) {
+            if (currentPage > 0) {
+                return currentPage - 1;
+            } else {
+                System.out.println("⚠ Sei già alla prima pagina");
+                System.out.print(PRESS_ENTER_TO_CONTINUE);
+                inputManager.readString();
+                return -1;
+            }
+        } else {
+            return tryShowCardDetails(choice, cards);
+        }
+    }
+
+    private int tryShowCardDetails(String choice, List<CardBean> cards) {
+        try {
+            int cardIndex = Integer.parseInt(choice) - 1;
+            if (cardIndex >= 0 && cardIndex < cards.size()) {
+                CardBean selectedCard = cards.get(cardIndex);
+                showCardDetails(selectedCard);
+                return -1; // Stay on page after viewing details
+            } else {
+                System.out.println("⚠ Numero carta non valido. Deve essere tra 1 e " + cards.size());
+                System.out.print(PRESS_ENTER_TO_CONTINUE);
+                inputManager.readString();
+                return -1;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("⚠ Input non valido. Inserisci un numero, N, P o 0");
+            System.out.print(PRESS_ENTER_TO_CONTINUE);
+            inputManager.readString();
+            return -1;
+        }
+    }
+
     private void showCardDetails(CardBean card) {
-        System.out.println("\n╔════════════════════════════════════════════════════════════════════╗");
+        System.out.println(HEADER_TOP_BORDER);
         System.out.println("║                      DETTAGLI CARTA                                ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════════╝");
+        System.out.println(HEADER_BOTTOM_BORDER);
         System.out.println("\n📇 Nome:        " + card.getName());
         System.out.println("🆔 ID:          " + card.getId());
         System.out.println("🎮 Gioco:       " + card.getGameType());
-        System.out.println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
-        System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out
+                .println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
+        System.out.println("\n" + SEPARATOR_LINE);
         System.out.print("\nPremi INVIO per tornare alla lista...");
         inputManager.readString();
     }
@@ -216,131 +240,157 @@ public class CliCollectorHPView implements ICollectorHPView {
             }
         }
 
-        // displayCards gestisce tutta la navigazione e visualizzazione
-        if (currentCards != null && !currentCards.isEmpty()) {
+        // Controller calls displayCards, so we don't need to call it here explicitly
+        // unless controller is null
+        if (controller == null && currentCards != null && !currentCards.isEmpty()) {
             displayCards(currentCards);
-        } else {
-            System.out.println("\n⚠ Nessuna carta disponibile.");
-            System.out.print("Premi INVIO per continuare...");
+        } else if (controller == null) {
+            System.out.println(NO_CARDS_AVAILABLE);
+            System.out.print(PRESS_ENTER_TO_CONTINUE);
             inputManager.readString();
         }
     }
 
-    private void searchByNameMenu() {
-        System.out.println("\n╔════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                    RICERCA PER NOME                               ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════════╝");
+    private void printMainMenu() {
+        System.out.println("\n=== CARDIFY HOME PAGE ===");
+        System.out.println("1. Visualizza carte popolari");
+        System.out.println("2. Cerca carte per nome");
+        System.out.println("3. Cerca carte per set");
+        System.out.println("4. Gestisci collezione");
+        System.out.println("5. Effettua scambio");
+        System.out.println("6. Visualizza profilo");
+        System.out.println("7. Logout");
+        System.out.println("0. Esci");
+        System.out.print("Scegli un'opzione: ");
+    }
 
-        System.out.print("\nInserisci il nome della carta da cercare: ");
+    private void searchByNameMenu() {
+        printSearchByNamePrompt();
         String cardName = inputManager.readString().trim();
 
         if (cardName.isEmpty()) {
             System.out.println("⚠ Nome carta non valido");
-            System.out.print("Premi INVIO per continuare...");
+            System.out.print(PRESS_ENTER_TO_CONTINUE);
             inputManager.readString();
             return;
         }
 
-        // Imposta il tipo di ricerca e la query
-        currentSearchType = SearchType.BY_NAME;
-        currentSearchQuery = cardName;
-
         System.out.println("\n✓ Ricerca impostata - Tipo: BY_NAME, Query: " + cardName);
-        System.out.println("⚠ Funzionalità di ricerca per nome non ancora implementata nel controller");
 
-        // TODO: Il controller dovrebbe implementare un metodo che chiama
-        // view.getSearchQuery() e view.getSearchType() e poi esegue la ricerca appropriata
+        if (controller != null) {
+            System.out.println("🔄 Ricerca in corso...");
+            controller.searchCardsByName(cardName);
+            // NOTE: controller.searchCardsByName calls view.displayCards()
+        } else {
+            System.out.println("ERROR: Controller non connesso");
+            System.out.print("\n" + PRESS_ENTER_TO_CONTINUE);
+            inputManager.readString();
+        }
+    }
 
-        System.out.print("\nPremi INVIO per continuare...");
-        inputManager.readString();
+    private void printSearchByNamePrompt() {
+        System.out.println(HEADER_TOP_BORDER);
+        System.out.println("║                    RICERCA PER NOME                               ║");
+        System.out.println(HEADER_BOTTOM_BORDER);
+        System.out.print("\nInserisci il nome della carta da cercare: ");
     }
 
     private void searchBySetMenu() {
         if (availableSets == null || availableSets.isEmpty()) {
             System.out.println("\n⚠ Set non ancora caricati. Attendi un momento...");
-            System.out.print("Premi INVIO per continuare...");
+            System.out.print(PRESS_ENTER_TO_CONTINUE);
             inputManager.readString();
             return;
         }
 
-        System.out.println("\n╔════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                      RICERCA PER SET                              ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════════╝");
-
         // Converti la mappa in una lista per permettere la selezione numerica
         List<Map.Entry<String, String>> setsList = new java.util.ArrayList<>(availableSets.entrySet());
-
-        System.out.println("\nSet disponibili (" + setsList.size() + " totali):");
-        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-
-        // Mostra i set in gruppi di 20
         int pageSize = 20;
         int currentPage = 0;
         int totalPages = (int) Math.ceil((double) setsList.size() / pageSize);
-
         boolean browsing = true;
+
         while (browsing) {
-            int start = currentPage * pageSize;
-            int end = Math.min(start + pageSize, setsList.size());
-
-            for (int i = start; i < end; i++) {
-                Map.Entry<String, String> entry = setsList.get(i);
-                System.out.printf("%3d. %-50s (ID: %s)%n",
-                    i + 1,
-                    entry.getValue(),
-                    entry.getKey());
-            }
-
-            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            System.out.println("Pagina " + (currentPage + 1) + " di " + totalPages);
-            System.out.println("\nOpzioni:");
-            System.out.println("- Inserisci il numero del set per vedere le carte");
-            if (currentPage < totalPages - 1) {
-                System.out.println("- Premi 'N' per la pagina successiva");
-            }
-            if (currentPage > 0) {
-                System.out.println("- Premi 'P' per la pagina precedente");
-            }
-            System.out.println("- Premi 0 per tornare al menu principale");
-            System.out.print("Scelta: ");
-
+            displaySetsPage(setsList, currentPage, pageSize, totalPages);
             String choice = inputManager.readString().trim();
+            int newPage = handleSetNavigationInput(choice, currentPage, totalPages, setsList);
 
-            if ("0".equals(choice)) {
+            if (newPage == -2) {
                 browsing = false;
-            } else if ("N".equalsIgnoreCase(choice) && currentPage < totalPages - 1) {
-                currentPage++;
-            } else if ("P".equalsIgnoreCase(choice) && currentPage > 0) {
-                currentPage--;
-            } else {
-                try {
-                    int setIndex = Integer.parseInt(choice) - 1;
-                    if (setIndex >= 0 && setIndex < setsList.size()) {
-                        Map.Entry<String, String> selectedSet = setsList.get(setIndex);
-                        String setId = selectedSet.getKey();
-                        String setName = selectedSet.getValue();
-
-                        // Imposta il tipo di ricerca e la query
-                        currentSearchType = SearchType.BY_SET;
-                        currentSearchQuery = setId;
-
-                        System.out.println("\n🔄 Caricamento carte dal set: " + setName + " (" + setId + ")");
-
-                        if (controller != null) {
-                            controller.loadCardsFromSet(setId);
-                        }
-
-                        // displayCards gestisce la visualizzazione e la navigazione
-                        if (currentCards != null && !currentCards.isEmpty()) {
-                            displayCards(currentCards);
-                        }
-                    } else {
-                        System.out.println("⚠ Numero set non valido. Riprova.");
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("⚠ Input non valido. Inserisci un numero o N/P.");
-                }
+            } else if (newPage != -1) {
+                currentPage = newPage;
             }
+        }
+    }
+
+    private void displaySetsPage(List<Map.Entry<String, String>> setsList, int currentPage, int pageSize,
+            int totalPages) {
+        System.out.println(HEADER_TOP_BORDER);
+        System.out.println("║                      RICERCA PER SET                              ║");
+        System.out.println(HEADER_BOTTOM_BORDER);
+        System.out.println("\nSet disponibili (" + setsList.size() + " totali):");
+        System.out.println(SEPARATOR_LINE);
+
+        int start = currentPage * pageSize;
+        int end = Math.min(start + pageSize, setsList.size());
+
+        for (int i = start; i < end; i++) {
+            Map.Entry<String, String> entry = setsList.get(i);
+            System.out.printf("%3d. %-50s (ID: %s)%n", i + 1, entry.getValue(), entry.getKey());
+        }
+
+        System.out.println(SEPARATOR_LINE);
+        System.out.println("Pagina " + (currentPage + 1) + " di " + totalPages);
+        System.out.println("\nOpzioni:");
+        System.out.println("- Inserisci il numero del set per vedere le carte");
+        if (currentPage < totalPages - 1) {
+            System.out.println("- Premi 'N' per la pagina successiva");
+        }
+        if (currentPage > 0) {
+            System.out.println("- Premi 'P' per la pagina precedente");
+        }
+        System.out.println("- Premi 0 per tornare al menu principale");
+        System.out.print("Scelta: ");
+    }
+
+    private int handleSetNavigationInput(String choice, int currentPage, int totalPages,
+            List<Map.Entry<String, String>> setsList) {
+        if ("0".equals(choice)) {
+            return -2;
+        } else if ("N".equalsIgnoreCase(choice)) {
+            return (currentPage < totalPages - 1) ? currentPage + 1 : -1;
+        } else if ("P".equalsIgnoreCase(choice)) {
+            return (currentPage > 0) ? currentPage - 1 : -1;
+        } else {
+            return trySelectSet(choice, setsList);
+        }
+    }
+
+    private int trySelectSet(String choice, List<Map.Entry<String, String>> setsList) {
+        try {
+            int setIndex = Integer.parseInt(choice) - 1;
+            if (setIndex >= 0 && setIndex < setsList.size()) {
+                Map.Entry<String, String> selectedSet = setsList.get(setIndex);
+                loadSet(selectedSet);
+            } else {
+                System.out.println("⚠ Numero set non valido. Riprova.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("⚠ Input non valido. Inserisci un numero o N/P.");
+        }
+        return -1; // Always stay on page or valid transition handled elsewhere (but here we just
+                   // load and stay)
+    }
+
+    private void loadSet(Map.Entry<String, String> selectedSet) {
+        String setId = selectedSet.getKey();
+        String setName = selectedSet.getValue();
+        System.out.println("\n🔄 Caricamento carte dal set: " + setName + " (" + setId + ")");
+
+        if (controller != null) {
+            controller.loadCardsFromSet(setId);
+        } else if (currentCards != null && !currentCards.isEmpty()) {
+            displayCards(currentCards);
         }
     }
 

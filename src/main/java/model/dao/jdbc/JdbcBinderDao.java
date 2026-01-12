@@ -2,7 +2,7 @@ package model.dao.jdbc;
 
 import model.dao.IBinderDao;
 import model.domain.Binder;
-import model.exception.DataPersistenceException;
+import exception.DataPersistenceException;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -17,11 +17,13 @@ public class JdbcBinderDao implements IBinderDao {
     private final String jdbcUrl;
     private final String dbUser;
     private final String dbPassword;
+    private final model.dao.ICardDao cardDao;
 
-    public JdbcBinderDao(String jdbcUrl, String dbUser, String dbPassword) {
+    public JdbcBinderDao(String jdbcUrl, String dbUser, String dbPassword, model.dao.ICardDao cardDao) {
         this.jdbcUrl = jdbcUrl;
         this.dbUser = dbUser;
         this.dbPassword = dbPassword;
+        this.cardDao = cardDao;
         initializeDatabase();
     }
 
@@ -31,33 +33,33 @@ public class JdbcBinderDao implements IBinderDao {
 
     private void initializeDatabase() {
         String createBindersTable = """
-            CREATE TABLE IF NOT EXISTS binders (
-                id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                owner VARCHAR(255) NOT NULL,
-                set_id VARCHAR(255),
-                set_name VARCHAR(255),
-                set_logo VARCHAR(255),
-                created_at TIMESTAMP,
-                last_modified TIMESTAMP
-            )
-        """;
+                    CREATE TABLE IF NOT EXISTS binders (
+                        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                        owner VARCHAR(255) NOT NULL,
+                        set_id VARCHAR(255),
+                        set_name VARCHAR(255),
+                        set_logo VARCHAR(255),
+                        created_at TIMESTAMP,
+                        last_modified TIMESTAMP
+                    )
+                """;
 
         String createBinderCardsTable = """
-            CREATE TABLE IF NOT EXISTS binder_cards (
-                id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                binder_id BIGINT NOT NULL,
-                card_id VARCHAR(255) NOT NULL,
-                card_name VARCHAR(255),
-                card_image_url VARCHAR(512),
-                game_type VARCHAR(50),
-                quantity INT DEFAULT 1,
-                is_tradable BOOLEAN DEFAULT FALSE,
-                FOREIGN KEY (binder_id) REFERENCES binders(id) ON DELETE CASCADE
-            )
-        """;
+                    CREATE TABLE IF NOT EXISTS binder_cards (
+                        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                        binder_id BIGINT NOT NULL,
+                        card_id VARCHAR(255) NOT NULL,
+                        card_name VARCHAR(255),
+                        card_image_url VARCHAR(512),
+                        game_type VARCHAR(50),
+                        quantity INT DEFAULT 1,
+                        is_tradable BOOLEAN DEFAULT FALSE,
+                        FOREIGN KEY (binder_id) REFERENCES binders(id) ON DELETE CASCADE
+                    )
+                """;
 
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
             stmt.execute(createBindersTable);
             stmt.execute(createBinderCardsTable);
             LOGGER.info("Binders and binder_cards tables initialized");
@@ -68,10 +70,10 @@ public class JdbcBinderDao implements IBinderDao {
 
     @Override
     public Optional<Binder> get(long id) {
-        String sql = "SELECT * FROM binders WHERE id = ?";
+        String sql = "SELECT id, owner, set_id, set_name, set_logo, created_at, last_modified FROM binders WHERE id = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, id);
             ResultSet rs = pstmt.executeQuery();
 
@@ -89,12 +91,12 @@ public class JdbcBinderDao implements IBinderDao {
 
     @Override
     public List<Binder> getAll() {
-        String sql = "SELECT * FROM binders";
+        String sql = "SELECT id, owner, set_id, set_name, set_logo, created_at, last_modified FROM binders";
         List<Binder> binders = new ArrayList<>();
 
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Binder binder = mapResultSetToBinder(rs);
@@ -111,19 +113,20 @@ public class JdbcBinderDao implements IBinderDao {
     @Override
     public void save(Binder binder) {
         String sql = """
-            INSERT INTO binders (owner, set_id, set_name, set_logo, created_at, last_modified)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO binders (owner, set_id, set_name, set_logo, created_at, last_modified)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """;
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, binder.getOwner());
             pstmt.setString(2, binder.getSetId());
             pstmt.setString(3, binder.getSetName());
             pstmt.setString(4, binder.getSetLogo());
             pstmt.setTimestamp(5, binder.getCreatedAt() != null ? Timestamp.valueOf(binder.getCreatedAt()) : null);
-            pstmt.setTimestamp(6, binder.getLastModified() != null ? Timestamp.valueOf(binder.getLastModified()) : null);
+            pstmt.setTimestamp(6,
+                    binder.getLastModified() != null ? Timestamp.valueOf(binder.getLastModified()) : null);
 
             pstmt.executeUpdate();
 
@@ -132,7 +135,7 @@ public class JdbcBinderDao implements IBinderDao {
                 binder.setId(generatedKeys.getLong(1));
             }
 
-            LOGGER.info(() -> "Binder saved: " + binder.getSetName());
+            LOGGER.log(Level.INFO, "Binder saved: {0}", binder.getSetName());
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to save binder: " + binder.getSetName(), e);
         }
@@ -141,10 +144,10 @@ public class JdbcBinderDao implements IBinderDao {
     @Override
     public void update(Binder binder, String[] params) {
         String sql = """
-            UPDATE binders
-            SET owner = ?, set_id = ?, set_name = ?, set_logo = ?, last_modified = ?
-            WHERE id = ?
-        """;
+                    UPDATE binders
+                    SET owner = ?, set_id = ?, set_name = ?, set_logo = ?, last_modified = ?
+                    WHERE id = ?
+                """;
 
         try (Connection conn = getConnection()) {
             conn.setAutoCommit(false);
@@ -160,7 +163,7 @@ public class JdbcBinderDao implements IBinderDao {
                 int rowsUpdated = pstmt.executeUpdate();
                 if (rowsUpdated == 0) {
                     throw new DataPersistenceException("No binder found with id: " + binder.getId(),
-                        new SQLException("Update affected 0 rows"));
+                            new SQLException("Update affected 0 rows"));
                 }
             }
 
@@ -168,7 +171,7 @@ public class JdbcBinderDao implements IBinderDao {
             updateBinderCards(conn, binder);
 
             conn.commit();
-            LOGGER.info(() -> "Binder updated: " + binder.getSetName());
+            LOGGER.log(Level.INFO, "Binder updated: {0}", binder.getSetName());
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to update binder: " + binder.getSetName(), e);
         }
@@ -179,15 +182,15 @@ public class JdbcBinderDao implements IBinderDao {
         String sql = "DELETE FROM binders WHERE id = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setLong(1, binder.getId());
             int rowsDeleted = pstmt.executeUpdate();
 
             if (rowsDeleted == 0) {
-                LOGGER.warning(() -> "No binder found to delete with id: " + binder.getId());
+                LOGGER.log(Level.WARNING, "No binder found to delete with id: {0}", binder.getId());
             } else {
-                LOGGER.info(() -> "Binder deleted: " + binder.getId());
+                LOGGER.log(Level.INFO, "Binder deleted: {0}", binder.getId());
             }
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to delete binder: " + binder.getId(), e);
@@ -217,11 +220,11 @@ public class JdbcBinderDao implements IBinderDao {
 
     @Override
     public List<Binder> getUserBinders(String owner) {
-        String sql = "SELECT * FROM binders WHERE owner = ?";
+        String sql = "SELECT id, owner, set_id, set_name, set_logo, created_at, last_modified FROM binders WHERE owner = ?";
         List<Binder> binders = new ArrayList<>();
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, owner);
             ResultSet rs = pstmt.executeQuery();
 
@@ -231,7 +234,7 @@ public class JdbcBinderDao implements IBinderDao {
                 binders.add(binder);
             }
 
-            LOGGER.info(() -> "Retrieved " + binders.size() + " binders for owner: " + owner);
+            LOGGER.log(Level.INFO, "Retrieved {0} binders for owner: {1}", new Object[] { binders.size(), owner });
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to get binders for owner: " + owner, e);
         }
@@ -252,15 +255,15 @@ public class JdbcBinderDao implements IBinderDao {
             String sql = "DELETE FROM binders WHERE id = ?";
 
             try (Connection conn = getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
                 pstmt.setLong(1, id);
                 int rowsDeleted = pstmt.executeUpdate();
 
                 if (rowsDeleted == 0) {
-                    LOGGER.warning(() -> "No binder found to delete with id: " + binderId);
+                    LOGGER.log(Level.WARNING, "No binder found to delete with id: {0}", binderId);
                 } else {
-                    LOGGER.info(() -> "Binder deleted: " + binderId);
+                    LOGGER.log(Level.INFO, "Binder deleted: {0}", binderId);
                 }
             }
         } catch (NumberFormatException e) {
@@ -272,31 +275,55 @@ public class JdbcBinderDao implements IBinderDao {
 
     /**
      * Loads all cards belonging to a binder from the database.
+     * Uses CardDao to fetch full card details (ensuring caching).
      */
     private void loadBinderCards(Connection conn, Binder binder) throws SQLException {
-        String sql = "SELECT * FROM binder_cards WHERE binder_id = ?";
+        String sql = "SELECT id, binder_id, card_id, card_name, card_image_url, game_type, quantity, is_tradable FROM binder_cards WHERE binder_id = ?";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, binder.getId());
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
-                model.bean.CardBean card = new model.bean.CardBean(
-                    rs.getString("card_id"),
-                    rs.getString("card_name"),
-                    rs.getString("card_image_url"),
-                    model.domain.CardGameType.valueOf(rs.getString("game_type"))
-                );
-                card.setQuantity(rs.getInt("quantity"));
-                card.setTradable(rs.getBoolean("is_tradable"));
+                String cardId = rs.getString("card_id");
+                String gameTypeStr = rs.getString("game_type");
 
-                binder.addCard(card);
+                // Fetch full card details from CardDao (Cache -> SDK)
+                model.domain.card.Card fullCard = null;
+                if (cardDao != null) {
+                    fullCard = cardDao.getCard(cardId, gameTypeStr);
+                }
+
+                model.bean.CardBean cardBean;
+                if (fullCard != null) {
+                    // Create Bean from full cached card
+                    cardBean = new model.bean.CardBean(
+                            fullCard.getId(),
+                            fullCard.getName(),
+                            fullCard.getImageUrl(),
+                            fullCard.getGameType());
+                } else {
+                    // Fallback to DB data if CardDao fails or returns null
+                    LOGGER.log(Level.WARNING, "Card not found in CardDao/SDK: {0}. Using DB fallback.", cardId);
+                    cardBean = new model.bean.CardBean(
+                            cardId,
+                            rs.getString("card_name"),
+                            rs.getString("card_image_url"),
+                            model.domain.CardGameType.valueOf(gameTypeStr));
+                }
+
+                // Set ownership details
+                cardBean.setQuantity(rs.getInt("quantity"));
+                cardBean.setTradable(rs.getBoolean("is_tradable"));
+
+                binder.addCard(cardBean);
             }
         }
     }
 
     /**
-     * Updates the cards in a binder by deleting all existing cards and inserting the current ones.
+     * Updates the cards in a binder by deleting all existing cards and inserting
+     * the current ones.
      */
     private void updateBinderCards(Connection conn, Binder binder) throws SQLException {
         // Delete existing cards
@@ -308,9 +335,9 @@ public class JdbcBinderDao implements IBinderDao {
 
         // Insert current cards
         String insertSql = """
-            INSERT INTO binder_cards (binder_id, card_id, card_name, card_image_url, game_type, quantity, is_tradable)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """;
+                    INSERT INTO binder_cards (binder_id, card_id, card_name, card_image_url, game_type, quantity, is_tradable)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """;
 
         try (PreparedStatement pstmt = conn.prepareStatement(insertSql)) {
             for (model.bean.CardBean card : binder.getCards()) {

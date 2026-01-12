@@ -1,10 +1,6 @@
 package view.factory;
 
-import controller.CollectionController;
-import controller.CollectorHPController;
-import controller.LoginController;
-import controller.RegistrationController;
-import controller.StoreHPController;
+import controller.*;
 import view.InputManager;
 import view.collection.CliCollectionView;
 import view.collection.ICollectionView;
@@ -16,6 +12,8 @@ import view.registration.CliRegistrationView;
 import view.registration.IRegistrationView;
 import view.storehomepage.CliStoreHPView;
 import view.storehomepage.IStoreHPView;
+import view.trade.CliTradeView;
+import view.trade.ITradeView;
 
 public class CliIViewFactory implements IViewFactory {
 
@@ -59,4 +57,12 @@ public class CliIViewFactory implements IViewFactory {
         view.setController(controller);
         return view;
     }
+
+    @Override
+    public ITradeView createTradeView(TradeController controller) {
+        CliTradeView view = new CliTradeView(inputManager);
+        view.setController(controller);
+        return view;
+    }
 }
+

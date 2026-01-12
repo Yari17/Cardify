@@ -28,10 +28,9 @@ public class JdbcDaoFactory extends DaoFactory {
     @Override
     public IUserDao createUserDao() {
         return new JdbcUserDao(
-            DatabaseConfig.JDBC_URL,
-            DatabaseConfig.JDBC_USER,
-            DatabaseConfig.JDBC_PASSWORD
-        );
+                DatabaseConfig.JDBC_URL,
+                DatabaseConfig.JDBC_USER,
+                DatabaseConfig.JDBC_PASSWORD);
     }
 
     /**
@@ -42,9 +41,17 @@ public class JdbcDaoFactory extends DaoFactory {
     @Override
     public IBinderDao createBinderDao() {
         return new JdbcBinderDao(
-            DatabaseConfig.JDBC_URL,
-            DatabaseConfig.JDBC_USER,
-            DatabaseConfig.JDBC_PASSWORD
-        );
+                DatabaseConfig.JDBC_URL,
+                DatabaseConfig.JDBC_USER,
+                DatabaseConfig.JDBC_PASSWORD,
+                createCardDao());
+    }
+
+    @Override
+    public model.dao.ICardDao createCardDao() {
+        return new model.dao.jdbc.JdbcCardDao(
+                config.DatabaseConfig.JDBC_URL,
+                config.DatabaseConfig.JDBC_USER,
+                config.DatabaseConfig.JDBC_PASSWORD);
     }
 }

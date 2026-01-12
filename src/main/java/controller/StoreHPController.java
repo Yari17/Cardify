@@ -1,23 +1,17 @@
 package controller;
 
-import view.storehomepage.IStoreHPView;
-
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class StoreHPController {
     private static final Logger LOGGER = Logger.getLogger(StoreHPController.class.getName());
 
-    private IStoreHPView view;
     private final String username;
-    private final Navigator navigator;
+    private final ApplicationController navigationController;
 
-    public StoreHPController(String username, Navigator navigator) {
+    public StoreHPController(String username, ApplicationController navigationController) {
         this.username = username;
-        this.navigator = navigator;
-    }
-
-    public void setView(IStoreHPView view) {
-        this.view = view;
+        this.navigationController = navigationController;
     }
 
     public String getUsername() {
@@ -25,8 +19,8 @@ public class StoreHPController {
     }
 
     public void onLogoutRequested() {
-        LOGGER.info("Store user " + username + " logging out");
-        navigator.logout();
+        LOGGER.log(Level.INFO, "Store user {0} logging out", username);
+        navigationController.logout();
     }
 
     public void onExitRequested() {

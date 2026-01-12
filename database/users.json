@@ -1,12 +1,21 @@
 {
   "users": {
     "user1": {
+      "id": 0,
       "name": "user1",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Collezionista"
     },
+    "user2": {
+      "id": 0,
+      "name": "user2",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
     "Store1": {
+      "id": 0,
       "name": "Store1",
       "reliabilityScore": 0,
       "reviewCount": 0,
@@ -15,6 +24,7 @@
   },
   "credentials": {
     "user1": "password",
+    "user2": "password",
     "Store1": "password"
   }
 }

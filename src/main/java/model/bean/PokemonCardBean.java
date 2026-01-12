@@ -1,11 +1,9 @@
 package model.bean;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import model.domain.CardGameType;
 
 import java.util.List;
 import java.util.Map;
-
 
 public class PokemonCardBean extends CardBean {
 
@@ -279,7 +277,6 @@ public class PokemonCardBean extends CardBean {
     public boolean isHolo() {
         return Boolean.TRUE.equals(variantHolo);
     }
-
 
     public boolean isStandardLegal() {
         return Boolean.TRUE.equals(legalStandard);

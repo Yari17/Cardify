@@ -2,10 +2,10 @@ package model.dao.jdbc;
 
 import model.dao.IUserDao;
 import model.domain.User;
-import model.exception.AuthenticationException;
-import model.exception.DataPersistenceException;
-import model.exception.UserAlreadyExistsException;
-import model.exception.UserNotFoundException;
+import exception.AuthenticationException;
+import exception.DataPersistenceException;
+import exception.UserAlreadyExistsException;
+import exception.UserNotFoundException;
 
 import java.sql.*;
 import java.util.Optional;
@@ -14,6 +14,17 @@ import java.util.logging.Level;
 
 public class JdbcUserDao implements IUserDao {
     private static final Logger LOGGER = Logger.getLogger(JdbcUserDao.class.getName());
+    private static final String COLUMN_USERNAME = "username";
+    private static final String COLUMN_PASSWORD = "password";
+    private static final String COLUMN_USER_TYPE = "user_type";
+    private static final String COLUMN_RELIABILITY = "reliability_score";
+    private static final String COLUMN_REVIEW_COUNT = "review_count";
+
+    // Static caches to persist data until application stops
+    private static final java.util.Map<String, User> userCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Map<String, String> credentialCache = new java.util.concurrent.ConcurrentHashMap<>();
+    private static boolean allLoaded = false;
+
     private final String jdbcUrl;
     private final String dbUser;
     private final String dbPassword;
@@ -31,17 +42,17 @@ public class JdbcUserDao implements IUserDao {
 
     private void initializeDatabase() {
         String createUsersTable = """
-            CREATE TABLE IF NOT EXISTS users (
-                username VARCHAR(255) PRIMARY KEY,
-                password VARCHAR(255) NOT NULL,
-                user_type VARCHAR(50) DEFAULT 'Collezionista',
-                reliability_score INT DEFAULT 0,
-                review_count INT DEFAULT 0
-            )
-        """;
+                    CREATE TABLE IF NOT EXISTS users (
+                        username VARCHAR(255) PRIMARY KEY,
+                        password VARCHAR(255) NOT NULL,
+                        user_type VARCHAR(50) DEFAULT 'Collezionista',
+                        reliability_score INT DEFAULT 0,
+                        review_count INT DEFAULT 0
+                    )
+                """;
 
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
             stmt.execute(createUsersTable);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Error initializing database", e);
@@ -50,20 +61,26 @@ public class JdbcUserDao implements IUserDao {
 
     @Override
     public Optional<User> findByName(String name) {
-        String sql = "SELECT  FROM users WHERE username = ?";
+        if (userCache.containsKey(name)) {
+            return Optional.of(userCache.get(name));
+        }
+
+        String sql = "SELECT " + COLUMN_USERNAME + ", " + COLUMN_RELIABILITY + ", " + COLUMN_REVIEW_COUNT + ", "
+                + COLUMN_USER_TYPE + " FROM users WHERE " + COLUMN_USERNAME + " = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, name);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 User user = new User(
-                        rs.getString("username"),
-                        rs.getInt("reliability_score"),
-                        rs.getInt("review_count")
-                );
-                user.setUserType(rs.getString("user_type"));
+                        rs.getString(COLUMN_USERNAME),
+                        rs.getInt(COLUMN_RELIABILITY),
+                        rs.getInt(COLUMN_REVIEW_COUNT));
+                user.setUserType(rs.getString(COLUMN_USER_TYPE));
+
+                userCache.put(name, user);
                 return Optional.of(user);
             }
         } catch (SQLException e) {
@@ -75,15 +92,21 @@ public class JdbcUserDao implements IUserDao {
 
     @Override
     public boolean authenticate(String username, String password) {
-        String sql = "SELECT password FROM users WHERE username = ?";
+        if (credentialCache.containsKey(username)) {
+            return password.equals(credentialCache.get(username));
+        }
+
+        String sql = "SELECT " + COLUMN_PASSWORD + " FROM users WHERE " + COLUMN_USERNAME + " = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                return password.equals(rs.getString("password"));
+                String storedPassword = rs.getString(COLUMN_PASSWORD);
+                credentialCache.put(username, storedPassword);
+                return password.equals(storedPassword);
             }
             throw new UserNotFoundException(username);
         } catch (SQLException e) {
@@ -101,19 +124,27 @@ public class JdbcUserDao implements IUserDao {
 
     @Override
     public void register(String username, String password, String userType) {
-        
+
         if (findByName(username).isPresent()) {
             throw new UserAlreadyExistsException(username);
         }
 
-        String sql = "INSERT INTO users (username, password, user_type, reliability_score, review_count) VALUES (?, ?, ?, 0, 0)";
+        String sql = "INSERT INTO users (" + COLUMN_USERNAME + ", " + COLUMN_PASSWORD + ", " + COLUMN_USER_TYPE + ", "
+                + COLUMN_RELIABILITY + ", " + COLUMN_REVIEW_COUNT + ") VALUES (?, ?, ?, 0, 0)";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.setString(3, userType);
             pstmt.executeUpdate();
+
+            // Update caches
+            User newUser = new User(username, 0, 0);
+            newUser.setUserType(userType);
+            userCache.put(username, newUser);
+            credentialCache.put(username, password);
+
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to register user: " + username, e);
         }
@@ -125,24 +156,37 @@ public class JdbcUserDao implements IUserDao {
     public Optional<User> get(long id) {
         // Gli User in questo sistema sono identificati principalmente per username
         // Questo metodo cerca per ID se implementato nella tabella
-        String sql = "SELECT * FROM users WHERE id = ?";
+
+        // Check cache first (iterating cache is faster than DB query if size is
+        // reasonable,
+        // but robust implementation should probably query DB if not allLoaded)
+        if (allLoaded) {
+            return userCache.values().stream()
+                    .filter(user -> user.getId() == id)
+                    .findFirst();
+        }
+
+        String sql = "SELECT " + COLUMN_USERNAME + ", " + COLUMN_RELIABILITY + ", " + COLUMN_REVIEW_COUNT + ", "
+                + COLUMN_USER_TYPE + " FROM users WHERE id = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setLong(1, id);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 User user = new User(
-                    rs.getString("username"),
-                    rs.getInt("reliability_score"),
-                    rs.getInt("review_count")
-                );
-                user.setUserType(rs.getString("user_type"));
+                        rs.getString(COLUMN_USERNAME),
+                        rs.getInt(COLUMN_RELIABILITY),
+                        rs.getInt(COLUMN_REVIEW_COUNT));
+                user.setUserType(rs.getString(COLUMN_USER_TYPE));
+
+                userCache.put(user.getName(), user);
                 return Optional.of(user);
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error getting user by id: " + id, e);
+            LOGGER.log(Level.WARNING, "Error getting user by id: {0}", id);
+            LOGGER.log(Level.WARNING, "Exception: ", e);
         }
 
         return Optional.empty();
@@ -150,22 +194,34 @@ public class JdbcUserDao implements IUserDao {
 
     @Override
     public java.util.List<User> getAll() {
+        if (allLoaded) {
+            return new java.util.ArrayList<>(userCache.values());
+        }
+
         java.util.List<User> users = new java.util.ArrayList<>();
-        String sql = "SELECT * FROM users";
+        String sql = "SELECT " + COLUMN_USERNAME + ", " + COLUMN_PASSWORD + ", " + COLUMN_RELIABILITY + ", "
+                + COLUMN_REVIEW_COUNT + ", "
+                + COLUMN_USER_TYPE + " FROM users";
 
         try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                String username = rs.getString(COLUMN_USERNAME);
+                String password = rs.getString(COLUMN_PASSWORD);
+
                 User user = new User(
-                    rs.getString("username"),
-                    rs.getInt("reliability_score"),
-                    rs.getInt("review_count")
-                );
-                user.setUserType(rs.getString("user_type"));
+                        username,
+                        rs.getInt(COLUMN_RELIABILITY),
+                        rs.getInt(COLUMN_REVIEW_COUNT));
+                user.setUserType(rs.getString(COLUMN_USER_TYPE));
                 users.add(user);
+
+                userCache.put(username, user);
+                credentialCache.put(username, password);
             }
+            allLoaded = true;
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to get all users", e);
         }
@@ -179,21 +235,29 @@ public class JdbcUserDao implements IUserDao {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        if (findByName(user.getUsername()).isPresent()) {
-            throw new UserAlreadyExistsException(user.getUsername());
+        if (findByName(user.getName()).isPresent()) {
+            throw new UserAlreadyExistsException(user.getName());
         }
 
-        String sql = "INSERT INTO users (username, user_type, reliability_score, review_count) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users (" + COLUMN_USERNAME + ", " + COLUMN_USER_TYPE + ", " + COLUMN_RELIABILITY
+                + ", " + COLUMN_REVIEW_COUNT + ") VALUES (?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, user.getUsername());
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getUserType());
             pstmt.setInt(3, user.getReliabilityScore());
             pstmt.setInt(4, user.getReviewCount());
             pstmt.executeUpdate();
+
+            userCache.put(user.getName(), user);
+            // Note: save(User) doesn't take password, so we can't update credentialCache
+            // fully
+            // if it's a new user without password. Assuming save() is for existing users or
+            // users created without password (which might be invalid state for auth).
+
         } catch (SQLException e) {
-            throw new DataPersistenceException("Failed to save user: " + user.getUsername(), e);
+            throw new DataPersistenceException("Failed to save user: " + user.getName(), e);
         }
     }
 
@@ -203,21 +267,25 @@ public class JdbcUserDao implements IUserDao {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        if (findByName(user.getUsername()).isEmpty()) {
-            throw new UserNotFoundException(user.getUsername());
+        // Logic check: ensure user exists
+        if (findByName(user.getName()).isEmpty()) {
+            throw new UserNotFoundException(user.getName());
         }
 
-        String sql = "UPDATE users SET user_type = ?, reliability_score = ?, review_count = ? WHERE username = ?";
+        String sql = "UPDATE users SET " + COLUMN_USER_TYPE + " = ?, " + COLUMN_RELIABILITY + " = ?, "
+                + COLUMN_REVIEW_COUNT + " = ? WHERE " + COLUMN_USERNAME + " = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, user.getUserType());
             pstmt.setInt(2, user.getReliabilityScore());
             pstmt.setInt(3, user.getReviewCount());
-            pstmt.setString(4, user.getUsername());
+            pstmt.setString(4, user.getName());
             pstmt.executeUpdate();
+
+            userCache.put(user.getName(), user);
         } catch (SQLException e) {
-            throw new DataPersistenceException("Failed to update user: " + user.getUsername(), e);
+            throw new DataPersistenceException("Failed to update user: " + user.getName(), e);
         }
     }
 
@@ -227,18 +295,21 @@ public class JdbcUserDao implements IUserDao {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        if (findByName(user.getUsername()).isEmpty()) {
-            throw new UserNotFoundException(user.getUsername());
+        if (findByName(user.getName()).isEmpty()) {
+            throw new UserNotFoundException(user.getName());
         }
 
-        String sql = "DELETE FROM users WHERE username = ?";
+        String sql = "DELETE FROM users WHERE " + COLUMN_USERNAME + " = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, user.getUsername());
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, user.getName());
             pstmt.executeUpdate();
+
+            userCache.remove(user.getName());
+            credentialCache.remove(user.getName());
         } catch (SQLException e) {
-            throw new DataPersistenceException("Failed to delete user: " + user.getUsername(), e);
+            throw new DataPersistenceException("Failed to delete user: " + user.getName(), e);
         }
     }
 }

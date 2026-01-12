@@ -45,8 +45,8 @@ public class DemoUserDao implements IUserDao {
         if (user.getId() == 0) {
             user.setId(nextId++);
         }
-        users.put(user.getUsername(), user);
-        LOGGER.info(() -> "User saved: " + user.getUsername());
+        users.put(user.getName(), user);
+        LOGGER.log(java.util.logging.Level.INFO, "User saved: {0}", user.getName());
     }
 
     @Override
@@ -54,19 +54,19 @@ public class DemoUserDao implements IUserDao {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
-        if (!users.containsKey(user.getUsername())) {
-            throw new IllegalStateException("User not found: " + user.getUsername());
+        if (!users.containsKey(user.getName())) {
+            throw new IllegalStateException("User not found: " + user.getName());
         }
-        users.put(user.getUsername(), user);
-        LOGGER.info(() -> "User updated: " + user.getUsername());
+        users.put(user.getName(), user);
+        LOGGER.log(java.util.logging.Level.INFO, "User updated: {0}", user.getName());
     }
 
     @Override
     public void delete(User user) {
         if (user != null) {
-            users.remove(user.getUsername());
-            credentials.remove(user.getUsername());
-            LOGGER.info(() -> "User deleted: " + user.getUsername());
+            users.remove(user.getName());
+            credentials.remove(user.getName());
+            LOGGER.log(java.util.logging.Level.INFO, "User deleted: {0}", user.getName());
         }
     }
 
@@ -101,7 +101,6 @@ public class DemoUserDao implements IUserDao {
 
         users.put(username, user);
         credentials.put(username, password);
-        LOGGER.info(() -> "User registered: " + username);
+        LOGGER.log(java.util.logging.Level.INFO, "User registered: {0}", username);
     }
 }
-

@@ -1,9 +1,11 @@
+
 package view.registration;
 
 import controller.RegistrationController;
 import model.bean.UserBean;
 import view.InputManager;
 
+@SuppressWarnings("java:S106")
 public class CliRegistrationView implements IRegistrationView {
     private final InputManager inputManager;
     private RegistrationController controller;
@@ -51,8 +53,8 @@ public class CliRegistrationView implements IRegistrationView {
 
         String choice = inputManager.readString();
         this.userType = "2".equals(choice)
-            ? UserBean.USER_TYPE_STORE
-            : UserBean.USER_TYPE_COLLECTOR;
+                ? UserBean.USER_TYPE_STORE
+                : UserBean.USER_TYPE_COLLECTOR;
 
         if (controller != null) {
             controller.onRegisterRequested();
@@ -61,6 +63,6 @@ public class CliRegistrationView implements IRegistrationView {
 
     @Override
     public void close() {
-        
+
     }
 }

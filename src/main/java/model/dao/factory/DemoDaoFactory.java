@@ -1,7 +1,6 @@
 package model.dao.factory;
 
-import model.dao.IBinderDao;
-import model.dao.IUserDao;
+import model.dao.*;
 import model.dao.demo.DemoBinderDao;
 import model.dao.demo.DemoUserDao;
 
@@ -38,5 +37,17 @@ public class DemoDaoFactory extends DaoFactory {
     public IBinderDao createBinderDao() {
         return new DemoBinderDao();
     }
-}
 
+    /**
+     * Crea un'istanza di CardDao.
+     * In demo mode, usiamo comunque la CardDao standard che può usare cache o mock.
+     * Oppure potremmo volere un MockCardDao. Per ora restituiamo la CardDao
+     * standard.
+     *
+     * @return implementazione di ICardDao
+     */
+    @Override
+    public model.dao.ICardDao createCardDao() {
+        return new model.dao.demo.DemoCardDao();
+    }
+}

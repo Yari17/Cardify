@@ -4,9 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import model.dao.IUserDao;
 import model.domain.User;
-import model.exception.DataPersistenceException;
-import model.exception.UserAlreadyExistsException;
-import model.exception.UserNotFoundException;
+import exception.DataPersistenceException;
+import exception.UserAlreadyExistsException;
+import exception.UserNotFoundException;
 
 import java.io.*;
 import java.util.*;
@@ -16,15 +16,18 @@ import java.util.logging.Level;
 
 public class JsonUserDao implements IUserDao {
     private static final Logger LOGGER = Logger.getLogger(JsonUserDao.class.getName());
-    private final Map<String, User> users;
-    private final Map<String, String> credentials; 
+    // Static caches to persist data until application stops
+    private static final Map<String, User> users = new ConcurrentHashMap<>();
+    private static final Map<String, String> credentials = new ConcurrentHashMap<>();
+    private static boolean loaded = false;
+
     private final String jsonFilePath;
     private final Gson gson;
 
-    
     private static class UserData {
         Map<String, User> users;
         Map<String, String> credentials;
+
         UserData(Map<String, User> users, Map<String, String> credentials) {
             this.users = users;
             this.credentials = credentials;
@@ -34,23 +37,27 @@ public class JsonUserDao implements IUserDao {
     public JsonUserDao(String jsonFilePath) {
         this.jsonFilePath = jsonFilePath;
         this.gson = new GsonBuilder().setPrettyPrinting().create();
-        this.users = new ConcurrentHashMap<>();
-        this.credentials = new ConcurrentHashMap<>();
 
-        
         File file = new File(jsonFilePath);
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
             parentDir.mkdirs();
         }
 
-        loadFromJson();
+        // Remove direct call to loadFromJson() from constructor to support lazy loading
+    }
+
+    private synchronized void ensureLoaded() {
+        if (!loaded) {
+            loadFromJson();
+            loaded = true;
+        }
     }
 
     private void loadFromJson() {
         File file = new File(jsonFilePath);
         if (!file.exists()) {
-            saveToJson(); 
+            saveToJson();
             return;
         }
 
@@ -69,6 +76,7 @@ public class JsonUserDao implements IUserDao {
             saveToJson();
         }
     }
+
     private void saveToJson() {
         try (Writer writer = new FileWriter(jsonFilePath)) {
             UserData data = new UserData(users, credentials);
@@ -80,10 +88,13 @@ public class JsonUserDao implements IUserDao {
 
     @Override
     public Optional<User> findByName(String name) {
+        ensureLoaded();
         return Optional.ofNullable(users.get(name));
     }
+
     @Override
     public boolean authenticate(String username, String password) {
+        ensureLoaded();
         String storedPassword = credentials.get(username);
         if (storedPassword == null) {
             throw new UserNotFoundException(username);
@@ -101,15 +112,15 @@ public class JsonUserDao implements IUserDao {
 
     @Override
     public void register(String username, String password, String userType) {
-        
+        ensureLoaded();
+
         if (users.containsKey(username)) {
             throw new UserAlreadyExistsException(username);
         }
 
-        
         credentials.put(username, password);
         User newUser = new User(username, 0, 0);
-        newUser.setUserType(userType); 
+        newUser.setUserType(userType);
         users.put(username, newUser);
         saveToJson();
     }
@@ -118,6 +129,7 @@ public class JsonUserDao implements IUserDao {
 
     @Override
     public Optional<User> get(long id) {
+        ensureLoaded();
         // Gli User sono indicizzati per username, non per ID numerico
         // Cerca l'utente che ha questo ID
         return users.values().stream()
@@ -127,6 +139,7 @@ public class JsonUserDao implements IUserDao {
 
     @Override
     public List<User> getAll() {
+        ensureLoaded();
         return new ArrayList<>(users.values());
     }
 
@@ -135,8 +148,9 @@ public class JsonUserDao implements IUserDao {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
+        ensureLoaded();
 
-        String username = user.getUsername();
+        String username = user.getName();
         if (users.containsKey(username)) {
             throw new UserAlreadyExistsException(username);
         }
@@ -150,8 +164,9 @@ public class JsonUserDao implements IUserDao {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
+        ensureLoaded();
 
-        String username = user.getUsername();
+        String username = user.getName();
         if (!users.containsKey(username)) {
             throw new UserNotFoundException(username);
         }
@@ -165,8 +180,9 @@ public class JsonUserDao implements IUserDao {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
+        ensureLoaded();
 
-        String username = user.getUsername();
+        String username = user.getName();
         if (!users.containsKey(username)) {
             throw new UserNotFoundException(username);
         }

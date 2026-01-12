@@ -1,14 +1,10 @@
 package view.factory;
 
+import controller.*;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import controller.CollectionController;
-import controller.CollectorHPController;
-import controller.LoginController;
-import controller.RegistrationController;
-import controller.StoreHPController;
 import view.collection.FXCollectionView;
 import view.collection.ICollectionView;
 import view.collectorhomepage.FXCollectorHPView;
@@ -19,6 +15,8 @@ import view.registration.IRegistrationView;
 import view.registration.FXRegistrationView;
 import view.storehomepage.IStoreHPView;
 import view.storehomepage.FXStoreHPView;
+import view.trade.FXTradeView;
+import view.trade.ITradeView;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -183,6 +181,38 @@ public class FXViewFactory implements IViewFactory {
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to load CollectionPage.fxml", e);
             throw new IllegalStateException("Cannot create CollectionView: FXML file not found or invalid", e);
+        }
+    }
+
+    @Override
+    public ITradeView createTradeView(TradeController controller) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TradePage.fxml"));
+            Parent root = loader.load();
+            Object fxmlController = loader.getController();
+
+            if (!(fxmlController instanceof FXTradeView)) {
+                String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
+                throw new IllegalStateException(
+                    "FXML controller is not FXTradeView. Found: " + controllerClass
+                );
+            }
+
+            FXTradeView fxController = (FXTradeView) fxmlController;
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Cardify - Trade");
+            fxController.setStage(stage);
+
+            // Set controller
+            fxController.setController(controller);
+
+            return fxController;
+
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to load TradePage.fxml", e);
+            throw new IllegalStateException("Cannot create TradeView: FXML file not found or invalid", e);
         }
     }
 }

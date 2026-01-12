@@ -1,7 +1,6 @@
 package view.collection;
 
 import model.domain.Binder;
-import model.domain.card.CardProvider;
 import view.IView;
 
 import java.util.Map;
@@ -24,14 +23,14 @@ public interface ICollectionView extends IView {
      * Displays the user's collection organized by sets.
      *
      * @param bindersBySet map of setId to Binder containing the user's collection
-     * @param cardProvider provider to fetch card information
+     *                     Visualizza la collezione organizzata per set con le carte
      */
-    void displayCollection(Map<String, Binder> bindersBySet, CardProvider cardProvider);
+    void displayCollection(Map<String, Binder> bindersBySet, model.dao.ICardDao cardDao);
 
     /**
      * Updates a single card in the UI without full refresh.
      *
-     * @param setId the set identifier
+     * @param setId  the set identifier
      * @param cardId the card identifier to update
      */
     void updateCardInSet(String setId, String cardId);

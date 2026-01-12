@@ -11,7 +11,7 @@ public class User {
         this.name = name;
         this.reliabilityScore = reliabilityScore;
         this.reviewCount = reviewCount;
-        this.userType = "Collezionista"; 
+        this.userType = config.AppConfig.USER_TYPE_COLLECTOR;
     }
 
     public long getId() {
@@ -23,11 +23,6 @@ public class User {
     }
 
     public String getName() {
-        return name;
-    }
-
-    // Alias per compatibilità con DAO
-    public String getUsername() {
         return name;
     }
 
@@ -47,7 +42,7 @@ public class User {
         this.userType = userType;
     }
 
-    public void addReview(int value){
+    public void addReview(int value) {
         this.reliabilityScore = ((this.reliabilityScore * this.reviewCount) + value) / (this.reviewCount + 1);
         this.reviewCount += 1;
     }

@@ -18,6 +18,20 @@
         <HBox alignment="CENTER_LEFT" spacing="20" styleClass="nav-bar">
 
             <!-- Left Navigation Icons with Labels -->
+            <!-- Homepage Button (disabled when on homepage) -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container">
+                <Button fx:id="homepageButton" styleClass="button-transparent" disable="true">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/homepage.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Homepage" styleClass="nav-label-disabled"/>
+            </VBox>
+
             <!-- Collection Button -->
             <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
                   onMouseEntered="#onNavButtonHoverEnter"
@@ -38,7 +52,7 @@
             <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
                   onMouseEntered="#onNavButtonHoverEnter"
                   onMouseExited="#onNavButtonHoverExit">
-                <Button fx:id="tradeButton" styleClass="button-transparent">
+                <Button fx:id="tradeButton" onAction="#onTradeClicked" styleClass="button-transparent">
                     <graphic>
                         <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                             <image>

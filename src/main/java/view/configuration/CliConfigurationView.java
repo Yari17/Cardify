@@ -3,9 +3,10 @@ package view.configuration;
 import controller.ConfigurationManager;
 import view.InputManager;
 
+@SuppressWarnings("java:S106")
 public class CliConfigurationView implements IConfigurationView {
     private final InputManager inputManager;
-    private ConfigurationManager controller;
+
     private String interfaceChoice;
     private String persistenceChoice;
 
@@ -15,7 +16,7 @@ public class CliConfigurationView implements IConfigurationView {
 
     @Override
     public void setController(ConfigurationManager controller) {
-        this.controller = controller;
+        // Controller is not used in this view implementation
     }
 
     @Override

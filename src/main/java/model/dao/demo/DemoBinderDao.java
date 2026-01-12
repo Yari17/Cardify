@@ -58,7 +58,8 @@ public class DemoBinderDao implements IBinderDao {
         bindersById.put(binder.getId(), binder);
         bindersByOwner.computeIfAbsent(binder.getOwner(), k -> new ArrayList<>()).add(binder);
 
-        LOGGER.info("Saved binder ID: " + binder.getId() + " in demo for user: " + binder.getOwner());
+        LOGGER.log(java.util.logging.Level.INFO, "Saved binder ID: {0} in demo for user: {1}",
+                new Object[] { binder.getId(), binder.getOwner() });
     }
 
     @Override
@@ -82,7 +83,7 @@ public class DemoBinderDao implements IBinderDao {
 
         bindersById.put(binder.getId(), binder);
 
-        LOGGER.info("Updated binder ID: " + binder.getId() + " in demo");
+        LOGGER.log(java.util.logging.Level.INFO, "Updated binder ID: {0} in demo", binder.getId());
     }
 
     @Override
@@ -101,7 +102,7 @@ public class DemoBinderDao implements IBinderDao {
             }
         }
 
-        LOGGER.info("Deleted binder ID: " + binder.getId() + " from demo");
+        LOGGER.log(java.util.logging.Level.INFO, "Deleted binder ID: {0} from demo", binder.getId());
     }
 
     public List<Binder> findByOwner(String owner) {
@@ -134,13 +135,12 @@ public class DemoBinderDao implements IBinderDao {
 
             if (binderOpt.isPresent()) {
                 delete(binderOpt.get());
-                LOGGER.info("Binder deleted from demo: " + binderId);
+                LOGGER.log(java.util.logging.Level.INFO, "Binder deleted from demo: {0}", binderId);
             } else {
-                LOGGER.warning("No binder found to delete with id: " + binderId);
+                LOGGER.log(java.util.logging.Level.WARNING, "No binder found to delete with id: {0}", binderId);
             }
         } catch (NumberFormatException e) {
-            LOGGER.warning("Invalid binder ID format: " + binderId);
+            LOGGER.log(java.util.logging.Level.WARNING, "Invalid binder ID format: {0}", binderId);
         }
     }
 }
-

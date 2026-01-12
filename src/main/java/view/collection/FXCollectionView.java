@@ -13,7 +13,6 @@ import controller.CollectionController;
 import model.bean.CardBean;
 import model.domain.Binder;
 import model.domain.card.Card;
-import model.domain.card.CardProvider;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.HashMap;
@@ -24,7 +23,7 @@ import java.util.logging.Logger;
 
 public class FXCollectionView implements ICollectionView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectionView.class.getName());
-
+    private static final String CARD_HOVER_STYLE = "card-hover";
 
     @FXML
     private Label usernameLabel;
@@ -40,7 +39,7 @@ public class FXCollectionView implements ICollectionView {
 
     private CollectionController controller;
     private Stage stage;
-    private CardProvider cardProvider;
+    private model.dao.ICardDao cardDao;
 
     // Track currently displayed binders to enable partial refresh
     private Map<String, Binder> currentBinders;
@@ -66,14 +65,14 @@ public class FXCollectionView implements ICollectionView {
     /**
      * Visualizza la collezione organizzata per set con le carte
      */
-    public void displayCollection(Map<String, Binder> bindersBySet, CardProvider cardProvider) {
+    public void displayCollection(Map<String, Binder> bindersBySet, model.dao.ICardDao cardDao) {
         if (setsContainer == null) {
             LOGGER.warning("setsContainer is null");
             return;
         }
 
-        // Store cardProvider and current binders for partial refresh
-        this.cardProvider = cardProvider;
+        // Store cardDao and current binders for partial refresh
+        this.cardDao = cardDao;
         this.currentBinders = new HashMap<>(bindersBySet);
 
         setsContainer.getChildren().clear();
@@ -89,7 +88,7 @@ public class FXCollectionView implements ICollectionView {
             String setId = entry.getKey();
             Binder binder = entry.getValue();
 
-            VBox setSection = createSetSection(setId, binder, cardProvider);
+            VBox setSection = createSetSection(setId, binder, cardDao);
             setsContainer.getChildren().add(setSection);
         }
 
@@ -119,10 +118,11 @@ public class FXCollectionView implements ICollectionView {
     /**
      * Crea una sezione per un set con tutte le sue carte
      */
-    private VBox createSetSection(String setId, Binder binder, CardProvider cardProvider) {
+    private VBox createSetSection(String setId, Binder binder, model.dao.ICardDao cardDao) {
         VBox setSection = new VBox(15);
         setSection.setPadding(new Insets(20));
         setSection.getStyleClass().add("set-section");
+        setSection.setUserData(setId);
 
         // Header del set
         HBox header = new HBox(20);
@@ -134,7 +134,7 @@ public class FXCollectionView implements ICollectionView {
         // Carica tutte le carte del set per calcolare le mancanti
         int totalCards = 0;
         try {
-            List<Card> allCards = cardProvider.searchPokemonSet(setId);
+            List<Card> allCards = cardDao.getSetCards(setId, config.AppConfig.POKEMON_GAME);
             totalCards = allCards.size();
         } catch (Exception e) {
             LOGGER.warning("Could not load total cards for set: " + setId);
@@ -166,7 +166,7 @@ public class FXCollectionView implements ICollectionView {
 
         // Carica tutte le carte del set
         try {
-            List<Card> allCards = cardProvider.searchPokemonSet(setId);
+            List<Card> allCards = cardDao.getSetCards(setId, config.AppConfig.POKEMON_GAME);
 
             // Crea mappa delle carte possedute per accesso rapido
             Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
@@ -192,7 +192,7 @@ public class FXCollectionView implements ICollectionView {
      */
     private VBox createCardTile(Card card, String setId, boolean isOwned, CardBean ownedCard) {
         VBox tile = new VBox();
-        tile.setPrefSize(120, 168);  // Dimensione esatta immagine
+        tile.setPrefSize(120, 168); // Dimensione esatta immagine
         tile.setMinSize(120, 168);
         tile.setMaxSize(120, 168);
         tile.setAlignment(Pos.TOP_CENTER);
@@ -215,13 +215,30 @@ public class FXCollectionView implements ICollectionView {
         cardImage.setFitHeight(168);
         cardImage.setPreserveRatio(true);
 
-        // Carica immagine
-        if (card.getImageUrl() != null && !card.getImageUrl().isEmpty()) {
+        // Carica immagine con placeholder se non disponibile
+        boolean imageLoaded = false;
+        String imageUrl = card.getImageUrl();
+        if (imageUrl != null && !imageUrl.isEmpty()) {
             try {
-                Image image = new Image(card.getImageUrl(), true);
+                // Direct loading (background loading enabled)
+                Image image = new Image(imageUrl, true);
                 cardImage.setImage(image);
+                imageLoaded = true;
             } catch (Exception e) {
-                LOGGER.warning("Failed to load image for card: " + card.getName());
+                LOGGER.warning("Failed to load image for card: " + card.getName() + " from URL: " + imageUrl
+                        + ". Error: " + e.getMessage());
+            }
+        }
+
+        // Se l'immagine non è caricata, mostra placeholder
+        if (!imageLoaded) {
+            try {
+                Image placeholderImage = new Image(getClass().getResourceAsStream("/icons/nocardimage.svg"));
+                cardImage.setImage(placeholderImage);
+                cardImage.setFitWidth(80);
+                cardImage.setFitHeight(120);
+            } catch (Exception e) {
+                LOGGER.warning("Failed to load placeholder image");
             }
         }
 
@@ -251,11 +268,11 @@ public class FXCollectionView implements ICollectionView {
             // Mostra controlli solo su hover
             tile.setOnMouseEntered(_ -> {
                 controls.setVisible(true);
-                tile.getStyleClass().add("card-hover");
+                tile.getStyleClass().add(CARD_HOVER_STYLE);
             });
             tile.setOnMouseExited(_ -> {
                 controls.setVisible(false);
-                tile.getStyleClass().remove("card-hover");
+                tile.getStyleClass().remove(CARD_HOVER_STYLE);
             });
         }
 
@@ -263,8 +280,8 @@ public class FXCollectionView implements ICollectionView {
 
         // Hover effect per carte non possedute
         if (!isOwned) {
-            tile.setOnMouseEntered(_ -> tile.getStyleClass().add("card-hover"));
-            tile.setOnMouseExited(_ -> tile.getStyleClass().remove("card-hover"));
+            tile.setOnMouseEntered(_ -> tile.getStyleClass().add(CARD_HOVER_STYLE));
+            tile.setOnMouseExited(_ -> tile.getStyleClass().remove(CARD_HOVER_STYLE));
         }
 
         return tile;
@@ -315,10 +332,9 @@ public class FXCollectionView implements ICollectionView {
         confirmDialog.setTitle("Conferma Eliminazione");
         confirmDialog.setHeaderText("Eliminare il set \"" + setName + "\"?");
         confirmDialog.setContentText(
-            "Questa azione eliminerà il set e tutte le carte associate.\n" +
-            "L'operazione non può essere annullata.\n\n" +
-            "Sei sicuro di voler continuare?"
-        );
+                "Questa azione eliminerà il set e tutte le carte associate.\n" +
+                        "L'operazione non può essere annullata.\n\n" +
+                        "Sei sicuro di voler continuare?");
 
         ButtonType buttonTypeYes = new ButtonType("Sì, Elimina", ButtonBar.ButtonData.OK_DONE);
         ButtonType buttonTypeNo = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -369,8 +385,8 @@ public class FXCollectionView implements ICollectionView {
         Label quantityLabel = new Label(String.valueOf(quantity));
         quantityLabel.getStyleClass().add("card-quantity-label");
         quantityLabel.setStyle("-fx-background-color: #29B6F6; -fx-text-fill: white; " +
-                              "-fx-padding: 5 10; -fx-background-radius: 12; -fx-font-weight: bold; " +
-                              "-fx-font-size: 14px; -fx-min-width: 40px;");
+                "-fx-padding: 5 10; -fx-background-radius: 12; -fx-font-weight: bold; " +
+                "-fx-font-size: 14px; -fx-min-width: 40px;");
 
         // Pulsante + (aggiungi altra copia)
         Button plusButton = new Button();
@@ -460,17 +476,14 @@ public class FXCollectionView implements ICollectionView {
         content.setPadding(new Insets(20));
         content.getChildren().addAll(
                 new Label("Set disponibili:"),
-                setComboBox
-        );
+                setComboBox);
 
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         okButton.setDisable(true);
-        setComboBox.valueProperty().addListener((_, _, newVal) ->
-                okButton.setDisable(newVal == null)
-        );
+        setComboBox.valueProperty().addListener((_, _, newVal) -> okButton.setDisable(newVal == null));
 
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -517,59 +530,85 @@ public class FXCollectionView implements ICollectionView {
     /**
      * Aggiorna una singola carta nel set senza refreshare tutta la collezione
      */
+    /**
+     * Aggiorna una singola carta nel set senza refreshare tutta la collezione
+     */
     public void updateCardInSet(String setId, String cardId) {
         if (setsContainer == null || currentBinders == null) {
             return;
         }
 
-        // Find the set section
-        for (javafx.scene.Node node : setsContainer.getChildren()) {
-            if (node instanceof VBox setSection) {
-                // Check if this is the right set by looking at the set name in header
-                if (setSection.getChildren().size() > 1 &&
-                    setSection.getChildren().get(1) instanceof FlowPane cardsGrid) {
+        VBox setSection = findSetSection(setId);
+        if (setSection == null)
+            return;
 
-                    // Find and update the specific card
-                    for (javafx.scene.Node cardNode : cardsGrid.getChildren()) {
-                        if (cardNode instanceof VBox cardTile &&
-                            cardTile.getUserData() != null &&
-                            cardTile.getUserData().equals(cardId)) {
+        FlowPane cardsGrid = findCardsGrid(setSection);
+        if (cardsGrid == null)
+            return;
 
-                            // Rebuild this card tile
-                            Binder binder = currentBinders.get(setId);
-                            if (binder != null) {
-                                try {
-                                    List<Card> allCards = cardProvider.searchPokemonSet(setId);
-                                    Card card = allCards.stream()
-                                        .filter(c -> c.getId().equals(cardId))
-                                        .findFirst()
-                                        .orElse(null);
+        VBox cardTile = findCardTile(cardsGrid, cardId);
+        if (cardTile == null)
+            return;
 
-                                    if (card != null) {
-                                        Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
-                                            .collect(java.util.stream.Collectors.toMap(CardBean::getId, c -> c));
-
-                                        CardBean ownedCard = ownedCardsMap.get(cardId);
-                                        boolean isOwned = ownedCard != null;
-
-                                        VBox newCardTile = createCardTile(card, setId, isOwned, ownedCard);
-                                        int index = cardsGrid.getChildren().indexOf(cardTile);
-                                        cardsGrid.getChildren().set(index, newCardTile);
-
-                                        LOGGER.info(() -> "Updated card " + cardId + " in UI");
-                                    }
-                                } catch (Exception e) {
-                                    LOGGER.warning("Failed to update card in UI: " + e.getMessage());
-                                }
-                            }
-                            return;
-                        }
-                    }
-                }
-            }
-        }
+        updateCardTileInGrid(cardsGrid, cardTile, setId, cardId);
     }
 
+    private VBox findSetSection(String setId) {
+        for (javafx.scene.Node node : setsContainer.getChildren()) {
+            if (node instanceof VBox setSection && setId.equals(setSection.getUserData())) {
+                return setSection;
+            }
+        }
+        return null;
+    }
+
+    private FlowPane findCardsGrid(VBox setSection) {
+        if (setSection.getChildren().size() > 1 &&
+                setSection.getChildren().get(1) instanceof FlowPane cardsGrid) {
+            return cardsGrid;
+        }
+        return null;
+    }
+
+    private VBox findCardTile(FlowPane cardsGrid, String cardId) {
+        for (javafx.scene.Node cardNode : cardsGrid.getChildren()) {
+            if (cardNode instanceof VBox cardTile &&
+                    cardId.equals(cardTile.getUserData())) {
+                return cardTile;
+            }
+        }
+        return null;
+    }
+
+    private void updateCardTileInGrid(FlowPane cardsGrid, VBox oldTile, String setId, String cardId) {
+        Binder binder = currentBinders.get(setId);
+        if (binder == null)
+            return;
+
+        try {
+            List<Card> allCards = cardDao.getSetCards(setId, config.AppConfig.POKEMON_GAME);
+            Card card = allCards.stream()
+                    .filter(c -> c.getId().equals(cardId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (card != null) {
+                Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
+                        .collect(java.util.stream.Collectors.toMap(CardBean::getId, c -> c));
+
+                CardBean ownedCard = ownedCardsMap.get(cardId);
+                boolean isOwned = ownedCard != null;
+
+                VBox newCardTile = createCardTile(card, setId, isOwned, ownedCard);
+                int index = cardsGrid.getChildren().indexOf(oldTile);
+                cardsGrid.getChildren().set(index, newCardTile);
+
+                LOGGER.info(() -> "Updated card " + cardId + " in UI");
+            }
+        } catch (Exception e) {
+            LOGGER.warning("Failed to update card in UI: " + e.getMessage());
+        }
+    }
 
     @FXML
     private void onSaveClicked() {
@@ -633,11 +672,10 @@ public class FXCollectionView implements ICollectionView {
         if (event.getSource() instanceof VBox container) {
             if (!container.getStyle().contains("dropshadow")) {
                 container.setStyle(
-                    "-fx-background-color: rgba(41, 182, 246, 0.2); " +
-                    "-fx-background-radius: 8; " +
-                    "-fx-scale-x: 1.1; " +
-                    "-fx-scale-y: 1.1;"
-                );
+                        "-fx-background-color: rgba(41, 182, 246, 0.2); " +
+                                "-fx-background-radius: 8; " +
+                                "-fx-scale-x: 1.1; " +
+                                "-fx-scale-y: 1.1;");
             }
         }
     }
@@ -651,4 +689,3 @@ public class FXCollectionView implements ICollectionView {
         }
     }
 }
-
