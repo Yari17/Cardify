@@ -23,6 +23,24 @@ public interface IBinderDao extends IDao<Binder> {
     List<Binder> getUserBinders(String owner);
 
     /**
+     * Retrieves all binders for a specific set across all users.
+     * Useful to find cards of a given set owned by others.
+     *
+     * @param setId the set identifier
+     * @return list of binders belonging to the set
+     */
+    List<Binder> getBindersBySet(String setId);
+
+    /**
+     * Retrieves all binders that are NOT owned by the provided owner.
+     * Useful when searching the marketplace / other users' collections.
+     *
+     * @param owner username to exclude
+     * @return list of binders owned by other users
+     */
+    List<Binder> getBindersExcludingOwner(String owner);
+
+    /**
      * Creates a new binder for a user with the specified set information.
      *
      * @param owner the username of the binder owner

@@ -1,7 +1,6 @@
-package model.domain.card;
+package model.domain;
 
 import model.bean.CardBean;
-import model.domain.CardGameType;
 
 public class Card {
     protected String id;

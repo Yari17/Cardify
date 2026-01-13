@@ -1,8 +1,10 @@
 package view.collectorhomepage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.Objects;
 
 import controller.CollectorHPController;
 import javafx.application.Platform;
@@ -117,6 +119,20 @@ public class FXCollectorHPView implements ICollectorHPView {
     private CollectorHPController controller;
     private Stage stage;
     private Map<String, String> setsIdToNameMap; // ID -> Nome del set
+
+    // Pagination fields
+    private List<CardBean> allCards;
+    private int currentPage = 0;
+    private static final int CARDS_PER_PAGE = 20;
+
+    @FXML
+    private Button previousButton;
+
+    @FXML
+    private Button nextButton;
+
+    @FXML
+    private Label pageLabel;
 
     public FXCollectorHPView() {
         // FXML fields will be injected by FXMLLoader
@@ -414,8 +430,8 @@ public class FXCollectorHPView implements ICollectorHPView {
             attackBox.setStyle(
                     "-fx-padding: 5; -fx-border-color: rgba(239, 83, 80, 0.3); -fx-border-width: 0 0 0 3; -fx-border-insets: 0;");
 
-            String name = (String) attack.getOrDefault("name", "Unknown");
-            String damage = (String) attack.getOrDefault("damage", "");
+            String name = attack.get("name") != null ? attack.get("name").toString() : "Unknown";
+            String damage = Objects.toString(attack.get("damage"), "");
             attackBox.getChildren().add(createLabel(name + (damage.isEmpty() ? "" : " - " + damage),
                     "-fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: bold;"));
 
@@ -508,25 +524,119 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @Override
     public void displayCards(List<CardBean> cards) {
-        if (cards == null || cards.isEmpty()) {
-            LOGGER.warning("No cards to display");
-            return;
-        }
-
-        // Assicurati che il box delle carte sia visibile
+        // Ensure UI updates happen on the FX thread
         Platform.runLater(() -> {
+            // Show cards view
             initialViewBox.setVisible(false);
             initialViewBox.setManaged(false);
             cardsViewBox.setVisible(true);
             cardsViewBox.setManaged(true);
 
+            // Clear previous cards to free memory
             cardsFlowPane.getChildren().clear();
 
-            for (CardBean card : cards) {
+            if (cards == null || cards.isEmpty()) {
+                LOGGER.info("No cards to display (empty result)");
+                // Show a friendly placeholder
+                Label emptyLabel = new Label("Nessuna carta trovata per il filtro selezionato.");
+                emptyLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 14px; -fx-padding: 20;");
+                cardsFlowPane.getChildren().add(emptyLabel);
+
+                // Reset pagination state
+                this.allCards = new ArrayList<>();
+                this.currentPage = 0;
+                updatePaginationControls(1);
+                return;
+            }
+
+            // Store all cards and reset to first page
+            this.allCards = cards;
+            this.currentPage = 0;
+
+            // Show first page
+            showCardsPage(0);
+        });
+    }
+
+    /**
+     * Display a specific page of cards to prevent OutOfMemoryError.
+     * Limits rendering to CARDS_PER_PAGE cards at a time.
+     */
+    private void showCardsPage(int pageIndex) {
+        if (allCards == null || allCards.isEmpty()) {
+            return;
+        }
+
+        int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
+
+        // Validate page index
+        if (pageIndex < 0 || pageIndex >= totalPages) {
+            return;
+        }
+
+        currentPage = pageIndex;
+        int startIndex = currentPage * CARDS_PER_PAGE;
+        int endIndex = Math.min(startIndex + CARDS_PER_PAGE, allCards.size());
+
+        LOGGER.log(java.util.logging.Level.INFO,
+                "Displaying page {0}/{1} (cards {2}-{3} of {4})",
+                new Object[] { currentPage + 1, totalPages, startIndex + 1, endIndex, allCards.size() });
+
+        List<CardBean> pageCards = allCards.subList(startIndex, endIndex);
+
+        Platform.runLater(() -> {
+            // Assicurati che il box delle carte sia visibile
+            initialViewBox.setVisible(false);
+            initialViewBox.setManaged(false);
+            cardsViewBox.setVisible(true);
+            cardsViewBox.setManaged(true);
+
+            // Clear previous cards to free memory
+            cardsFlowPane.getChildren().clear();
+
+            // Load only cards for current page
+            for (CardBean card : pageCards) {
                 VBox cardContainer = createCardView(card);
                 cardsFlowPane.getChildren().add(cardContainer);
             }
+
+            // Update pagination controls
+            updatePaginationControls(totalPages);
         });
+    }
+
+    /**
+     * Update pagination button states and page label.
+     */
+    private void updatePaginationControls(int totalPages) {
+        if (pageLabel != null) {
+            pageLabel.setText(String.format("Page %d of %d", currentPage + 1, totalPages));
+        }
+
+        if (previousButton != null) {
+            previousButton.setDisable(currentPage == 0);
+        }
+
+        if (nextButton != null) {
+            nextButton.setDisable(currentPage >= totalPages - 1);
+        }
+    }
+
+    @FXML
+    private void onPreviousPage() {
+        if (currentPage > 0) {
+            showCardsPage(currentPage - 1);
+        }
+    }
+
+    @FXML
+    private void onNextPage() {
+        if (allCards != null) {
+            int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
+            if (currentPage < totalPages - 1) {
+                showCardsPage(currentPage + 1);
+            }
+        }
     }
 
     private VBox createCardView(CardBean card) {
@@ -573,10 +683,20 @@ public class FXCollectorHPView implements ICollectorHPView {
         nameLabel.getStyleClass().add("card-name");
         nameLabel.setStyle("-fx-wrap-text: true; -fx-max-width: 180;");
 
+        Label ownerLabel = null;
+        if (card.getOwner() != null && !card.getOwner().isEmpty()) {
+            ownerLabel = new Label("Owner: " + card.getOwner());
+            ownerLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 11px;");
+        }
+
         Label idLabel = new Label("ID: " + card.getId());
         idLabel.getStyleClass().add("card-id");
 
-        cardBox.getChildren().addAll(gameTypeLabel, imageView, nameLabel, idLabel);
+        if (ownerLabel != null) {
+            cardBox.getChildren().addAll(gameTypeLabel, imageView, nameLabel, ownerLabel, idLabel);
+        } else {
+            cardBox.getChildren().addAll(gameTypeLabel, imageView, nameLabel, idLabel);
+        }
 
         // Aggiungi evento click per aprire dialog dettagli
         cardBox.setOnMouseClicked(_ -> showCardDetailsDialog(card));
@@ -735,7 +855,7 @@ public class FXCollectorHPView implements ICollectorHPView {
         // Caso speciale per le carte popolari
         if (selectedSetName.equals(POPULAR_CARDS_LABEL)) {
             LOGGER.info("Selected popular cards set");
-            controller.loadCardsFromSet(config.AppConfig.DEFAULT_SET_ID);
+            controller.loadPopularCards();
             return;
         }
 

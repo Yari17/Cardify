@@ -3,6 +3,7 @@ package view.collection;
 import model.domain.Binder;
 import view.IView;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,11 +22,14 @@ public interface ICollectionView extends IView {
 
     /**
      * Displays the user's collection organized by sets.
+     * The controller is responsible for obtaining persistence data and passes
+     * both the binders and a map of setId->cards for rendering. The view must
+     * not call DAOs directly.
      *
      * @param bindersBySet map of setId to Binder containing the user's collection
-     *                     Visualizza la collezione organizzata per set con le carte
+     * @param setCardsMap map of setId to list of Card instances (from persistence)
      */
-    void displayCollection(Map<String, Binder> bindersBySet, model.dao.ICardDao cardDao);
+    void displayCollection(Map<String, Binder> bindersBySet, Map<String, List<model.domain.Card>> setCardsMap);
 
     /**
      * Updates a single card in the UI without full refresh.

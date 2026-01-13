@@ -1,9 +1,12 @@
 package controller;
 
+import model.bean.TradeBean;
 import model.bean.UserBean;
 import view.trade.ITradeView;
 
 import java.util.logging.Logger;
+
+import static java.util.Collections.singletonList;
 
 public class TradeController {
     private static final Logger LOGGER = Logger.getLogger(TradeController.class.getName());
@@ -30,7 +33,7 @@ public class TradeController {
         // Mock Pending Trades
         java.util.List<model.bean.TradeBean> pendingTrades = new java.util.ArrayList<>();
 
-        model.bean.TradeBean t1 = new model.bean.TradeBean();
+        TradeBean t1 = new model.bean.TradeBean();
         t1.setId("TRD-101");
         t1.setSenderUsername("AshKetchum");
         t1.setReceiverUsername(username);
@@ -39,7 +42,7 @@ public class TradeController {
         // Simple mock card
         model.bean.CardBean c1 = new model.bean.CardBean("base1-4", "Charizard", null,
                 model.domain.CardGameType.POKEMON);
-        t1.setOfferedCards(java.util.Collections.singletonList(c1));
+        t1.setOfferedCards(singletonList(c1));
         pendingTrades.add(t1);
 
         model.bean.TradeBean t2 = new model.bean.TradeBean();
@@ -50,7 +53,7 @@ public class TradeController {
         t2.setCreatedAt(java.time.LocalDateTime.now().minusHours(5));
         model.bean.CardBean c2 = new model.bean.CardBean("base1-15", "Venusaur", null,
                 model.domain.CardGameType.POKEMON);
-        t2.setOfferedCards(java.util.Collections.singletonList(c2));
+        t2.setOfferedCards(singletonList(c2));
         pendingTrades.add(t2);
 
         // Mock Scheduled/Accepted Trades

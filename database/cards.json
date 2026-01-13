@@ -1,2391 +1,841 @@
 {
   "cards": {
-    "base4-60": {
-      "id": "base4-60",
-      "name": "Seaking",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/60/high.png",
+    "pl4-1": {
+      "category": "Pokemon",
+      "localId": "1",
+      "illustrator": "Kagemaru Himeno",
+      "rarity": "Rare Holo",
+      "setId": "pl4",
+      "setName": "Arceus",
+      "setLogo": "https://assets.tcgdex.net/en/pl/pl4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/pl/pl4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": true,
+      "variantNormal": false,
+      "variantReverse": true,
+      "variantWPromo": false,
+      "types": [
+        "Fire"
+      ],
+      "evolveFrom": "Charmeleon",
+      "stage": "Stage2",
+      "attacks": [
+        {
+          "damage": "30",
+          "cost": [
+            "Fire"
+          ],
+          "effect": "",
+          "name": "Fire Wing"
+        },
+        {
+          "damage": "80",
+          "cost": [
+            "Fire",
+            "Fire",
+            "Colorless"
+          ],
+          "effect": "Discard a Fire Energy attached to Charizard.",
+          "name": "Burning Tail"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Water",
+          "value": "+30"
+        }
+      ],
+      "retreat": 3,
+      "legalStandard": false,
+      "legalExpanded": false,
+      "id": "pl4-1",
+      "name": "Charizard",
+      "imageUrl": "https://assets.tcgdex.net/en/pl/pl4/1/high.png",
       "gameType": "POKEMON"
     },
-    "base4-61": {
-      "id": "base4-61",
-      "name": "Seel",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/61/high.png",
+    "base3-7": {
+      "id": "base3-7",
+      "name": "Hitmonlee",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/7/high.png",
       "gameType": "POKEMON"
     },
-    "base4-62": {
-      "id": "base4-62",
-      "name": "Tauros",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/62/high.png",
+    "base3-8": {
+      "id": "base3-8",
+      "name": "Hypno",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/8/high.png",
       "gameType": "POKEMON"
     },
-    "base4-63": {
-      "id": "base4-63",
-      "name": "Wartortle",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/63/high.png",
+    "base3-9": {
+      "id": "base3-9",
+      "name": "Kabutops",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/9/high.png",
       "gameType": "POKEMON"
     },
-    "base4-68": {
-      "id": "base4-68",
-      "name": "Caterpie",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/68/high.png",
+    "base3-16": {
+      "category": "Pokemon",
+      "localId": "16",
+      "illustrator": "Kagemaru Himeno",
+      "rarity": "Rare",
+      "setId": "base3",
+      "setName": "Fossil",
+      "setLogo": "https://assets.tcgdex.net/en/base/base3/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/base/base3/symbol",
+      "variantFirstEdition": true,
+      "variantHolo": false,
+      "variantNormal": true,
+      "variantReverse": false,
+      "variantWPromo": false,
+      "hp": 60,
+      "types": [
+        "Fighting"
+      ],
+      "stage": "Stage1",
+      "attacks": [
+        {
+          "damage": "30",
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "effect": "",
+          "name": "Wing Attack"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Grass",
+          "value": "×2"
+        }
+      ],
+      "legalStandard": false,
+      "legalExpanded": false,
+      "id": "base3-16",
+      "name": "Aerodactyl",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/16/high.png",
       "gameType": "POKEMON"
     },
-    "base4-69": {
-      "id": "base4-69",
-      "name": "Charmander",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/69/high.png",
+    "base3-3": {
+      "id": "base3-3",
+      "name": "Ditto",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/3/high.png",
       "gameType": "POKEMON"
     },
-    "base4-64": {
-      "id": "base4-64",
-      "name": "Weepinbell",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/64/high.png",
+    "base3-17": {
+      "id": "base3-17",
+      "name": "Articuno",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/17/high.png",
       "gameType": "POKEMON"
     },
-    "base4-65": {
-      "id": "base4-65",
-      "name": "Abra",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/65/high.png",
+    "base3-4": {
+      "id": "base3-4",
+      "name": "Dragonite",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/4/high.png",
       "gameType": "POKEMON"
     },
-    "base4-66": {
-      "id": "base4-66",
-      "name": "Bellsprout",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/66/high.png",
+    "base3-5": {
+      "id": "base3-5",
+      "name": "Gengar",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/5/high.png",
       "gameType": "POKEMON"
     },
-    "base4-67": {
-      "id": "base4-67",
-      "name": "Bulbasaur",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/67/high.png",
+    "base3-18": {
+      "id": "base3-18",
+      "name": "Ditto",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/18/high.png",
       "gameType": "POKEMON"
     },
-    "base4-71": {
-      "id": "base4-71",
-      "name": "Diglett",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/71/high.png",
+    "base3-6": {
+      "id": "base3-6",
+      "name": "Haunter",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/6/high.png",
       "gameType": "POKEMON"
     },
-    "base4-72": {
-      "id": "base4-72",
-      "name": "Doduo",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/72/high.png",
+    "base3-19": {
+      "id": "base3-19",
+      "name": "Dragonite",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/19/high.png",
       "gameType": "POKEMON"
     },
-    "base4-73": {
-      "id": "base4-73",
-      "name": "Drowzee",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/73/high.png",
+    "base3-1": {
+      "id": "base3-1",
+      "name": "Aerodactyl",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/1/high.png",
       "gameType": "POKEMON"
     },
-    "base4-74": {
-      "id": "base4-74",
-      "name": "Exeggcute",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/74/high.png",
+    "base3-2": {
+      "id": "base3-2",
+      "name": "Articuno",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/2/high.png",
       "gameType": "POKEMON"
     },
-    "base4-70": {
-      "id": "base4-70",
-      "name": "Cubone",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/70/high.png",
+    "base3-50": {
+      "id": "base3-50",
+      "name": "Kabuto",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/50/high.png",
       "gameType": "POKEMON"
     },
-    "base4-79": {
-      "id": "base4-79",
-      "name": "Magnemite",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/79/high.png",
+    "base3-51": {
+      "id": "base3-51",
+      "name": "Krabby",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/51/high.png",
       "gameType": "POKEMON"
     },
-    "base4-130": {
-      "id": "base4-130",
-      "name": "Water Energy",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/130/high.png",
+    "base3-12": {
+      "id": "base3-12",
+      "name": "Moltres",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/12/high.png",
       "gameType": "POKEMON"
     },
-    "base4-75": {
-      "id": "base4-75",
-      "name": "Gastly",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/75/high.png",
+    "base3-56": {
+      "id": "base3-56",
+      "name": "Tentacool",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/56/high.png",
       "gameType": "POKEMON"
     },
-    "base4-76": {
-      "id": "base4-76",
-      "name": "Goldeen",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/76/high.png",
+    "base3-13": {
+      "id": "base3-13",
+      "name": "Muk",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/13/high.png",
       "gameType": "POKEMON"
     },
-    "base4-77": {
-      "id": "base4-77",
-      "name": "Jigglypuff",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/77/high.png",
+    "base3-57": {
+      "id": "base3-57",
+      "name": "Zubat",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/57/high.png",
       "gameType": "POKEMON"
     },
-    "base4-78": {
-      "id": "base4-78",
-      "name": "Machop",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/78/high.png",
+    "base3-14": {
+      "id": "base3-14",
+      "name": "Raichu",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/14/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-58": {
+      "id": "base3-58",
+      "name": "Mr. Fuji",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/58/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-15": {
+      "id": "base3-15",
+      "name": "Zapdos",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/15/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-59": {
+      "id": "base3-59",
+      "name": "Energy Search",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/59/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-52": {
+      "id": "base3-52",
+      "name": "Omanyte",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/52/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-53": {
+      "id": "base3-53",
+      "name": "Psyduck",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/53/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-10": {
+      "id": "base3-10",
+      "name": "Lapras",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/10/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-54": {
+      "id": "base3-54",
+      "name": "Shellder",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/54/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-11": {
+      "id": "base3-11",
+      "name": "Magneton",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/11/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-55": {
+      "id": "base3-55",
+      "name": "Slowpoke",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/55/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-27": {
+      "id": "base3-27",
+      "name": "Moltres",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/27/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-28": {
+      "id": "base3-28",
+      "name": "Muk",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/28/high.png",
+      "gameType": "POKEMON"
+    },
+    "pl4-71": {
+      "category": "Pokemon",
+      "localId": "71",
+      "illustrator": "sui",
+      "rarity": "Common",
+      "setId": "pl4",
+      "setName": "Arceus",
+      "setLogo": "https://assets.tcgdex.net/en/pl/pl4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/pl/pl4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": false,
+      "variantNormal": true,
+      "variantReverse": true,
+      "variantWPromo": false,
+      "types": [
+        "Lightning"
+      ],
+      "stage": "Basic",
+      "attacks": [
+        {
+          "damage": "10",
+          "cost": [
+            "Lightning"
+          ],
+          "effect": "",
+          "name": "Pika Ball"
+        },
+        {
+          "damage": "",
+          "cost": [
+            "Lightning",
+            "Colorless",
+            "Colorless"
+          ],
+          "effect": "Discard all Lightning Energy attached to Pikachu and then choose 1 of your opponent\u0027s Pokémon. This attack does 40 damage to that Pokémon. (Don\u0027t apply Weakness and Resistance for Benched Pokémon.)",
+          "name": "Mega Shot"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Fighting",
+          "value": "+10"
+        }
+      ],
+      "retreat": 1,
+      "legalStandard": false,
+      "legalExpanded": false,
+      "id": "pl4-71",
+      "name": "Pikachu",
+      "imageUrl": "https://assets.tcgdex.net/en/pl/pl4/71/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-29": {
+      "id": "base3-29",
+      "name": "Raichu",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/29/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-60": {
+      "id": "base3-60",
+      "name": "Gambler",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/60/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-61": {
+      "id": "base3-61",
+      "name": "Recycle",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/61/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-62": {
+      "id": "base3-62",
+      "name": "Mysterious Fossil",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/62/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-23": {
+      "id": "base3-23",
+      "name": "Hypno",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/23/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-24": {
+      "id": "base3-24",
+      "name": "Kabutops",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/24/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-25": {
+      "id": "base3-25",
+      "name": "Lapras",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/25/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-26": {
+      "id": "base3-26",
+      "name": "Magneton",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/26/high.png",
+      "gameType": "POKEMON"
+    },
+    "pl4-6": {
+      "category": "Pokemon",
+      "localId": "6",
+      "illustrator": "Kagemaru Himeno",
+      "rarity": "Rare Holo",
+      "setId": "pl4",
+      "setName": "Arceus",
+      "setLogo": "https://assets.tcgdex.net/en/pl/pl4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/pl/pl4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": true,
+      "variantNormal": false,
+      "variantReverse": true,
+      "variantWPromo": false,
+      "hp": 90,
+      "types": [
+        "Grass"
+      ],
+      "evolveFrom": "Burmy",
+      "stage": "Stage1",
+      "attacks": [
+        {
+          "damage": "",
+          "effect": "Search your deck for up to 3 in any combination of Burmy and Wormadam, show them to your opponent, and put them into your hand. Shuffle your deck afterward.",
+          "name": "Cloak Party"
+        },
+        {
+          "damage": "30",
+          "cost": [
+            "Colorless"
+          ],
+          "effect": "Search your discard pile for a basic Energy card and attach it to 1 of your Benched Pokémon.",
+          "name": "Energy Assist"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Fire",
+          "value": "+20"
+        }
+      ],
+      "legalStandard": false,
+      "legalExpanded": false,
+      "id": "pl4-6",
+      "name": "Mothim",
+      "imageUrl": "https://assets.tcgdex.net/en/pl/pl4/6/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-20": {
+      "id": "base3-20",
+      "name": "Gengar",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/20/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-21": {
+      "id": "base3-21",
+      "name": "Haunter",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/21/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-22": {
+      "id": "base3-22",
+      "name": "Hitmonlee",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/22/high.png",
       "gameType": "POKEMON"
     },
     "base4-6": {
+      "category": "Pokemon",
+      "localId": "6",
+      "illustrator": "Ken Sugimori",
+      "rarity": "Rare",
+      "setId": "base4",
+      "setName": "Base Set 2",
+      "setLogo": "https://assets.tcgdex.net/en/base/base4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/base/base4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": true,
+      "variantNormal": false,
+      "variantReverse": false,
+      "variantWPromo": false,
+      "hp": 40,
+      "types": [
+        "Colorless"
+      ],
+      "stage": "Basic",
+      "attacks": [
+        {
+          "damage": "",
+          "cost": [
+            "Colorless"
+          ],
+          "effect": "Flip a coin. If heads, the Defending Pokémon is now Asleep.",
+          "name": "Sing"
+        },
+        {
+          "damage": "",
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "effect": "Choose 1 of Defending Pokémon\u0027s attacks. Metronome copies that attack except for its Energy costs and anything else required in order to use that attack, such as discarding energy cards. (No matter what type the defender is, Clefairy\u0027s type is still Colorless.)",
+          "name": "Metronome"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Fighting",
+          "value": "×2"
+        }
+      ],
+      "legalStandard": false,
+      "legalExpanded": false,
       "id": "base4-6",
       "name": "Clefairy",
       "imageUrl": "https://assets.tcgdex.net/en/base/base4/6/high.png",
       "gameType": "POKEMON"
     },
-    "swsh10.5-019": {
-      "id": "swsh10.5-019",
-      "name": "Slowpoke",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/019/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-7": {
-      "id": "base4-7",
-      "name": "Gyarados",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/7/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-8": {
-      "id": "base4-8",
-      "name": "Hitmonchan",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/8/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-017": {
-      "id": "swsh10.5-017",
-      "name": "Blastoise",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/017/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-9": {
-      "id": "base4-9",
-      "name": "Magneton",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/9/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-018": {
-      "id": "swsh10.5-018",
-      "name": "Radiant Blastoise",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/018/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-2": {
-      "id": "base4-2",
-      "name": "Blastoise",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/2/high.png",
+    "base3-38": {
+      "id": "base3-38",
+      "name": "Kingler",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/38/high.png",
       "gameType": "POKEMON"
     },
     "base4-3": {
+      "category": "Pokemon",
+      "localId": "3",
+      "illustrator": "Ken Sugimori",
+      "rarity": "Rare",
+      "setId": "base4",
+      "setName": "Base Set 2",
+      "setLogo": "https://assets.tcgdex.net/en/base/base4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/base/base4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": true,
+      "variantNormal": false,
+      "variantReverse": false,
+      "variantWPromo": false,
+      "hp": 120,
+      "types": [
+        "Colorless"
+      ],
+      "stage": "Basic",
+      "attacks": [
+        {
+          "damage": "",
+          "cost": [
+            "Colorless",
+            "Colorless"
+          ],
+          "effect": "Flip a coin. If heads, prevent all damage done to Chansey during your opponent\u0027s next turn. (Any other effects of attacks still happen.)",
+          "name": "Scrunch"
+        },
+        {
+          "damage": "80",
+          "cost": [
+            "Colorless",
+            "Colorless",
+            "Colorless",
+            "Colorless"
+          ],
+          "effect": "Chansey does 80 damage to itself.",
+          "name": "Double-edge"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Fighting",
+          "value": "×2"
+        }
+      ],
+      "legalStandard": false,
+      "legalExpanded": false,
       "id": "base4-3",
       "name": "Chansey",
       "imageUrl": "https://assets.tcgdex.net/en/base/base4/3/high.png",
       "gameType": "POKEMON"
     },
-    "base4-4": {
-      "id": "base4-4",
-      "name": "Charizard",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/4/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-5": {
-      "id": "base4-5",
-      "name": "Clefable",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/5/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-011": {
-      "id": "swsh10.5-011",
-      "name": "Radiant Charizard",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/011/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-012": {
-      "id": "swsh10.5-012",
-      "name": "Moltres",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/012/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-1": {
-      "id": "base4-1",
-      "name": "Alakazam",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/1/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-010": {
-      "id": "swsh10.5-010",
-      "name": "Charizard",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/010/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-015": {
-      "id": "swsh10.5-015",
-      "name": "Squirtle",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/015/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-016": {
-      "id": "swsh10.5-016",
-      "name": "Wartortle",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/016/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-013": {
-      "id": "swsh10.5-013",
-      "name": "Numel",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/013/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-014": {
-      "id": "swsh10.5-014",
-      "name": "Camerupt",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/014/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-40": {
-      "id": "base4-40",
-      "name": "Farfetch\u0027d",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/40/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-41": {
-      "id": "base4-41",
-      "name": "Fearow",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/41/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-46": {
-      "id": "base4-46",
-      "name": "Kadabra",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/46/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-47": {
-      "id": "base4-47",
-      "name": "Kakuna",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/47/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-48": {
-      "id": "base4-48",
-      "name": "Lickitung",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/48/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-49": {
-      "id": "base4-49",
-      "name": "Machoke",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/49/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-42": {
-      "id": "base4-42",
-      "name": "Growlithe",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/42/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-43": {
-      "id": "base4-43",
-      "name": "Haunter",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/43/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-44": {
-      "id": "base4-44",
-      "name": "Ivysaur",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/44/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-45": {
-      "id": "base4-45",
-      "name": "Jynx",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/45/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-008": {
-      "id": "swsh10.5-008",
-      "name": "Charmander",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/008/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-009": {
-      "id": "swsh10.5-009",
-      "name": "Charmeleon",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/009/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-006": {
-      "id": "swsh10.5-006",
-      "name": "Spinarak",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/006/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-007": {
-      "id": "swsh10.5-007",
-      "name": "Ariados",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/007/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-001": {
-      "id": "swsh10.5-001",
-      "name": "Bulbasaur",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/001/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-004": {
-      "id": "swsh10.5-004",
-      "name": "Radiant Venusaur",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/004/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-005": {
-      "id": "swsh10.5-005",
-      "name": "Alolan Exeggutor V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/005/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-002": {
-      "id": "swsh10.5-002",
-      "name": "Ivysaur",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/002/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-003": {
-      "id": "swsh10.5-003",
-      "name": "Venusaur",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/003/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-50": {
-      "id": "base4-50",
-      "name": "Magikarp",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/50/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-51": {
-      "id": "base4-51",
+    "base3-39": {
+      "id": "base3-39",
       "name": "Magmar",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/51/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-52": {
-      "id": "base4-52",
-      "name": "Marowak",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/52/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-57": {
-      "id": "base4-57",
-      "name": "Poliwhirl",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/57/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-58": {
-      "id": "base4-58",
-      "name": "Raticate",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/58/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-59": {
-      "id": "base4-59",
-      "name": "Rhydon",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/59/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-53": {
-      "id": "base4-53",
-      "name": "Nidorina",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/53/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-54": {
-      "id": "base4-54",
-      "name": "Nidorino",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/54/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-55": {
-      "id": "base4-55",
-      "name": "Parasect",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/55/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-56": {
-      "id": "base4-56",
-      "name": "Persian",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/56/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-82": {
-      "id": "base4-82",
-      "name": "Nidoran♀",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/82/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-83": {
-      "id": "base4-83",
-      "name": "Nidoran♂",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/83/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-84": {
-      "id": "base4-84",
-      "name": "Onix",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/84/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-85": {
-      "id": "base4-85",
-      "name": "Paras",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/85/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-80": {
-      "id": "base4-80",
-      "name": "Meowth",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/80/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-81": {
-      "id": "base4-81",
-      "name": "Metapod",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/81/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-86": {
-      "id": "base4-86",
-      "name": "Pidgey",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/86/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-87": {
-      "id": "base4-87",
-      "name": "Pikachu",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/87/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-88": {
-      "id": "base4-88",
-      "name": "Poliwag",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/88/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-89": {
-      "id": "base4-89",
-      "name": "Rattata",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/89/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-93": {
-      "id": "base4-93",
-      "name": "Squirtle",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/93/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-94": {
-      "id": "base4-94",
-      "name": "Starmie",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/94/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-95": {
-      "id": "base4-95",
-      "name": "Staryu",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/95/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-96": {
-      "id": "base4-96",
-      "name": "Tangela",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/96/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-90": {
-      "id": "base4-90",
-      "name": "Rhyhorn",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/90/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-91": {
-      "id": "base4-91",
-      "name": "Sandshrew",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/91/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-92": {
-      "id": "base4-92",
-      "name": "Spearow",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/92/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-97": {
-      "id": "base4-97",
-      "name": "Venonat",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/97/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-98": {
-      "id": "base4-98",
-      "name": "Voltorb",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/98/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-99": {
-      "id": "base4-99",
-      "name": "Vulpix",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/99/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-077": {
-      "id": "swsh10.5-077",
-      "name": "Slaking V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/077/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-078": {
-      "id": "swsh10.5-078",
-      "name": "Professor\u0027s Research",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/078/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-075": {
-      "id": "swsh10.5-075",
-      "name": "Melmetal V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/075/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-076": {
-      "id": "swsh10.5-076",
-      "name": "Dragonite V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/076/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-079": {
-      "id": "swsh10.5-079",
-      "name": "Mewtwo VSTAR",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/079/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-080": {
-      "id": "swsh10.5-080",
-      "name": "Melmetal VMAX",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/080/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-081": {
-      "id": "swsh10.5-081",
-      "name": "Dragonite VSTAR",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/081/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-084": {
-      "id": "swsh10.5-084",
-      "name": "Professor\u0027s Research",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/084/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-085": {
-      "id": "swsh10.5-085",
-      "name": "Spark",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/085/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-082": {
-      "id": "swsh10.5-082",
-      "name": "Blanche",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/082/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-083": {
-      "id": "swsh10.5-083",
-      "name": "Candela",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/083/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-066": {
-      "id": "swsh10.5-066",
-      "name": "Egg Incubator",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/066/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-067": {
-      "id": "swsh10.5-067",
-      "name": "Lure Module",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/067/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-064": {
-      "id": "swsh10.5-064",
-      "name": "Blanche",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/064/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-065": {
-      "id": "swsh10.5-065",
-      "name": "Candela",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/065/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-068": {
-      "id": "swsh10.5-068",
-      "name": "PokéStop",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/068/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-069": {
-      "id": "swsh10.5-069",
-      "name": "Rare Candy",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/069/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-070": {
-      "id": "swsh10.5-070",
-      "name": "Spark",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/070/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-073": {
-      "id": "swsh10.5-073",
-      "name": "Conkeldurr V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/073/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-074": {
-      "id": "swsh10.5-074",
-      "name": "Conkeldurr V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/074/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-071": {
-      "id": "swsh10.5-071",
-      "name": "Alolan Exeggutor V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/071/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-072": {
-      "id": "swsh10.5-072",
-      "name": "Mewtwo V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/072/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-088": {
-      "id": "swsh10.5-088",
-      "name": "Lure Module",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/088/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-086": {
-      "id": "swsh10.5-086",
-      "name": "Mewtwo VSTAR",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/086/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-087": {
-      "id": "swsh10.5-087",
-      "name": "Egg Incubator",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/087/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-039": {
-      "id": "swsh10.5-039",
-      "name": "Solrock",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/039/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-28": {
-      "id": "base4-28",
-      "name": "Pidgeotto",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/28/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-29": {
-      "id": "base4-29",
-      "name": "Pinsir",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/29/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-033": {
-      "id": "swsh10.5-033",
-      "name": "Xatu",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/033/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-034": {
-      "id": "swsh10.5-034",
-      "name": "Lunatone",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/034/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-031": {
-      "id": "swsh10.5-031",
-      "name": "Mewtwo VSTAR",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/031/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-032": {
-      "id": "swsh10.5-032",
-      "name": "Natu",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/032/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-109": {
-      "id": "base4-109",
-      "name": "Defender",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/109/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-037": {
-      "id": "swsh10.5-037",
-      "name": "Larvitar",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/037/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-038": {
-      "id": "swsh10.5-038",
-      "name": "Pupitar",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/038/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-035": {
-      "id": "swsh10.5-035",
-      "name": "Sylveon",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/035/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-036": {
-      "id": "swsh10.5-036",
-      "name": "Onix",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/036/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-105": {
-      "id": "base4-105",
-      "name": "Pokémon Breeder",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/105/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-106": {
-      "id": "base4-106",
-      "name": "Pokémon Trader",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/106/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-107": {
-      "id": "base4-107",
-      "name": "Scoop Up",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/107/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-108": {
-      "id": "base4-108",
-      "name": "Super Energy Removal",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/108/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-101": {
-      "id": "base4-101",
-      "name": "Computer Search",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/101/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-040": {
-      "id": "swsh10.5-040",
-      "name": "Conkeldurr V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/040/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-102": {
-      "id": "base4-102",
-      "name": "Impostor Professor Oak",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/102/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-041": {
-      "id": "swsh10.5-041",
-      "name": "Alolan Rattata",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/041/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-103": {
-      "id": "base4-103",
-      "name": "Item Finder",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/103/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-104": {
-      "id": "base4-104",
-      "name": "Lass",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/104/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-24": {
-      "id": "base4-24",
-      "name": "Electabuzz",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/24/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-25": {
-      "id": "base4-25",
-      "name": "Electrode",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/25/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-26": {
-      "id": "base4-26",
-      "name": "Kangaskhan",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/26/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-27": {
-      "id": "base4-27",
-      "name": "Mr. Mime",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/27/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-100": {
-      "id": "base4-100",
-      "name": "Weedle",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/100/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-20": {
-      "id": "base4-20",
-      "name": "Zapdos",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/20/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-21": {
-      "id": "base4-21",
-      "name": "Beedrill",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/21/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-22": {
-      "id": "base4-22",
-      "name": "Dragonair",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/22/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-23": {
-      "id": "base4-23",
-      "name": "Dugtrio",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/23/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-028": {
-      "id": "swsh10.5-028",
-      "name": "Pikachu",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/028/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-029": {
-      "id": "swsh10.5-029",
-      "name": "Zapdos",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/029/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-39": {
-      "id": "base4-39",
-      "name": "Exeggutor",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/39/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-022": {
-      "id": "swsh10.5-022",
-      "name": "Gyarados",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/022/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-023": {
-      "id": "swsh10.5-023",
-      "name": "Lapras",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/023/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-020": {
-      "id": "swsh10.5-020",
-      "name": "Slowbro",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/020/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-021": {
-      "id": "swsh10.5-021",
-      "name": "Magikarp",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/021/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-026": {
-      "id": "swsh10.5-026",
-      "name": "Golisopod",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/026/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-027": {
-      "id": "swsh10.5-027",
-      "name": "Pikachu",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/027/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-024": {
-      "id": "swsh10.5-024",
-      "name": "Articuno",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/024/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-025": {
-      "id": "swsh10.5-025",
-      "name": "Wimpod",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/025/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-30": {
-      "id": "base4-30",
-      "name": "Snorlax",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/30/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-030": {
-      "id": "swsh10.5-030",
-      "name": "Mewtwo V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/030/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-35": {
-      "id": "base4-35",
-      "name": "Charmeleon",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/35/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-36": {
-      "id": "base4-36",
-      "name": "Dewgong",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/36/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-37": {
-      "id": "base4-37",
-      "name": "Dodrio",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/37/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-38": {
-      "id": "base4-38",
-      "name": "Dratini",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/38/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-31": {
-      "id": "base4-31",
-      "name": "Venomoth",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/31/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-32": {
-      "id": "base4-32",
-      "name": "Victreebel",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/32/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-33": {
-      "id": "base4-33",
-      "name": "Arcanine",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/33/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-34": {
-      "id": "base4-34",
-      "name": "Butterfree",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/34/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-055": {
-      "id": "swsh10.5-055",
-      "name": "Snorlax",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/055/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-056": {
-      "id": "swsh10.5-056",
-      "name": "Aipom",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/056/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-053": {
-      "id": "swsh10.5-053",
-      "name": "Ditto",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/053/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-054": {
-      "id": "swsh10.5-054",
-      "name": "Eevee",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/054/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-059": {
-      "id": "swsh10.5-059",
-      "name": "Bidoof",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/059/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-057": {
-      "id": "swsh10.5-057",
-      "name": "Ambipom",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/057/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-058": {
-      "id": "swsh10.5-058",
-      "name": "Slaking V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/058/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-127": {
-      "id": "base4-127",
-      "name": "Grass Energy",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/127/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-128": {
-      "id": "base4-128",
-      "name": "Lightning Energy",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/128/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-129": {
-      "id": "base4-129",
-      "name": "Psychic Energy",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/129/high.png",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/39/high.png",
       "gameType": "POKEMON"
     },
     "base4-123": {
+      "category": "Trainer",
+      "localId": "123",
+      "illustrator": "Keiji Kinebuchi",
+      "rarity": "Common",
+      "setId": "base4",
+      "setName": "Base Set 2",
+      "setLogo": "https://assets.tcgdex.net/en/base/base4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/base/base4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": false,
+      "variantNormal": true,
+      "variantReverse": false,
+      "variantWPromo": false,
+      "legalStandard": false,
+      "legalExpanded": false,
       "id": "base4-123",
       "name": "Switch",
       "imageUrl": "https://assets.tcgdex.net/en/base/base4/123/high.png",
       "gameType": "POKEMON"
     },
-    "swsh10.5-062": {
-      "id": "swsh10.5-062",
-      "name": "Tranquill",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/062/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-124": {
-      "id": "base4-124",
-      "name": "Double Colorless Energy",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/124/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-063": {
-      "id": "swsh10.5-063",
-      "name": "Unfezant",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/063/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-125": {
-      "id": "base4-125",
-      "name": "Fighting Energy",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/125/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-060": {
-      "id": "swsh10.5-060",
-      "name": "Bibarel",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/060/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-126": {
-      "id": "base4-126",
-      "name": "Fire Energy",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/126/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-061": {
-      "id": "swsh10.5-061",
-      "name": "Pidove",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/061/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-120": {
-      "id": "base4-120",
-      "name": "Gust of Wind",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/120/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-121": {
-      "id": "base4-121",
-      "name": "Poké Ball",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/121/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-122": {
-      "id": "base4-122",
-      "name": "Potion",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/122/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-17": {
-      "id": "base4-17",
-      "name": "Scyther",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/17/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-18": {
-      "id": "base4-18",
-      "name": "Venusaur",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/18/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-19": {
-      "id": "base4-19",
-      "name": "Wigglytuff",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/19/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-044": {
-      "id": "swsh10.5-044",
-      "name": "Steelix",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/044/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-045": {
-      "id": "swsh10.5-045",
-      "name": "Meltan",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/045/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-042": {
-      "id": "swsh10.5-042",
-      "name": "Alolan Raticate",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/042/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-043": {
-      "id": "swsh10.5-043",
-      "name": "Tyranitar",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/043/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-048": {
-      "id": "swsh10.5-048",
-      "name": "Melmetal VMAX",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/048/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-049": {
-      "id": "swsh10.5-049",
-      "name": "Dragonite V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/049/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-046": {
-      "id": "swsh10.5-046",
-      "name": "Melmetal",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/046/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-047": {
-      "id": "swsh10.5-047",
-      "name": "Melmetal V",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/047/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-116": {
-      "id": "base4-116",
-      "name": "Professor Oak",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/116/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-117": {
-      "id": "base4-117",
-      "name": "Super Potion",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/117/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-118": {
-      "id": "base4-118",
-      "name": "Bill",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/118/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-119": {
-      "id": "base4-119",
-      "name": "Energy Removal",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/119/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-112": {
-      "id": "base4-112",
-      "name": "Maintenance",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/112/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-051": {
-      "id": "swsh10.5-051",
-      "name": "Chansey",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/051/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-113": {
-      "id": "base4-113",
-      "name": "PlusPower",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/113/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-052": {
-      "id": "swsh10.5-052",
-      "name": "Blissey",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/052/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-114": {
-      "id": "base4-114",
-      "name": "Pokémon Center",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/114/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-115": {
-      "id": "base4-115",
-      "name": "Pokédex",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/115/high.png",
-      "gameType": "POKEMON"
-    },
-    "swsh10.5-050": {
-      "id": "swsh10.5-050",
-      "name": "Dragonite VSTAR",
-      "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/050/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-13": {
-      "id": "base4-13",
-      "name": "Ninetales",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/13/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-14": {
-      "id": "base4-14",
-      "name": "Pidgeot",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/14/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-15": {
-      "id": "base4-15",
-      "name": "Poliwrath",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/15/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-110": {
-      "id": "base4-110",
-      "name": "Energy Retrieval",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/110/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-16": {
-      "id": "base4-16",
-      "name": "Raichu",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/16/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-111": {
-      "id": "base4-111",
-      "name": "Full Heal",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/111/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-10": {
-      "id": "base4-10",
-      "name": "Mewtwo",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/10/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-11": {
-      "id": "base4-11",
-      "name": "Nidoking",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/11/high.png",
-      "gameType": "POKEMON"
-    },
-    "base4-12": {
-      "id": "base4-12",
-      "name": "Nidoqueen",
-      "imageUrl": "https://assets.tcgdex.net/en/base/base4/12/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-008": {
-      "id": "sv08.5-008",
-      "name": "Whimsicott",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/008/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-129": {
-      "id": "sv08.5-129",
-      "name": "Sparkling Crystal",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/129/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-007": {
-      "id": "sv08.5-007",
-      "name": "Cottonee",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/007/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-128": {
-      "id": "sv08.5-128",
-      "name": "Scoop Up Cyclone",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/128/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-009": {
-      "id": "sv08.5-009",
-      "name": "Applin",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/009/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-004": {
-      "id": "sv08.5-004",
-      "name": "Budew",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/004/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-125": {
-      "id": "sv08.5-125",
-      "name": "Professor\u0027s Research",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/125/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-003": {
-      "id": "sv08.5-003",
-      "name": "Pinsir",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/003/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-124": {
-      "id": "sv08.5-124",
-      "name": "Professor\u0027s Research",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/124/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-006": {
-      "id": "sv08.5-006",
-      "name": "Leafeon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/006/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-127": {
-      "id": "sv08.5-127",
-      "name": "Roto-Stick",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/127/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-005": {
-      "id": "sv08.5-005",
-      "name": "Leafeon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/005/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-126": {
-      "id": "sv08.5-126",
-      "name": "Rescue Board",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/126/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-121": {
-      "id": "sv08.5-121",
-      "name": "Professor Turo\u0027s Scenario",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/121/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-120": {
-      "id": "sv08.5-120",
-      "name": "Professor Sada\u0027s Vitality",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/120/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-002": {
-      "id": "sv08.5-002",
-      "name": "Exeggutor",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/002/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-123": {
-      "id": "sv08.5-123",
-      "name": "Professor\u0027s Research",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/123/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-001": {
-      "id": "sv08.5-001",
-      "name": "Exeggcute",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/001/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-122": {
-      "id": "sv08.5-122",
-      "name": "Professor\u0027s Research",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/122/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-019": {
-      "id": "sv08.5-019",
-      "name": "Slowking",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/019/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-018": {
-      "id": "sv08.5-018",
-      "name": "Slowpoke",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/018/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-139": {
-      "id": "sv08.5-139",
-      "name": "Larry\u0027s Skill",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/139/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-015": {
-      "id": "sv08.5-015",
-      "name": "Litleo",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/015/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-136": {
-      "id": "sv08.5-136",
-      "name": "Eri",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/136/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-014": {
-      "id": "sv08.5-014",
-      "name": "Flareon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/014/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-135": {
-      "id": "sv08.5-135",
-      "name": "Brassius",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/135/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-017": {
-      "id": "sv08.5-017",
-      "name": "Hearthflame Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/017/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-138": {
-      "id": "sv08.5-138",
-      "name": "Giacomo",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/138/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-016": {
-      "id": "sv08.5-016",
-      "name": "Pyroar",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/016/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-137": {
-      "id": "sv08.5-137",
-      "name": "Friends in Paldea",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/137/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-011": {
-      "id": "sv08.5-011",
-      "name": "Hydrapple ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/011/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-132": {
-      "id": "sv08.5-132",
-      "name": "Amarys",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/132/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-010": {
-      "id": "sv08.5-010",
-      "name": "Dipplin",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/010/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-131": {
-      "id": "sv08.5-131",
-      "name": "Treasure Tracker",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/131/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-013": {
-      "id": "sv08.5-013",
-      "name": "Flareon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/013/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-134": {
-      "id": "sv08.5-134",
-      "name": "Atticus",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/134/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-012": {
-      "id": "sv08.5-012",
-      "name": "Teal Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/012/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-133": {
-      "id": "sv08.5-133",
-      "name": "Atticus",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/133/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-130": {
-      "id": "sv08.5-130",
-      "name": "Techno Radar",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/130/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-029": {
-      "id": "sv08.5-029",
-      "name": "Jolteon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/029/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-147": {
-      "id": "sv08.5-147",
-      "name": "Ceruledge ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/147/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-026": {
-      "id": "sv08.5-026",
-      "name": "Glaceon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/026/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-146": {
-      "id": "sv08.5-146",
-      "name": "Flareon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/146/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-025": {
-      "id": "sv08.5-025",
-      "name": "Glaceon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/025/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-149": {
-      "id": "sv08.5-149",
-      "name": "Vaporeon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/149/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-028": {
-      "id": "sv08.5-028",
-      "name": "Pikachu ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/028/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-148": {
-      "id": "sv08.5-148",
-      "name": "Hearthflame Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/148/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-027": {
-      "id": "sv08.5-027",
-      "name": "Wellspring Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/027/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-143": {
-      "id": "sv08.5-143",
-      "name": "Tyme",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/143/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-022": {
-      "id": "sv08.5-022",
-      "name": "Vaporeon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/022/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-142": {
-      "id": "sv08.5-142",
-      "name": "Raifort",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/142/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-021": {
-      "id": "sv08.5-021",
-      "name": "Seaking",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/021/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-024": {
-      "id": "sv08.5-024",
-      "name": "Suicune",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/024/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-145": {
-      "id": "sv08.5-145",
-      "name": "Teal Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/145/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-144": {
-      "id": "sv08.5-144",
-      "name": "Leafeon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/144/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-023": {
-      "id": "sv08.5-023",
-      "name": "Vaporeon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/023/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-141": {
-      "id": "sv08.5-141",
-      "name": "Ortega",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/141/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-020": {
-      "id": "sv08.5-020",
-      "name": "Goldeen",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/020/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-140": {
-      "id": "sv08.5-140",
-      "name": "Mela",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/140/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-037": {
-      "id": "sv08.5-037",
-      "name": "Dusknoir",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/037/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-158": {
-      "id": "sv08.5-158",
-      "name": "Iron Crown ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/158/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-036": {
-      "id": "sv08.5-036",
-      "name": "Dusclops",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/036/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-157": {
-      "id": "sv08.5-157",
-      "name": "Iron Valiant ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/157/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-039": {
-      "id": "sv08.5-039",
-      "name": "Aromatisse",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/039/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-038": {
-      "id": "sv08.5-038",
-      "name": "Spritzee",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/038/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-159": {
-      "id": "sv08.5-159",
-      "name": "Sandy Shocks ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/159/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-033": {
-      "id": "sv08.5-033",
-      "name": "Espeon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/033/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-154": {
-      "id": "sv08.5-154",
-      "name": "Iron Hands ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/154/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-153": {
-      "id": "sv08.5-153",
-      "name": "Jolteon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/153/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-032": {
-      "id": "sv08.5-032",
-      "name": "Iron Thorns ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/032/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-035": {
-      "id": "sv08.5-035",
-      "name": "Duskull",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/035/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-156": {
-      "id": "sv08.5-156",
-      "name": "Sylveon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/156/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-034": {
-      "id": "sv08.5-034",
-      "name": "Espeon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/034/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-155": {
-      "id": "sv08.5-155",
-      "name": "Espeon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/155/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-150": {
-      "id": "sv08.5-150",
-      "name": "Glaceon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/150/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-152": {
-      "id": "sv08.5-152",
-      "name": "Wellspring Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/152/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-031": {
-      "id": "sv08.5-031",
-      "name": "Iron Hands ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/031/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-151": {
-      "id": "sv08.5-151",
-      "name": "Palafin ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/151/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-030": {
-      "id": "sv08.5-030",
-      "name": "Jolteon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/030/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-107": {
-      "id": "sv08.5-107",
-      "name": "Explorer\u0027s Guidance",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/107/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-106": {
-      "id": "sv08.5-106",
-      "name": "Earthen Vessel",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/106/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-109": {
-      "id": "sv08.5-109",
-      "name": "Friends in Paldea",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/109/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-108": {
-      "id": "sv08.5-108",
-      "name": "Festival Grounds",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/108/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-103": {
-      "id": "sv08.5-103",
-      "name": "Carmine",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/103/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-102": {
-      "id": "sv08.5-102",
-      "name": "Bug Catching Set",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/102/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-105": {
-      "id": "sv08.5-105",
-      "name": "Crispin",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/105/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-104": {
-      "id": "sv08.5-104",
-      "name": "Ciphermaniac\u0027s Codebreaking",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/104/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-101": {
-      "id": "sv08.5-101",
-      "name": "Buddy-Buddy Poffin",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/101/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-100": {
-      "id": "sv08.5-100",
-      "name": "Briar",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/100/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-118": {
-      "id": "sv08.5-118",
-      "name": "Ogre\u0027s Mask",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/118/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-117": {
-      "id": "sv08.5-117",
-      "name": "Maximum Belt",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/117/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-119": {
-      "id": "sv08.5-119",
-      "name": "Prime Catcher",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/119/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-114": {
-      "id": "sv08.5-114",
-      "name": "Lacey",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/114/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-113": {
-      "id": "sv08.5-113",
-      "name": "Kieran",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/113/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-116": {
-      "id": "sv08.5-116",
-      "name": "Max Rod",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/116/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-115": {
-      "id": "sv08.5-115",
-      "name": "Larry\u0027s Skill",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/115/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-110": {
-      "id": "sv08.5-110",
-      "name": "Glass Trumpet",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/110/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-112": {
-      "id": "sv08.5-112",
-      "name": "Janine\u0027s Secret Art",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/112/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-111": {
-      "id": "sv08.5-111",
-      "name": "Haban Berry",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/111/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-088": {
-      "id": "sv08.5-088",
-      "name": "Furfrou",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/088/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-087": {
-      "id": "sv08.5-087",
-      "name": "Shaymin",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/087/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-089": {
-      "id": "sv08.5-089",
-      "name": "Hawlucha",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/089/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-084": {
-      "id": "sv08.5-084",
-      "name": "Lopunny",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/084/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-083": {
-      "id": "sv08.5-083",
-      "name": "Buneary",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/083/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-086": {
-      "id": "sv08.5-086",
-      "name": "Regigigas",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/086/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-085": {
-      "id": "sv08.5-085",
-      "name": "Fan Rotom",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/085/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-080": {
-      "id": "sv08.5-080",
-      "name": "Dudunsparce",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/080/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-082": {
-      "id": "sv08.5-082",
-      "name": "Lugia ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/082/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-081": {
-      "id": "sv08.5-081",
-      "name": "Miltank",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/081/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-099": {
-      "id": "sv08.5-099",
-      "name": "Black Belt\u0027s Training",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/099/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-098": {
-      "id": "sv08.5-098",
-      "name": "Black Belt\u0027s Training",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/098/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-095": {
-      "id": "sv08.5-095",
-      "name": "Binding Mochi",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/095/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-094": {
-      "id": "sv08.5-094",
-      "name": "Area Zero Underdepths",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/094/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-097": {
-      "id": "sv08.5-097",
-      "name": "Black Belt\u0027s Training",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/097/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-096": {
-      "id": "sv08.5-096",
-      "name": "Black Belt\u0027s Training",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/096/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-091": {
-      "id": "sv08.5-091",
-      "name": "Noivern ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/091/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-090": {
-      "id": "sv08.5-090",
-      "name": "Noibat",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/090/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-093": {
-      "id": "sv08.5-093",
-      "name": "Amarys",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/093/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-092": {
-      "id": "sv08.5-092",
-      "name": "Terapagos ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/092/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-169": {
-      "id": "sv08.5-169",
-      "name": "Terapagos ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/169/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-048": {
-      "id": "sv08.5-048",
-      "name": "Pupitar",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/048/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-168": {
-      "id": "sv08.5-168",
-      "name": "Bloodmoon Ursaluna ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/168/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-047": {
-      "id": "sv08.5-047",
-      "name": "Larvitar",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/047/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-049": {
-      "id": "sv08.5-049",
-      "name": "Groudon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/049/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-165": {
-      "id": "sv08.5-165",
-      "name": "Dragapult ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/165/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-044": {
-      "id": "sv08.5-044",
-      "name": "Munkidori",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/044/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-164": {
-      "id": "sv08.5-164",
-      "name": "Gholdengo ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/164/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-043": {
-      "id": "sv08.5-043",
-      "name": "Flutter Mane",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/043/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-167": {
-      "id": "sv08.5-167",
-      "name": "Eevee ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/167/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-046": {
-      "id": "sv08.5-046",
-      "name": "Iron Boulder",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/046/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-166": {
-      "id": "sv08.5-166",
-      "name": "Raging Bolt ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/166/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-045": {
-      "id": "sv08.5-045",
-      "name": "Fezandipiti",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/045/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-161": {
-      "id": "sv08.5-161",
-      "name": "Umbreon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/161/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-040": {
-      "id": "sv08.5-040",
-      "name": "Sylveon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/040/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-160": {
-      "id": "sv08.5-160",
-      "name": "Cornerstone Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/160/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-163": {
-      "id": "sv08.5-163",
-      "name": "Pecharunt ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/163/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-042": {
-      "id": "sv08.5-042",
-      "name": "Scream Tail",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/042/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-162": {
-      "id": "sv08.5-162",
-      "name": "Roaring Moon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/162/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-041": {
-      "id": "sv08.5-041",
-      "name": "Sylveon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/041/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-059": {
-      "id": "sv08.5-059",
-      "name": "Umbreon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/059/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-058": {
-      "id": "sv08.5-058",
-      "name": "Cornerstone Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/058/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-179": {
-      "id": "sv08.5-179",
-      "name": "Pikachu ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/179/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-176": {
-      "id": "sv08.5-176",
-      "name": "Iron Leaves ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/176/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-055": {
-      "id": "sv08.5-055",
-      "name": "Great Tusk",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/055/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-175": {
-      "id": "sv08.5-175",
-      "name": "Lacey",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/175/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-054": {
-      "id": "sv08.5-054",
-      "name": "Bloodmoon Ursaluna",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/054/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-178": {
-      "id": "sv08.5-178",
-      "name": "Walking Wake ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/178/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-057": {
-      "id": "sv08.5-057",
-      "name": "Okidogi",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/057/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-177": {
-      "id": "sv08.5-177",
-      "name": "Teal Mask Ogerpon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/177/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-056": {
-      "id": "sv08.5-056",
-      "name": "Sandy Shocks ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/056/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-172": {
-      "id": "sv08.5-172",
-      "name": "Drayton",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/172/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-051": {
-      "id": "sv08.5-051",
-      "name": "Lucario ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/051/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-171": {
-      "id": "sv08.5-171",
-      "name": "Crispin",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/171/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-050": {
-      "id": "sv08.5-050",
-      "name": "Riolu",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/050/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-174": {
-      "id": "sv08.5-174",
-      "name": "Kieran",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/174/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-053": {
-      "id": "sv08.5-053",
-      "name": "Hippowdon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/053/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-173": {
-      "id": "sv08.5-173",
-      "name": "Janine\u0027s Secret Art",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/173/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-052": {
-      "id": "sv08.5-052",
-      "name": "Hippopotas",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/052/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-170": {
-      "id": "sv08.5-170",
-      "name": "Amarys",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/170/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-069": {
-      "id": "sv08.5-069",
-      "name": "Duraludon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/069/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-066": {
-      "id": "sv08.5-066",
-      "name": "Bronzor",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/066/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-065": {
-      "id": "sv08.5-065",
-      "name": "Roaring Moon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/065/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-068": {
-      "id": "sv08.5-068",
-      "name": "Heatran",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/068/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-067": {
-      "id": "sv08.5-067",
-      "name": "Bronzong",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/067/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-062": {
-      "id": "sv08.5-062",
-      "name": "Houndour",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/062/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-061": {
-      "id": "sv08.5-061",
-      "name": "Sneasel",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/061/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-064": {
-      "id": "sv08.5-064",
-      "name": "Tyranitar ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/064/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-063": {
-      "id": "sv08.5-063",
-      "name": "Houndoom",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/063/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-060": {
-      "id": "sv08.5-060",
-      "name": "Umbreon ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/060/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-180": {
-      "id": "sv08.5-180",
-      "name": "Terapagos ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/180/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-077": {
-      "id": "sv08.5-077",
-      "name": "Hoothoot",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/077/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-076": {
-      "id": "sv08.5-076",
-      "name": "Snorlax ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/076/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-079": {
-      "id": "sv08.5-079",
-      "name": "Dunsparce",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/079/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-078": {
-      "id": "sv08.5-078",
-      "name": "Noctowl",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/078/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-073": {
-      "id": "sv08.5-073",
-      "name": "Dragapult ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/073/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-072": {
-      "id": "sv08.5-072",
-      "name": "Drakloak",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/072/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-075": {
-      "id": "sv08.5-075",
-      "name": "Eevee ex",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/075/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-074": {
-      "id": "sv08.5-074",
-      "name": "Eevee",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/074/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-071": {
-      "id": "sv08.5-071",
-      "name": "Dreepy",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/071/high.png",
-      "gameType": "POKEMON"
-    },
-    "sv08.5-070": {
-      "id": "sv08.5-070",
-      "name": "Archaludon",
-      "imageUrl": "https://assets.tcgdex.net/en/sv/sv08.5/070/high.png",
+    "base3-34": {
+      "id": "base3-34",
+      "name": "Golbat",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/34/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-35": {
+      "id": "base3-35",
+      "name": "Golduck",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/35/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-36": {
+      "id": "base3-36",
+      "name": "Golem",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/36/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-37": {
+      "id": "base3-37",
+      "name": "Graveler",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/37/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-30": {
+      "id": "base3-30",
+      "name": "Zapdos",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/30/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-31": {
+      "id": "base3-31",
+      "name": "Arbok",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/31/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-32": {
+      "id": "base3-32",
+      "name": "Cloyster",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/32/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-33": {
+      "id": "base3-33",
+      "name": "Gastly",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/33/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-49": {
+      "id": "base3-49",
+      "name": "Horsea",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/49/high.png",
+      "gameType": "POKEMON"
+    },
+    "pl4-59": {
+      "category": "Pokemon",
+      "localId": "59",
+      "illustrator": "Suwama Chiaki",
+      "rarity": "Common",
+      "setId": "pl4",
+      "setName": "Arceus",
+      "setLogo": "https://assets.tcgdex.net/en/pl/pl4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/pl/pl4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": false,
+      "variantNormal": true,
+      "variantReverse": true,
+      "variantWPromo": false,
+      "types": [
+        "Fire"
+      ],
+      "stage": "Basic",
+      "attacks": [
+        {
+          "damage": "",
+          "cost": [
+            "Colorless"
+          ],
+          "effect": "Search your deck for a Fire Basic Pokémon, show it to your opponent, and put it into your hand. Shuffle your deck afterward.",
+          "name": "Call for Friends"
+        },
+        {
+          "damage": "20",
+          "cost": [
+            "Fire",
+            "Colorless"
+          ],
+          "effect": "",
+          "name": "Steady Firebreathing"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Water",
+          "value": "+10"
+        }
+      ],
+      "retreat": 1,
+      "legalStandard": false,
+      "legalExpanded": false,
+      "id": "pl4-59",
+      "name": "Charmander",
+      "imageUrl": "https://assets.tcgdex.net/en/pl/pl4/59/high.png",
+      "gameType": "POKEMON"
+    },
+    "pl4-16": {
+      "category": "Pokemon",
+      "localId": "16",
+      "illustrator": "Midori Harada",
+      "rarity": "Rare",
+      "setId": "pl4",
+      "setName": "Arceus",
+      "setLogo": "https://assets.tcgdex.net/en/pl/pl4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/pl/pl4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": false,
+      "variantNormal": true,
+      "variantReverse": true,
+      "variantWPromo": false,
+      "hp": 110,
+      "types": [
+        "Psychic"
+      ],
+      "evolveFrom": "Haunter",
+      "stage": "Stage2",
+      "attacks": [
+        {
+          "damage": "60",
+          "cost": [
+            "Psychic",
+            "Psychic",
+            "Colorless"
+          ],
+          "effect": "Does 10 damage to 1 of your opponent\u0027s Benched Pokémon. (Don\u0027t apply Weakness and Resistance for Benched Pokémon.) You may switch Gengar with 1 of your Benched Pokémon.",
+          "name": "Shadow Skip"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Darkness",
+          "value": "+30"
+        }
+      ],
+      "legalStandard": false,
+      "legalExpanded": false,
+      "id": "pl4-16",
+      "name": "Gengar",
+      "imageUrl": "https://assets.tcgdex.net/en/pl/pl4/16/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-40": {
+      "id": "base3-40",
+      "name": "Omastar",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/40/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-45": {
+      "id": "base3-45",
+      "name": "Weezing",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/45/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-46": {
+      "id": "base3-46",
+      "name": "Ekans",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/46/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-47": {
+      "id": "base3-47",
+      "name": "Geodude",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/47/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-48": {
+      "id": "base3-48",
+      "name": "Grimer",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/48/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-41": {
+      "id": "base3-41",
+      "name": "Sandslash",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/41/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-42": {
+      "id": "base3-42",
+      "name": "Seadra",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/42/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-43": {
+      "id": "base3-43",
+      "name": "Slowbro",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/43/high.png",
+      "gameType": "POKEMON"
+    },
+    "pl4-12": {
+      "category": "Pokemon",
+      "localId": "12",
+      "illustrator": "Ryota Saito",
+      "rarity": "Rare Holo",
+      "setId": "pl4",
+      "setName": "Arceus",
+      "setLogo": "https://assets.tcgdex.net/en/pl/pl4/logo",
+      "setSymbol": "https://assets.tcgdex.net/univ/pl/pl4/symbol",
+      "variantFirstEdition": false,
+      "variantHolo": true,
+      "variantNormal": false,
+      "variantReverse": true,
+      "variantWPromo": false,
+      "types": [
+        "Lightning"
+      ],
+      "stage": "Basic",
+      "attacks": [
+        {
+          "damage": "10",
+          "cost": [
+            "Colorless"
+          ],
+          "effect": "Flip a coin. If heads, search your discard pile for an Energy card and attach it to Zapdos .",
+          "name": "Charge Beam"
+        },
+        {
+          "damage": "40",
+          "cost": [
+            "Lightning",
+            "Lightning",
+            "Colorless"
+          ],
+          "effect": "You may discard all Lightning Energy attached to Zapdos . If you do, this attack\u0027s base damage is 80 instead of 40.",
+          "name": "Lightning Strike"
+        }
+      ],
+      "weaknesses": [
+        {
+          "type": "Lightning",
+          "value": "×2"
+        }
+      ],
+      "retreat": 2,
+      "legalStandard": false,
+      "legalExpanded": false,
+      "id": "pl4-12",
+      "name": "Zapdos",
+      "imageUrl": "https://assets.tcgdex.net/en/pl/pl4/12/high.png",
+      "gameType": "POKEMON"
+    },
+    "base3-44": {
+      "id": "base3-44",
+      "name": "Tentacruel",
+      "imageUrl": "https://assets.tcgdex.net/en/base/base3/44/high.png",
       "gameType": "POKEMON"
     }
   }

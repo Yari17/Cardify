@@ -220,6 +220,28 @@ public class JsonBinderDao implements IBinderDao {
         }
     }
 
+    @Override
+    public List<Binder> getBindersBySet(String setId) {
+        List<Binder> result = new ArrayList<>();
+        for (Binder binder : bindersById.values()) {
+            if (setId != null && setId.equals(binder.getSetId())) {
+                result.add(binder);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Binder> getBindersExcludingOwner(String owner) {
+        List<Binder> result = new ArrayList<>();
+        for (Binder binder : bindersById.values()) {
+            if (owner == null || !owner.equals(binder.getOwner())) {
+                result.add(binder);
+            }
+        }
+        return result;
+    }
+
     // Adapter per LocalDateTime con Gson
     private static class LocalDateTimeAdapter extends com.google.gson.TypeAdapter<LocalDateTime> {
         @Override

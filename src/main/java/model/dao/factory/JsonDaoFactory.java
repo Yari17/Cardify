@@ -40,8 +40,5 @@ public class JsonDaoFactory extends DaoFactory {
         return new JsonBinderDao(DatabaseConfig.BINDERS_JSON_PATH);
     }
 
-    @Override
-    public model.dao.ICardDao createCardDao() {
-        return new model.dao.json.JsonCardDao(config.DatabaseConfig.CARDS_JSON_PATH);
-    }
+    // cards persistence removed: no CardDao provided by JSON factory anymore
 }

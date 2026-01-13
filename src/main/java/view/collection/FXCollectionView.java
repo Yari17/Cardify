@@ -12,15 +12,16 @@ import javafx.stage.Stage;
 import controller.CollectionController;
 import model.bean.CardBean;
 import model.domain.Binder;
-import model.domain.card.Card;
+import model.domain.Card;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
+//Controller grafico del caso d'uso Gestisci Collezione
 public class FXCollectionView implements ICollectionView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectionView.class.getName());
     private static final String CARD_HOVER_STYLE = "card-hover";
@@ -39,14 +40,20 @@ public class FXCollectionView implements ICollectionView {
 
     private CollectionController controller;
     private Stage stage;
-    private model.dao.ICardDao cardDao;
+    // GUI must not hold DAO references. Controller supplies setCardsMap via displayCollection.
+    private Map<String, List<Card>> setCardsMap;
 
     // Track currently displayed binders to enable partial refresh
     private Map<String, Binder> currentBinders;
 
+    // Pagination fields - track current page for each set
+    private Map<String, Integer> setCurrentPages;
+    private static final int CARDS_PER_PAGE = 20;
+
     public FXCollectionView() {
         // FXML fields will be injected by FXMLLoader
         this.currentBinders = new HashMap<>();
+        this.setCurrentPages = new HashMap<>();
     }
 
     public void setController(CollectionController controller) {
@@ -65,15 +72,17 @@ public class FXCollectionView implements ICollectionView {
     /**
      * Visualizza la collezione organizzata per set con le carte
      */
-    public void displayCollection(Map<String, Binder> bindersBySet, model.dao.ICardDao cardDao) {
+    public void displayCollection(Map<String, Binder> bindersBySet, Map<String, List<model.domain.Card>> setCardsMap) {
         if (setsContainer == null) {
             LOGGER.warning("setsContainer is null");
             return;
         }
 
-        // Store cardDao and current binders for partial refresh
-        this.cardDao = cardDao;
+        // Store current binders and setCardsMap for partial refresh
         this.currentBinders = new HashMap<>(bindersBySet);
+        // keep reference to setCards for later updates
+        this.setCardsMap = (setCardsMap != null) ? new HashMap<>(setCardsMap) : new HashMap<>();
+        Map<String, List<Card>> effectiveSetCards = this.setCardsMap;
 
         setsContainer.getChildren().clear();
 
@@ -88,7 +97,8 @@ public class FXCollectionView implements ICollectionView {
             String setId = entry.getKey();
             Binder binder = entry.getValue();
 
-            VBox setSection = createSetSection(setId, binder, cardDao);
+            List<Card> allCards = effectiveSetCards.getOrDefault(setId, java.util.Collections.emptyList());
+            VBox setSection = createSetSection(setId, binder, allCards);
             setsContainer.getChildren().add(setSection);
         }
 
@@ -98,7 +108,7 @@ public class FXCollectionView implements ICollectionView {
             setsContainer.getChildren().add(emptyState);
         }
 
-        LOGGER.info("Displayed collection with " + bindersBySet.size() + " sets");
+        LOGGER.log(Level.INFO,"Displayed collection with {0} sets", bindersBySet.size());
     }
 
     /**
@@ -118,7 +128,7 @@ public class FXCollectionView implements ICollectionView {
     /**
      * Crea una sezione per un set con tutte le sue carte
      */
-    private VBox createSetSection(String setId, Binder binder, model.dao.ICardDao cardDao) {
+    private VBox createSetSection(String setId, Binder binder, List<Card> allCards) {
         VBox setSection = new VBox(15);
         setSection.setPadding(new Insets(20));
         setSection.getStyleClass().add("set-section");
@@ -132,22 +142,26 @@ public class FXCollectionView implements ICollectionView {
         setNameLabel.getStyleClass().add("set-name-label");
 
         // Carica tutte le carte del set per calcolare le mancanti
-        int totalCards = 0;
-        try {
-            List<Card> allCards = cardDao.getSetCards(setId, config.AppConfig.POKEMON_GAME);
-            totalCards = allCards.size();
-        } catch (Exception e) {
-            LOGGER.warning("Could not load total cards for set: " + setId);
-        }
+        int totalCards = (allCards != null) ? allCards.size() : 0;
 
         int ownedCards = binder.getCardCount();
-        int missingCards = totalCards - ownedCards;
+        int missingCards = Math.max(0, totalCards - ownedCards);
 
         Label statsLabel = new Label(ownedCards + " carte possedute");
         statsLabel.getStyleClass().add("set-stats-label");
 
         Label missingLabel = new Label(missingCards + " mancanti");
         missingLabel.setStyle("-fx-text-fill: #ed4747; -fx-font-size: 16px; -fx-font-weight: bold;");
+
+        // If there are no cards available for this set (persistence/provider returned nothing),
+        // make it explicit in the UI so user knows why the grid is empty.
+        if (totalCards == 0) {
+            Label noCardsNote = new Label("Nessuna carta disponibile per questo set (dati non caricati)");
+            noCardsNote.setStyle("-fx-text-fill: #cfcfcf; -fx-font-size: 12px;");
+            VBox.setMargin(noCardsNote, new Insets(6,0,0,0));
+            // We'll add this below next to the header (after header is assembled)
+            header.getChildren().add(noCardsNote);
+        }
 
         // Spacer per spingere il bottone elimina a destra
         Region spacer = new Region();
@@ -158,33 +172,163 @@ public class FXCollectionView implements ICollectionView {
 
         header.getChildren().addAll(setNameLabel, statsLabel, missingLabel, spacer, deleteButton);
 
-        // Griglia delle carte
+        // Griglia delle carte (paginata)
         FlowPane cardsGrid = new FlowPane();
         cardsGrid.setHgap(15);
         cardsGrid.setVgap(15);
         cardsGrid.setPrefWrapLength(Region.USE_COMPUTED_SIZE);
+        cardsGrid.setUserData("cardsGrid_" + setId); // Identificatore per trovare la griglia
 
-        // Carica tutte le carte del set
+        // Pagination controls
+        HBox paginationControls = createPaginationControls(setId, allCards, binder);
+
+        // Initialize to page 0
+        setCurrentPages.put(setId, 0);
+
+        // Load first page of cards
         try {
-            List<Card> allCards = cardDao.getSetCards(setId, config.AppConfig.POKEMON_GAME);
-
-            // Crea mappa delle carte possedute per accesso rapido
-            Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
-                    .collect(java.util.stream.Collectors.toMap(CardBean::getId, c -> c));
-
-            for (Card card : allCards) {
-                CardBean ownedCard = ownedCardsMap.get(card.getId());
-                boolean isOwned = ownedCard != null;
-                VBox cardTile = createCardTile(card, setId, isOwned, ownedCard);
-                cardsGrid.getChildren().add(cardTile);
-            }
+            loadCardsPage(setId, allCards, binder, cardsGrid, paginationControls);
         } catch (Exception e) {
             LOGGER.severe("Error loading cards for set: " + setId);
         }
 
-        setSection.getChildren().addAll(header, cardsGrid);
+        setSection.getChildren().addAll(header, cardsGrid, paginationControls);
 
         return setSection;
+    }
+
+    /**
+     * Load a specific page of cards for a set
+     */
+    private void loadCardsPage(String setId, List<Card> allCards, Binder binder, FlowPane cardsGrid,
+            HBox paginationControls) {
+        int currentPage = setCurrentPages.getOrDefault(setId, 0);
+        int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
+
+        if (totalPages == 0)
+            totalPages = 1;
+
+        int startIndex = currentPage * CARDS_PER_PAGE;
+        int endIndex = Math.min(startIndex + CARDS_PER_PAGE, allCards.size());
+
+        int displayStart = allCards.isEmpty() ? 0 : (startIndex + 1);
+        int displayEnd = endIndex;
+        LOGGER.log(java.util.logging.Level.INFO,
+                "Loading page {0}/{1} for set {2} (cards {3}-{4} of {5})",
+                new Object[] { currentPage + 1, totalPages, setId, displayStart, displayEnd, allCards.size() });
+
+        List<Card> pageCards = allCards.subList(startIndex, endIndex);
+
+        // Clear previous cards
+        cardsGrid.getChildren().clear();
+
+        // Crea mappa delle carte possedute per accesso rapido
+        Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
+                .collect(java.util.stream.Collectors.toMap(CardBean::getId, c -> c));
+
+        // Add cards for current page
+        for (Card card : pageCards) {
+            CardBean ownedCard = ownedCardsMap.get(card.getId());
+            boolean isOwned = ownedCard != null;
+            VBox cardTile = createCardTile(card, setId, isOwned, ownedCard);
+            cardsGrid.getChildren().add(cardTile);
+        }
+
+        // Update pagination controls
+        updatePaginationControls(paginationControls, currentPage, totalPages);
+    }
+
+    /**
+     * Create pagination controls for a set
+     */
+    private HBox createPaginationControls(String setId, List<Card> allCards, Binder binder) {
+        HBox controls = new HBox(15);
+        controls.setAlignment(Pos.CENTER);
+        controls.setPadding(new Insets(10));
+        controls.setUserData("pagination_" + setId);
+
+        Button prevButton = new Button();
+        prevButton.setText("Previous");
+        prevButton.setUserData("prevButton");
+        prevButton.getStyleClass().add("button-accent");
+
+        FontIcon prevIcon = new FontIcon("fas-arrow-left");
+        prevIcon.setIconSize(14);
+        prevIcon.setIconColor(javafx.scene.paint.Color.WHITE);
+        prevButton.setGraphic(prevIcon);
+
+        Label pageLabel = new Label("Page 1 of 1");
+        pageLabel.setUserData("pageLabel");
+        pageLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
+
+        Button nextButton = new Button();
+        nextButton.setText("Next");
+        nextButton.setUserData("nextButton");
+        nextButton.getStyleClass().add("button-accent");
+
+        FontIcon nextIcon = new FontIcon("fas-arrow-right");
+        nextIcon.setIconSize(14);
+        nextIcon.setIconColor(javafx.scene.paint.Color.WHITE);
+        nextButton.setGraphic(nextIcon);
+
+        // Set button actions
+        prevButton.setOnAction(e -> {
+            int currentPage = setCurrentPages.getOrDefault(setId, 0);
+            if (currentPage > 0) {
+                setCurrentPages.put(setId, currentPage - 1);
+                FlowPane grid = findCardsGridInSet(setId);
+                if (grid != null) {
+                    loadCardsPage(setId, allCards, binder, grid, controls);
+                }
+            }
+        });
+
+        nextButton.setOnAction(e -> {
+            int currentPage = setCurrentPages.getOrDefault(setId, 0);
+            int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
+            if (currentPage < totalPages - 1) {
+                setCurrentPages.put(setId, currentPage + 1);
+                FlowPane grid = findCardsGridInSet(setId);
+                if (grid != null) {
+                    loadCardsPage(setId, allCards, binder, grid, controls);
+                }
+            }
+        });
+
+        controls.getChildren().addAll(prevButton, pageLabel, nextButton);
+
+        return controls;
+    }
+
+    /**
+     * Update pagination button states
+     */
+    private void updatePaginationControls(HBox controls, int currentPage, int totalPages) {
+        for (javafx.scene.Node node : controls.getChildren()) {
+            if ("prevButton".equals(node.getUserData())) {
+                (node).setDisable(currentPage == 0);
+            } else if ("nextButton".equals(node.getUserData())) {
+                (node).setDisable(currentPage >= totalPages - 1);
+            } else if ("pageLabel".equals(node.getUserData())) {
+                ((Label) node).setText(String.format("Page %d of %d", currentPage + 1, totalPages));
+            }
+        }
+    }
+
+    /**
+     * Find cards grid for a specific set
+     */
+    private FlowPane findCardsGridInSet(String setId) {
+        VBox setSection = findSetSection(setId);
+        if (setSection == null)
+            return null;
+
+        for (javafx.scene.Node node : setSection.getChildren()) {
+            if (node instanceof FlowPane && ("cardsGrid_" + setId).equals(node.getUserData())) {
+                return (FlowPane) node;
+            }
+        }
+        return null;
     }
 
     /**
@@ -242,9 +386,9 @@ public class FXCollectionView implements ICollectionView {
             }
         }
 
-        // Applica opacità se non posseduta
+        // Applica opacità se non posseduta (slightly obscured to distinguish from owned)
         if (!isOwned) {
-            cardImage.setOpacity(0.3);
+            cardImage.setOpacity(0.5);
         }
 
         // Container per immagine con overlay controlli
@@ -586,11 +730,8 @@ public class FXCollectionView implements ICollectionView {
             return;
 
         try {
-            List<Card> allCards = cardDao.getSetCards(setId, config.AppConfig.POKEMON_GAME);
-            Card card = allCards.stream()
-                    .filter(c -> c.getId().equals(cardId))
-                    .findFirst()
-                    .orElse(null);
+            List<Card> allCards = setCardsMap != null ? setCardsMap.getOrDefault(setId, java.util.Collections.emptyList()) : java.util.Collections.emptyList();
+            Card card = allCards.stream().filter(c -> c.getId().equals(cardId)).findFirst().orElse(null);
 
             if (card != null) {
                 Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
@@ -689,3 +830,4 @@ public class FXCollectionView implements ICollectionView {
         }
     }
 }
+

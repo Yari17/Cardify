@@ -122,6 +122,16 @@ public class DemoBinderDao implements IBinderDao {
     }
 
     @Override
+    public List<Binder> getBindersBySet(String setId) {
+        return List.of();
+    }
+
+    @Override
+    public List<Binder> getBindersExcludingOwner(String owner) {
+        return List.of();
+    }
+
+    @Override
     public void createBinder(String owner, String setId, String setName) {
         Binder binder = new Binder(owner, setId, setName);
         save(binder);

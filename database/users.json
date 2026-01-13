@@ -8,15 +8,120 @@
       "userType": "Collezionista"
     },
     "user2": {
-      "id": 0,
+      "id": 1,
       "name": "user2",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Collezionista"
     },
     "Store1": {
-      "id": 0,
+      "id": 18,
       "name": "Store1",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "marco_rossi": {
+      "id": 3,
+      "name": "Marco Rossi",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "giulia_neri": {
+      "id": 4,
+      "name": "Giulia Neri",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "alessandro_bianchi": {
+      "id": 5,
+      "name": "Alessandro Bianchi",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "lucia_ferri": {
+      "id": 6,
+      "name": "Lucia Ferri",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "andrea_marini": {
+      "id": 7,
+      "name": "Andrea Marini",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "francesca_ricci": {
+      "id": 8,
+      "name": "Francesca Ricci",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "stefano_verdi": {
+      "id": 9,
+      "name": "Stefano Verdi",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "valentina_tosi": {
+      "id": 10,
+      "name": "Valentina Tosi",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "riccardo_galli": {
+      "id": 11,
+      "name": "Riccardo Galli",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "elena_sanna": {
+      "id": 12,
+      "name": "Elena Sanna",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "la_tana_del_goblin": {
+      "id": 13,
+      "name": "La Tana del Goblin",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "nexus_comics": {
+      "id": 14,
+      "name": "Nexus Comics",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "fumetti_co": {
+      "id": 15,
+      "name": "Fumetti & Co",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "giochi_di_carta": {
+      "id": 16,
+      "name": "Giochi di Carta",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "tavolo_e_fumetti": {
+      "id": 17,
+      "name": "Tavolo e Fumetti",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Store"
@@ -25,6 +130,21 @@
   "credentials": {
     "user1": "password",
     "user2": "password",
-    "Store1": "password"
+    "Store1": "password",
+    "marco_rossi": "password",
+    "giulia_neri": "password",
+    "alessandro_bianchi": "password",
+    "lucia_ferri": "password",
+    "andrea_marini": "password",
+    "francesca_ricci": "password",
+    "stefano_verdi": "password",
+    "valentina_tosi": "password",
+    "riccardo_galli": "password",
+    "elena_sanna": "password",
+    "la_tana_del_goblin": "password",
+    "nexus_comics": "password",
+    "fumetti_co": "password",
+    "giochi_di_carta": "password",
+    "tavolo_e_fumetti": "password"
   }
 }

@@ -65,14 +65,6 @@ public abstract class DaoFactory {
     public abstract IBinderDao createBinderDao();
 
     /**
-     * Factory method per creare un CardDao.
-     * Restituisce un DAO per l'accesso ai dati delle carte (con caching).
-     *
-     * @return istanza di ICardDao
-     */
-    public abstract model.dao.ICardDao createCardDao();
-
-    /**
      * Enum che definisce i tipi di persistenza disponibili.
      * Ogni tipo corrisponde a una famiglia di DAO (Abstract Factory concreta).
      */

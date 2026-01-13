@@ -41,21 +41,13 @@ public class CliTradeView implements ITradeView {
         String choice = inputManager.readString();
 
         switch (choice) {
-            case "1" -> {
-                if (controller != null) {
-                    controller.navigateToHome();
-                }
-            }
-            case "2" -> {
-                if (controller != null) {
-                    controller.navigateToCollection();
-                }
-            }
-            case "3" -> {
-                if (controller != null) {
-                    controller.onLogoutRequested();
-                }
-            }
+            case "1" -> controller.navigateToHome();
+
+            case "2" -> controller.navigateToCollection();
+
+            case "3" -> controller.onLogoutRequested();
+
+
             default -> {
                 System.out.println("Opzione non valida.");
                 display();
@@ -75,7 +67,7 @@ public class CliTradeView implements ITradeView {
 
     @Override
     public void displayTrades(java.util.List<model.bean.TradeBean> pendingTrades,
-            java.util.List<model.bean.TradeBean> scheduledTrades) {
+                              java.util.List<model.bean.TradeBean> scheduledTrades) {
         System.out.println("\n=== SCAMBI IN ATTESA (PENDING) ===");
         if (pendingTrades == null || pendingTrades.isEmpty()) {
             System.out.println("Nessuno scambio in attesa.");

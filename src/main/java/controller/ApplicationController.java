@@ -115,8 +115,8 @@ public class ApplicationController {
      * Navigate to the collector home page.
      */
     public void navigateToCollectorHomePage(UserBean user) throws NavigationException {
-        model.dao.ICardDao cardDao = daoFactory.createCardDao();
-        CollectorHPController controller = new CollectorHPController(user.getUsername(), this, cardDao);
+        model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
+        CollectorHPController controller = new CollectorHPController(user.getUsername(), this, binderDao);
         ICollectorHPView view = viewFactory.createCollectorHomePageView(controller);
         controller.setView(view);
         displayView(view);
@@ -137,8 +137,7 @@ public class ApplicationController {
      */
     public void navigateToCollection(String username) throws NavigationException {
         model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
-        model.dao.ICardDao cardDao = daoFactory.createCardDao();
-        CollectionController controller = new CollectionController(username, this, binderDao, cardDao);
+        CollectionController controller = new CollectionController(username, this, binderDao);
         ICollectionView collectionView = viewFactory.createCollectionView(controller);
         controller.setView(collectionView);
         displayView(collectionView);
@@ -170,7 +169,7 @@ public class ApplicationController {
     }
 
     /**
-     * Logout: clear navigation history and return to login.
+     * Logout: clear navigation history and return to log in.
      */
     public void logout() throws NavigationException {
         LOGGER.info("Logging out: clearing history and navigating to login");

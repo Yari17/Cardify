@@ -3,10 +3,11 @@ package view.collection;
 import controller.CollectionController;
 import model.bean.CardBean;
 import model.domain.Binder;
-import model.domain.card.Card;
+import model.domain.Card;
 import view.InputManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -28,13 +29,18 @@ public class CliCollectionView implements ICollectionView {
     private final InputManager inputManager;
     private CollectionController controller;
     private Map<String, Binder> currentBinders;
-    private model.dao.ICardDao cardDao;
-    private String username;
+    // CLI must not hold DAO references
+    // convert incoming map to local Map<String, List<Card>> via unchecked cast
+    //noinspection unchecked
+    private Map<String, List<Card>> localSetCards;
+    // Added missing state fields
     private boolean saveButtonVisible;
+    private String username;
 
     public CliCollectionView(InputManager inputManager) {
         this.inputManager = inputManager;
         this.saveButtonVisible = false;
+        this.localSetCards = new HashMap<>();
     }
 
     public void setController(CollectionController controller) {
@@ -47,9 +53,12 @@ public class CliCollectionView implements ICollectionView {
     }
 
     @Override
-    public void displayCollection(Map<String, Binder> bindersBySet, model.dao.ICardDao cardDao) {
+    public void displayCollection(Map<String, Binder> bindersBySet, Map<String, List<model.domain.Card>> setCardsMap) {
         this.currentBinders = bindersBySet;
-        this.cardDao = cardDao;
+        // store provided persistence map for later use; CLI must not call DAOs
+        // convert incoming map to local Map<String, List<Card>> via unchecked cast
+        //noinspection unchecked
+        this.localSetCards = setCardsMap != null ? new HashMap<>(setCardsMap) : new HashMap<>();
 
         clearScreen();
         showCollectionHeader();
@@ -67,7 +76,8 @@ public class CliCollectionView implements ICollectionView {
     public void updateCardInSet(String setId, String cardId) {
         // In CLI, non è necessario aggiornare un singolo elemento
         // Il refresh avviene solo quando si salva o si ricarica
-        LOGGER.info(() -> "Card updated in cache: " + cardId + " in set " + setId);
+        // Use plain String logging for broader JDK compatibility
+        LOGGER.info("Card updated in cache: " + cardId + " in set " + setId);
     }
 
     @Override
@@ -121,15 +131,15 @@ public class CliCollectionView implements ICollectionView {
         for (Map.Entry<String, Binder> entry : currentBinders.entrySet()) {
             Binder binder = entry.getValue();
             try {
-                // TODO: Handle game type properly, for now forcing Pokemon
-                List<Card> allCards = cardDao.getSetCards(entry.getKey(), "pokemon");
+                // Use setCards supplied by controller (no DAO/API calls here)
+                List<Card> allCards = localSetCards.getOrDefault(entry.getKey(), java.util.Collections.emptyList());
                 int totalCards = allCards.size();
                 int ownedCards = binder.getCardCount();
                 int missingCards = totalCards - ownedCards;
 
                 System.out.printf("   [%d] %s - %d carte possedute, \u001B[31m%d mancanti\u001B[0m%n",
                         index++, binder.getSetName(), ownedCards, missingCards);
-            } catch (Exception e) {
+            } catch (Exception unused) {
                 // Fallback se non si riesce a caricare il totale
                 System.out.printf("   [%d] %s - %d carte possedute%n",
                         index++, binder.getSetName(), binder.getCardCount());
@@ -187,7 +197,7 @@ public class CliCollectionView implements ICollectionView {
         String choice = inputManager.readString().trim();
 
         if ("0".equals(choice)) {
-            displayCollection(currentBinders, cardDao);
+            displayCollection(currentBinders, localSetCards);
             return;
         }
 
@@ -201,7 +211,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException unused) {
             showError(INVALID_NUMBER);
         }
     }
@@ -214,7 +224,7 @@ public class CliCollectionView implements ICollectionView {
             System.out.println(SEPARATOR);
 
             try {
-                List<Card> allCards = cardDao.getSetCards(setId, "pokemon");
+                List<Card> allCards = localSetCards.getOrDefault(setId, java.util.Collections.emptyList());
                 Map<String, CardBean> ownedCardsMap = new java.util.HashMap<>();
                 for (CardBean card : binder.getCards()) {
                     ownedCardsMap.put(card.getId(), card);
@@ -247,7 +257,7 @@ public class CliCollectionView implements ICollectionView {
                         }
                     }
                     case "0" -> {
-                        displayCollection(currentBinders, cardDao);
+                        displayCollection(currentBinders, localSetCards);
                         return;
                     }
                     default -> System.out.println(INVALID_CHOICE);
@@ -517,7 +527,7 @@ public class CliCollectionView implements ICollectionView {
         String choice = inputManager.readString().trim();
 
         if ("0".equals(choice)) {
-            displayCollection(currentBinders, cardDao);
+            displayCollection(currentBinders, localSetCards);
             return;
         }
 

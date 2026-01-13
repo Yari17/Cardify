@@ -1,9 +1,12 @@
 package controller;
 
+import config.AppConfig;
+import model.api.ApiFactory;
+import model.api.ICardProvider;
 import model.bean.CardBean;
 import model.dao.IBinderDao;
 import model.domain.Binder;
-import model.domain.card.Card;
+import model.domain.Card;
 import view.collection.ICollectionView;
 
 import java.util.HashMap;
@@ -11,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+//Controller applicativo per la gestione della collezione di carte di un utente
 public class CollectionController {
     private static final Logger LOGGER = Logger.getLogger(CollectionController.class.getName());
     private static final String SET_NOT_FOUND_MSG = "Set not found for setId: ";
@@ -18,7 +22,7 @@ public class CollectionController {
     private final String username;
     private final ApplicationController navigationController;
     private final IBinderDao binderDao;
-    private final model.dao.ICardDao cardDao;
+    private final ApiFactory apiFactory;
     private ICollectionView view;
 
     // Cache locale dei binder dell'utente: setId -> Binder
@@ -28,12 +32,11 @@ public class CollectionController {
     private final Map<String, Binder> pendingChanges;
     private boolean hasUnsavedChanges;
 
-    public CollectionController(String username, ApplicationController navigationController, IBinderDao binderDao,
-            model.dao.ICardDao cardDao) {
+    public CollectionController(String username, ApplicationController navigationController, IBinderDao binderDao) {
         this.username = username;
         this.navigationController = navigationController;
         this.binderDao = binderDao;
-        this.cardDao = cardDao;
+        this.apiFactory = new ApiFactory();
         this.cachedBinders = new HashMap<>();
         this.pendingChanges = new HashMap<>();
         this.hasUnsavedChanges = false;
@@ -67,15 +70,61 @@ public class CollectionController {
             // Update the cached binders
             this.cachedBinders = new HashMap<>(bindersBySet);
 
+            // Prepare setId -> List<Card> map by fetching card details via provider for card ids in binders
+            Map<String, List<Card>> setCardsMap = new HashMap<>();
+            model.api.ICardProvider provider = null;
+            try {
+                provider = apiFactory.getCardProvider(AppConfig.POKEMON_GAME);
+            } catch (Exception ex) {
+                LOGGER.warning(() -> "Could not obtain ICardProvider: " + ex.getMessage());
+            }
+
+            for (String setId : bindersBySet.keySet()) {
+                try {
+                    // First try to fetch the entire set from the provider so we can
+                    // show both owned and non-owned cards for that set.
+                    List<Card> allSetCards = null;
+                    if (provider != null) {
+                        try {
+                            allSetCards = provider.searchSet(setId);
+                        } catch (Exception e) {
+                            LOGGER.fine(() -> "Provider.searchSet failed for " + setId + ": " + e.getMessage());
+                        }
+                    }
+
+                    // If the provider returned nothing, fall back to fetching only
+                    // details for the card ids present in the binder (legacy behavior).
+                    if (allSetCards == null || allSetCards.isEmpty()) {
+                        allSetCards = new java.util.ArrayList<>();
+                        Binder binder = bindersBySet.get(setId);
+                        if (binder != null && binder.getCards() != null) {
+                            for (CardBean cb : binder.getCards()) {
+                                if (cb == null || cb.getId() == null) continue;
+                                if (provider != null) {
+                                    try {
+                                        Card detail = provider.getCardDetails(cb.getId());
+                                        if (detail != null) allSetCards.add(detail);
+                                    } catch (Exception provEx) {
+                                        LOGGER.fine(() -> "Provider failed to fetch details for " + cb.getId() + ": " + provEx.getMessage());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    setCardsMap.put(setId, allSetCards != null ? allSetCards : java.util.Collections.emptyList());
+                } catch (Exception ex) {
+                    LOGGER.warning(() -> "Failed to load provider cards for set " + setId + ": " + ex.getMessage());
+                    setCardsMap.put(setId, java.util.Collections.emptyList());
+                }
+            }
+
             // Clear pending changes since we're loading fresh data
             pendingChanges.clear();
             hasUnsavedChanges = false;
             if (view != null) {
                 view.setSaveButtonVisible(false);
-            }
-
-            if (view != null) {
-                view.displayCollection(bindersBySet, cardDao);
+                view.displayCollection(bindersBySet, setCardsMap);
             }
 
             LOGGER.info(() -> "Loaded collection with " + userBinders.size() + " sets for user: " + username);
@@ -87,11 +136,16 @@ public class CollectionController {
         }
     }
 
-    // ...
 
     public Map<String, String> getAvailableSets() {
         try {
-            return cardDao.getAllSets(config.AppConfig.POKEMON_GAME);
+            ICardProvider provider = apiFactory.getCardProvider(AppConfig.POKEMON_GAME);
+            if (provider != null) {
+                return provider.getAllSets();
+            } else {
+                LOGGER.warning("No provider available for game: " + AppConfig.POKEMON_GAME);
+                return Map.of();
+            }
         } catch (Exception e) {
             LOGGER.severe("Error fetching available sets: " + e.getMessage());
             return Map.of();
@@ -325,13 +379,6 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Verifica se ci sono modifiche non salvate
-     */
-    public boolean hasUnsavedChanges() {
-        return hasUnsavedChanges;
-    }
-
     public void navigateToHome() {
         LOGGER.info(() -> "Navigating to home page for user: " + username);
         if (view != null) {
@@ -357,3 +404,19 @@ public class CollectionController {
         navigationController.logout();
     }
 }
+
+/*
+Devi ridistribuire le responsabilità nel seguente modo:
+la logica di controllo e applicativa deve essere racchiusa completamente nel controller applicativo
+il controller grafico viene associato alla view corrispondente
+il controller grafico invoca operazioni del controller applicativo
+se la view evolve, l’impatto dei cambiamenti si ripercuotono solo sul controller grafico e non sul modo in cui il caso d’uso è realizzato (i.e. controller applicativo)
+il controller grafico converte formati esterno in interno e viceversa (se non a carico della View)
+il controller grafico realizza la mappa tra input dell'utente e processi eseguiti dal Model
+il controller grafico crea/seleziona le istanze di View richieste
+il controller applicativo può utilizzare i dao per accedere alla persistenza
+il controller applicativo può utilizzare card provider in modo polimorfico per fetchare dati dalle API
+presentazione e persistenza deve essere disaccoppiata dalla logica di controllo
+voglio che non ci siano chiamate a dao o api nel controller grafico, se serve deve chiedere al controller applicativo
+i dati presentati nella view e ottenuti dalla view devono essere passati dal controller applicativo alla view tramite bean
+  */

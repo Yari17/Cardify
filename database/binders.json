@@ -7,48 +7,425 @@
     "cards": [
       {
         "id": "base4-3",
-        "name": "Chansey",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base4/3/high.png",
         "gameType": "POKEMON",
         "quantity": 2,
-        "isTradable": true
+        "isTradable": true,
+        "status": ""
       },
       {
         "id": "base4-6",
-        "name": "Clefairy",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base4/6/high.png",
         "gameType": "POKEMON",
         "quantity": 3,
-        "isTradable": false
+        "isTradable": false,
+        "status": ""
       },
       {
         "id": "base4-123",
-        "name": "Switch",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base4/123/high.png",
         "gameType": "POKEMON",
         "quantity": 1,
-        "isTradable": false
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "pl4-1",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "pl4-6",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-12",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-16",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-59",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-71",
+        "gameType": "POKEMON",
+        "quantity": 5,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-10T01:12:10.668730",
-    "lastModified": "2026-01-10T12:25:53.442666"
+    "lastModified": "2026-01-13T01:18:48.724023"
   },
   {
     "id": 2,
-    "owner": "user1",
-    "setId": "swsh10.5",
-    "setName": "Pokémon GO",
+    "owner": "marco_rossi",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
     "cards": [
       {
-        "id": "swsh10.5-076",
-        "name": "Dragonite V",
-        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/076/high.png",
+        "id": "pl4-1",
         "gameType": "POKEMON",
         "quantity": 1,
-        "isTradable": false
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-3",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-12",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
       }
     ],
-    "createdAt": "2026-01-10T12:43:41.859465",
-    "lastModified": "2026-01-10T15:25:42.696180"
+    "createdAt": "2026-01-13T01:20",
+    "lastModified": "2026-01-13T01:20"
+  },
+  {
+    "id": 3,
+    "owner": "giulia_neri",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-5",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-6",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-8",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:21",
+    "lastModified": "2026-01-13T01:21"
+  },
+  {
+    "id": 4,
+    "owner": "alessandro_bianchi",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-9",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-10",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "pl4-11",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:22",
+    "lastModified": "2026-01-13T01:22"
+  },
+  {
+    "id": 5,
+    "owner": "lucia_ferri",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-13",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-14",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "pl4-15",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:23",
+    "lastModified": "2026-01-13T01:23"
+  },
+  {
+    "id": 6,
+    "owner": "andrea_marini",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-16",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-17",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-18",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:24",
+    "lastModified": "2026-01-13T01:24"
+  },
+  {
+    "id": 7,
+    "owner": "francesca_ricci",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-19",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-20",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-21",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:25",
+    "lastModified": "2026-01-13T01:25"
+  },
+  {
+    "id": 8,
+    "owner": "stefano_verdi",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-22",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-23",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "pl4-24",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:26",
+    "lastModified": "2026-01-13T01:26"
+  },
+  {
+    "id": 9,
+    "owner": "valentina_tosi",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-25",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-26",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "pl4-27",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:27",
+    "lastModified": "2026-01-13T01:27"
+  },
+  {
+    "id": 10,
+    "owner": "riccardo_galli",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-28",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-29",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-30",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:28",
+    "lastModified": "2026-01-13T01:28"
+  },
+  {
+    "id": 11,
+    "owner": "elena_sanna",
+    "setId": "pl4",
+    "setName": "Platinum Legends",
+    "cards": [
+      {
+        "id": "pl4-31",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-32",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "pl4-33",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T01:29",
+    "lastModified": "2026-01-13T01:29"
+  },
+  {
+    "id": 12,
+    "owner": "user1",
+    "setId": "base3",
+    "setName": "Fossil",
+    "cards": [
+      {
+        "id": "base3-16",
+        "name": "Aerodactyl",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base3/16/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "base3-23",
+        "name": "Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base3/23/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "base3-3",
+        "name": "Ditto",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base3/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "base3-4",
+        "name": "Dragonite",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base3/4/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-13T14:28:03.119244",
+    "lastModified": "2026-01-13T15:06:29.202276"
   }
 ]

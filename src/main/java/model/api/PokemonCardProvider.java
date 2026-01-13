@@ -1,12 +1,12 @@
-package model.domain.card.adapter;
+package model.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import model.domain.CardGameType;
-import model.domain.card.Card;
-import model.domain.card.PokemonCard;
+import model.domain.Card;
+import model.domain.PokemonCard;
 import net.tcgdex.sdk.TCGdex;
 import net.tcgdex.sdk.models.CardResume;
 import net.tcgdex.sdk.models.Set;
@@ -21,25 +21,52 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
-    private static final Logger LOGGER = Logger.getLogger(PokemonAdapter.class.getName());
+public class PokemonCardProvider implements ICardProvider {
+    private static final Logger LOGGER = Logger.getLogger(PokemonCardProvider.class.getName());
     private final TCGdex api;
     private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
     private static final String IMAGE_FIELD = "image";
     private static final String HIGH_PNG_SUFFIX = "/high.png";
 
-    public PokemonAdapter() {
+    public PokemonCardProvider() {
         this.api = new TCGdex("en");
     }
 
-
     @Override
-    public List<Card> searchCardsByName(String name) {
+    public List<Card> searchSet(String setId) {
+        try {
+            Set set = api.fetchSet(setId);
+            assert set != null;
+            List<CardResume> cards = set.getCards();
+
+            List<Card> cardList = new ArrayList<>();
+            for (CardResume cardResume : cards) {
+                String imageUrl = cardResume.getImage() != null ? cardResume.getImage() + HIGH_PNG_SUFFIX : null;
+
+                Card card = new Card(
+                        cardResume.getId(),
+                        cardResume.getName(),
+                        imageUrl,
+                        CardGameType.POKEMON);
+                cardList.add(card);
+            }
+
+            return cardList;
+        } catch (NullPointerException _) {
+            return new ArrayList<>();
+        }
+    }
+
+    // l'sdk non fornisce un metodo per cercare le carte per nome, quindi devo fare
+    // una richiesta http
+    @Override
+    public List<Card> searchCardsByName(String cardName) {
         try {
             // Costruisci l'URL con il parametro di ricerca
-            String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
+            String encodedName = URLEncoder.encode(cardName, StandardCharsets.UTF_8);
             String url = "https://api.tcgdex.net/v2/en/cards?name=" + encodedName;
 
             // Effettua la richiesta HTTP GET
@@ -65,70 +92,41 @@ public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
         }
     }
 
-    private List<Card> getCards(JsonArray jsonArray) {
-        List<Card> cardList = new ArrayList<>();
-        if (jsonArray != null) {
-            for (JsonElement element : jsonArray) {
-                JsonObject jsonCard = element.getAsJsonObject();
-
-                String id = jsonCard.get("id").getAsString();
-                String cardName = jsonCard.get("name").getAsString();
-                String imageUrl = jsonCard.has(IMAGE_FIELD) && !jsonCard.get(IMAGE_FIELD).isJsonNull()
-                        ? jsonCard.get(IMAGE_FIELD).getAsString() + HIGH_PNG_SUFFIX
-                        : null;
-
-                Card card = new Card(id, cardName, imageUrl, CardGameType.POKEMON);
-                cardList.add(card);
-            }
-        }
-        return cardList;
-    }
-
     @Override
-    public List<Card> searchSet(String setID) {
+    public Map<String, String> getAllSets() {
         try {
-            Set set = api.fetchSet(setID);
-            assert set != null;
-            List<CardResume> cards = set.getCards();
+            LOGGER.info("PokemonAdapter.getAllSets() called - fetching sets from SDK...");
+            SetResume[] setArray = api.fetchSets();
+            LOGGER.log(Level.INFO,"SDK returned: {0} sets ",(setArray != null ? setArray.length : 0));
 
-            List<Card> cardList = new ArrayList<>();
-            for (CardResume cardResume : cards) {
-                String imageUrl = cardResume.getImage() != null ?
-                        cardResume.getImage() + HIGH_PNG_SUFFIX : null;
+            Map<String, String> setMap = new HashMap<>();
 
-                Card card = new Card(
-                        cardResume.getId(),
-                        cardResume.getName(),
-                        imageUrl,
-                        CardGameType.POKEMON
-                );
-                cardList.add(card);
+            if (setArray != null) {
+                for (SetResume setResume : setArray) {
+                    setMap.put(setResume.getId(), setResume.getName());
+                }
+                LOGGER.log(Level.INFO,"Successfully mapped {0}  sets", setMap.size());
+            } else {
+                LOGGER.warning("fetchSets() returned null!");
             }
-
-            return cardList;
-        } catch (NullPointerException _) {
-            return new ArrayList<>();
+            return setMap;
+        } catch (Exception e) {
+            LOGGER.severe("Exception in getAllSets: " + e.getClass().getName() + " - " + e.getMessage());
+            e.printStackTrace();
+            return new HashMap<>();
         }
     }
 
-    @Override
-    public Set getSetDetails(String setID) {
-        return api.fetchSet(setID);
-    }
 
     @Override
-    public Card getCardById(String id) {
-        return null;
-    }
+    public PokemonCard getCardDetails(String cardId) {
 
-    @Override
-    public PokemonCard getCardDetails(String id) {
         try {
-            LOGGER.info("Fetching card details for ID: " + id);
-            net.tcgdex.sdk.models.Card card = api.fetchCard(id);
+            LOGGER.log(java.util.logging.Level.INFO, "Fetching card details for ID: {0}", cardId);
+            net.tcgdex.sdk.models.Card card = api.fetchCard(cardId);
 
             if (card == null) {
-                LOGGER.warning("API returned null for card ID: " + id);
+                LOGGER.log(java.util.logging.Level.WARNING, "API returned null for card ID: {0}", cardId);
                 return null;
             }
 
@@ -166,26 +164,35 @@ public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
             pokemonCard.setDescription(card.getDescription());
             pokemonCard.setStage(card.getStage());
 
-            // Converti attacks da List<CardAttack> a List<Map<String, Object>> (con null-check)
-            if (card.getAttacks() != null && !card.getAttacks().isEmpty()) {
+            // Converti attacks da List<CardAttack> a List<Map<String, Object>> (con
+            // null-check)
+            var attacksRaw = card.getAttacks();
+            if (attacksRaw != null && !attacksRaw.isEmpty()) {
                 List<Map<String, Object>> attacksList = new ArrayList<>();
-                for (var attack : card.getAttacks()) {
+                for (var attack : attacksRaw) {
                     if (attack != null) {
                         Map<String, Object> attackMap = new HashMap<>();
-                        attackMap.put("name", attack.getName());
+                        // Normalize fields to avoid nulls later in the view (null-safe check)
+                        String attackName = attack.getName();
+                        attackMap.put("name", (attackName != null && !attackName.isEmpty()) ? attackName : "Unknown");
                         attackMap.put("cost", attack.getCost());
-                        attackMap.put("damage", attack.getDamage());
-                        attackMap.put("effect", attack.getEffect());
+                        // Damage may be string or numeric; normalize to String (empty if null)
+                        Object dmg = attack.getDamage();
+                        attackMap.put("damage", dmg != null ? dmg.toString() : "");
+                        // Effect may be null; normalize to empty string if absent
+                        attackMap.put("effect", attack.getEffect() != null ? attack.getEffect() : "");
                         attacksList.add(attackMap);
                     }
                 }
                 pokemonCard.setAttacks(attacksList);
             }
 
-            // Converti weaknesses da List<CardWeakRes> a List<Map<String, String>> (con null-check)
-            if (card.getWeaknesses() != null && !card.getWeaknesses().isEmpty()) {
+            // Converti weaknesses da List<CardWeakRes> a List<Map<String, String>> (con
+            // null-check)
+            var weaknessesRaw = card.getWeaknesses();
+            if (weaknessesRaw != null && !weaknessesRaw.isEmpty()) {
                 List<Map<String, String>> weaknessesList = new ArrayList<>();
-                for (var weakness : card.getWeaknesses()) {
+                for (var weakness : weaknessesRaw) {
                     if (weakness != null) {
                         Map<String, String> weaknessMap = new HashMap<>();
                         weaknessMap.put("type", weakness.getType());
@@ -205,29 +212,33 @@ public class PokemonAdapter implements ICardApiAdapter<PokemonCard> {
                 pokemonCard.setLegalExpanded(card.getLegal().getExpanded());
             }
 
-            LOGGER.info("Successfully loaded details for card: " + id);
+            LOGGER.log(Level.INFO, "Successfully loaded details for card: {0}", cardId);
             return pokemonCard;
         } catch (Exception e) {
-            LOGGER.severe("Error loading card details for ID '" + id + "': " + e.getClass().getName() + " - " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading card details for ID {0}: {1} - {2}",
+                    new Object[]{cardId, e.getClass().getName(), e.getMessage()});
+            // log stack trace at finer level
+            LOGGER.log(java.util.logging.Level.FINER, "Exception", e);
             return null;
         }
     }
 
-    @Override
-    public Map<String, String> getAllSets() {
-        try {
-            SetResume[] setArray = api.fetchSets();
-            Map<String, String> setMap = new HashMap<>();
+    private List<Card> getCards(JsonArray jsonArray) {
+        List<Card> cardList = new ArrayList<>();
+        if (jsonArray != null) {
+            for (JsonElement element : jsonArray) {
+                JsonObject jsonCard = element.getAsJsonObject();
 
-            if (setArray != null) {
-                for (SetResume setResume : setArray) {
-                    setMap.put(setResume.getId(), setResume.getName());
-                }
+                String id = jsonCard.get("id").getAsString();
+                String cardName = jsonCard.get("name").getAsString();
+                String imageUrl = jsonCard.has(IMAGE_FIELD) && !jsonCard.get(IMAGE_FIELD).isJsonNull()
+                        ? jsonCard.get(IMAGE_FIELD).getAsString() + HIGH_PNG_SUFFIX
+                        : null;
+
+                Card card = new Card(id, cardName, imageUrl, CardGameType.POKEMON);
+                cardList.add(card);
             }
-            return setMap;
-        } catch (Exception _) {
-            return new HashMap<>();
         }
+        return cardList;
     }
 }

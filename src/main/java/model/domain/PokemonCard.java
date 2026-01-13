@@ -1,7 +1,6 @@
-package model.domain.card;
+package model.domain;
 
 import model.bean.PokemonCardBean;
-import model.domain.CardGameType;
 
 import java.util.List;
 import java.util.Map;
