@@ -16,7 +16,6 @@ public class Binder {
     private String owner;
     private String setId;
     private String setName;
-    private String setLogo;
     private List<CardBean> cards;
     private LocalDateTime createdAt;
     private LocalDateTime lastModified;
@@ -47,10 +46,6 @@ public class Binder {
         return owner;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
     public String getSetId() {
         return setId;
     }
@@ -65,14 +60,6 @@ public class Binder {
 
     public void setSetName(String setName) {
         this.setName = setName;
-    }
-
-    public String getSetLogo() {
-        return setLogo;
-    }
-
-    public void setSetLogo(String setLogo) {
-        this.setLogo = setLogo;
     }
 
     public List<CardBean> getCards() {
@@ -92,10 +79,6 @@ public class Binder {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getLastModified() {
-        return lastModified;
-    }
-
     public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
     }
@@ -113,25 +96,8 @@ public class Binder {
         updateLastModified();
     }
 
-    public boolean hasCard(String cardId) {
-        return this.cards.stream().anyMatch(card -> card.getId().equals(cardId));
-    }
-
     public int getCardCount() {
         return this.cards.size();
-    }
-
-    /**
-     * Gets a card by its ID.
-     *
-     * @param cardId the card ID to search for
-     * @return the CardBean if found, null otherwise
-     */
-    public CardBean getCardById(String cardId) {
-        return this.cards.stream()
-                .filter(card -> card.getId().equals(cardId))
-                .findFirst()
-                .orElse(null);
     }
 
     private void updateLastModified() {

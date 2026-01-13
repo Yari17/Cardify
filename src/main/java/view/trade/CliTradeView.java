@@ -67,25 +67,5 @@ public class CliTradeView implements ITradeView {
 
     @Override
     public void displayTrades(java.util.List<model.bean.TradeBean> pendingTrades,
-                              java.util.List<model.bean.TradeBean> scheduledTrades) {
-        System.out.println("\n=== SCAMBI IN ATTESA (PENDING) ===");
-        if (pendingTrades == null || pendingTrades.isEmpty()) {
-            System.out.println("Nessuno scambio in attesa.");
-        } else {
-            for (model.bean.TradeBean trade : pendingTrades) {
-                System.out.println("- Scambio #" + trade.getId() + " da " + trade.getSenderUsername() + " (Offerta: "
-                        + trade.getOfferedCardsNames() + ")");
-            }
-        }
-
-        System.out.println("\n=== SCAMBI PROGRAMMATI (SCHEDULED) ===");
-        if (scheduledTrades == null || scheduledTrades.isEmpty()) {
-            System.out.println("Nessuno scambio programmato.");
-        } else {
-            for (model.bean.TradeBean trade : scheduledTrades) {
-                System.out.println("- Scambio #" + trade.getId() + " con " + trade.getReceiverUsername() + " (Data: "
-                        + trade.getScheduledDate() + " @ " + trade.getStoreLocation() + ")");
-            }
-        }
-    }
+                              java.util.List<model.bean.TradeBean> scheduledTrades) {}
 }

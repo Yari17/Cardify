@@ -1,6 +1,7 @@
 package model.bean;
 
-import model.domain.CardGameType;
+
+import model.domain.enumerations.CardGameType;
 
 import java.util.List;
 import java.util.Map;

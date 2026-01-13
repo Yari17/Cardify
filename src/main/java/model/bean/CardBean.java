@@ -1,6 +1,7 @@
 package model.bean;
 
-import model.domain.CardGameType;
+
+import model.domain.enumerations.CardGameType;
 
 public class CardBean {
     private String id;

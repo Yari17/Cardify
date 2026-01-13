@@ -3,11 +3,13 @@ package view.trade;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import controller.TradeController;
+import model.bean.TradeBean;
 
 import java.util.logging.Logger;
 
@@ -54,7 +56,7 @@ public class FXTradeView implements ITradeView {
         setupCellFactory(scheduledTradesList);
     }
 
-    private void setupCellFactory(javafx.scene.control.ListView<model.bean.TradeBean> listView) {
+    private void setupCellFactory(ListView<TradeBean> listView) {
         listView.setCellFactory(param -> new javafx.scene.control.ListCell<>() {
             @Override
             protected void updateItem(model.bean.TradeBean item, boolean empty) {
@@ -62,25 +64,11 @@ public class FXTradeView implements ITradeView {
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
-                } else {
-                    StringBuilder text = new StringBuilder();
-                    if (item.getStatus() == model.domain.TradeStatus.PENDING) {
-                        text.append("Scambio #").append(item.getId())
-                                .append("\nDa: ").append(item.getSenderUsername())
-                                .append("\nOfferta: ").append(item.getOfferedCardsNames());
-                    } else if (item.getStatus() == model.domain.TradeStatus.ACCEPTED) {
-                        text.append("Scambio #").append(item.getId())
-                                .append("\nCon: ").append(item.getReceiverUsername())
-                                .append("\nData: ").append(item.getScheduledDate())
-                                .append("\nLuogo: ").append(item.getStoreLocation());
-                    } else {
-                        text.append("Scambio #").append(item.getId()).append(" - ").append(item.getStatus());
-                    }
-                    setText(text.toString());
+                } else {}
                     setStyle("-fx-text-fill: white; -fx-padding: 10;");
                 }
             }
-        });
+        );
     }
 
     public void setController(TradeController controller) {

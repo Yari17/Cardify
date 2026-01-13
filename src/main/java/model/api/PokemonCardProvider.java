@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import model.domain.CardGameType;
+import model.domain.enumerations.CardGameType;
 import model.domain.Card;
 import model.domain.PokemonCard;
 import net.tcgdex.sdk.TCGdex;

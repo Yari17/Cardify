@@ -1,4 +1,4 @@
-package model.domain;
+package model.domain.enumerations;
 
 public enum CardGameType {
     POKEMON("Pokemon TCG"),
