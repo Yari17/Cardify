@@ -8,6 +8,7 @@ public class Card {
     protected String name;
     protected String imageUrl;
     protected CardGameType gameType;
+    protected int quantity = 0;
 
     public Card(String id, String name, String imageUrl, CardGameType gameType) {
         this.id = id;
@@ -16,7 +17,7 @@ public class Card {
         this.gameType = gameType;
     }
 
-    public  CardBean toBean(){
+    public CardBean toBean() {
         return new CardBean(
             this.id,
             this.name,
@@ -39,5 +40,13 @@ public class Card {
 
     public CardGameType getGameType() {
         return gameType;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 }

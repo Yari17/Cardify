@@ -214,6 +214,17 @@ public class FXCollectorHPView implements ICollectorHPView {
         content.setAlignment(javafx.geometry.Pos.CENTER);
         content.setStyle("-fx-background-color: #1E2530;");
 
+        // Diagnostic logging: report owner and tradable state to help debug negotiation flow
+        try {
+            String owner = card != null ? card.getOwner() : "<null>";
+            boolean tradable = card != null && card.isTradable();
+            String username = (controller != null) ? controller.getUsername() : "<no-controller>";
+            LOGGER.log(java.util.logging.Level.INFO, "Opening card dialog - id: {0}, owner: {1}, tradable: {2}, currentUser: {3}",
+                    new Object[] { card != null ? card.getId() : "<null>", owner, tradable, username });
+        } catch (Exception e) {
+            LOGGER.log(java.util.logging.Level.FINE, "Failed to log dialog diagnostics: {0}", e.getMessage());
+        }
+
         content.getChildren().addAll(
                 createTitleLabel(card),
                 createGameTypeLabel(card),
@@ -226,6 +237,21 @@ public class FXCollectorHPView implements ICollectorHPView {
 
         if (card.isTradable()) {
             content.getChildren().add(createTradableInfo());
+        }
+
+        // If the card belongs to another user and is tradable, add a "Proponi scambio" button
+        if (card.getOwner() != null && !card.getOwner().isEmpty() && controller != null
+                && !controller.getUsername().trim().equalsIgnoreCase(card.getOwner().trim())
+                && card.isTradable()) {
+            javafx.scene.control.Button negotiateButton = new javafx.scene.control.Button("Proponi scambio");
+            negotiateButton.setOnAction(evt -> {
+                try {
+                    controller.openNegotiation(card);
+                } catch (Exception e) {
+                    LOGGER.warning("Failed to open negotiation: " + e.getMessage());
+                }
+            });
+            content.getChildren().add(negotiateButton);
         }
 
         return content;
@@ -263,7 +289,7 @@ public class FXCollectorHPView implements ICollectorHPView {
         if (card.getImageUrl() != null && !card.getImageUrl().isEmpty()) {
             try {
                 Image cardImage = new Image(card.getImageUrl(), true);
-                if (cardImage != null && !cardImage.isError()) {
+                if ( !cardImage.isError()) {
                     cardImageView.setImage(cardImage);
                     imageLoaded = true;
                 }
@@ -658,7 +684,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             try {
                 // Direct loading (background)
                 Image image = new Image(card.getImageUrl(), true);
-                if (image != null && !image.isError()) {
+                if (!image.isError()) {
                     imageView.setImage(image);
                     imageLoaded = true;
                 }

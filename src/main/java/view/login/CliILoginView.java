@@ -2,7 +2,7 @@ package view.login;
 
 import controller.LoginController;
 import model.bean.UserBean;
-import view.InputManager;
+import config.InputManager;
 
 @SuppressWarnings("java:S106")
 public class CliILoginView implements ILoginView {
@@ -30,7 +30,12 @@ public class CliILoginView implements ILoginView {
                 handleLogin();
                 break;
             case "2":
-                handleRegistration();
+                // Delegate navigation to the application controller via LoginController
+                if (controller != null) {
+                    controller.onRegisterRequested();
+                } else {
+                    System.out.println("Registrazione non disponibile: controller non impostato.");
+                }
                 break;
             case "0":
                 System.out.println("Arrivederci!");
@@ -58,20 +63,6 @@ public class CliILoginView implements ILoginView {
         display();
     }
 
-    private void handleRegistration() {
-        System.out.println("\n=== REGISTRAZIONE ===");
-        System.out.print("Username (min 3 caratteri): ");
-        this.username = inputManager.readString();
-
-        System.out.print("Password (min 6 caratteri): ");
-        this.password = inputManager.readString();
-
-        System.out.println("La registrazione via CLI non è ancora completamente implementata.");
-        System.out.println("Usa l'interfaccia JavaFX per registrarti.");
-
-        display();
-    }
-
     @Override
     public UserBean getUserCredentials() {
         return new UserBean(username, password);
@@ -94,5 +85,6 @@ public class CliILoginView implements ILoginView {
 
     @Override
     public void close() {
+        // Intentionally empty for CLI (no resources to free).
     }
 }

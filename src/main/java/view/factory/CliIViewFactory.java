@@ -1,7 +1,7 @@
 package view.factory;
 
 import controller.*;
-import view.InputManager;
+import config.InputManager;
 import view.collection.CliCollectionView;
 import view.collection.ICollectionView;
 import view.collectorhomepage.CliCollectorHPView;
@@ -14,6 +14,8 @@ import view.storehomepage.CliStoreHPView;
 import view.storehomepage.IStoreHPView;
 import view.trade.CliTradeView;
 import view.trade.ITradeView;
+import view.negotiation.CliNegotiationView;
+import view.negotiation.INegotiationView;
 
 public class CliIViewFactory implements IViewFactory {
 
@@ -64,5 +66,11 @@ public class CliIViewFactory implements IViewFactory {
         view.setController(controller);
         return view;
     }
-}
 
+    @Override
+    public INegotiationView createNegotiationView(NegotiationController controller) {
+        CliNegotiationView view = new CliNegotiationView(inputManager);
+        view.setController(controller);
+        return view;
+    }
+}

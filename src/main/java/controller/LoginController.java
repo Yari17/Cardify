@@ -43,11 +43,14 @@ public class LoginController {
 
         if (authenticatedUser.isPresent()) {
             User user = authenticatedUser.get();
-            view.showSuccess("Login effettuato con successo! Benvenuto " + user.getName());
+
+            UserBean loggedInUserBean = new UserBean(user.getName(), null, user.getUserType());
+
+            view.showSuccess("Login effettuato con successo! Benvenuto " + loggedInUserBean.getUsername());
 
             view.close();
 
-            UserBean loggedInUserBean = new UserBean(user.getName(), null, user.getUserType());
+
             navigationController.handleRoleBasedNavigation(loggedInUserBean);
         } else {
             view.showInputError("Credenziali non valide. Riprova.");

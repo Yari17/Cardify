@@ -5,7 +5,8 @@ import javafx.application.Platform;
 import model.bean.UserBean;
 import model.dao.IUserDao;
 import model.dao.factory.DaoFactory;
-import view.InputManager;
+import config.InputManager;
+import model.domain.enumerations.PersistenceType;
 import view.IView;
 import view.collection.ICollectionView;
 import view.collectorhomepage.ICollectorHPView;
@@ -22,13 +23,18 @@ import java.util.logging.Logger;
 public class ApplicationController {
     private static final Logger LOGGER = Logger.getLogger(ApplicationController.class.getName());
     private static final String JAVAFX = "JavaFX";
-
     private final Deque<IView> viewStack = new ArrayDeque<>();
+    //configurazione
     private String currentInterface;
     private String currentPersistence;
+    //factory
     private DaoFactory daoFactory;
-    private IUserDao userDao;
+    public DaoFactory getDaoFactory() { return daoFactory; }
+
     private IViewFactory viewFactory;
+    //DAO
+    private IUserDao userDao;
+
 
     public void start() {
         InputManager inputManager = new InputManager();
@@ -52,28 +58,25 @@ public class ApplicationController {
             navigateToLogin();
         }
     }
-
+    // Restituisce la factory di view appropriata in base all'interfaccia selezionata
     private IViewFactory createViewFactory(InputManager inputManager) {
         return JAVAFX.equals(currentInterface)
                 ? new FXViewFactory()
                 : new CliIViewFactory(inputManager);
     }
-
+    // Restituisce la factory di DAO appropriata in base alla persistenza selezionata
     private DaoFactory createDaoFactory() {
-        DaoFactory.PersistenceType persistenceType = switch (currentPersistence) {
-            case "DEMO" -> DaoFactory.PersistenceType.DEMO;
-            case "JSON" -> DaoFactory.PersistenceType.JSON;
-            case "JDBC" -> DaoFactory.PersistenceType.JDBC;
-            default -> DaoFactory.PersistenceType.JSON; // Default a JSON
+        PersistenceType persistenceType = switch (currentPersistence) {
+            case "DEMO" -> PersistenceType.DEMO;
+            case "JSON" -> PersistenceType.JSON;
+            case "JDBC" -> PersistenceType.JDBC;
+            default -> PersistenceType.JSON; // Default a JSON
         };
 
         return DaoFactory.getFactory(persistenceType);
     }
 
-    /**
-     * Aggiorna AppConfig con il tipo di persistenza selezionato.
-     * Mappa i valori del ConfigurationManager ai valori di AppConfig.
-     */
+
     private void updateAppConfigPersistence() {
         String appConfigType = switch (currentPersistence) {
             case "DEMO" -> config.AppConfig.DAO_TYPE_MEMORY; // "demo"
@@ -89,11 +92,8 @@ public class ApplicationController {
         Platform.startup(() -> Platform.runLater(this::navigateToLogin));
     }
 
-    // ============ Navigation Methods (ex-Navigator) ============
 
-    /**
-     * Navigate to the login page.
-     */
+
     public void navigateToLogin() throws NavigationException {
         LoginController controller = new LoginController(userDao, this);
         ILoginView view = viewFactory.createLoginView(controller);
@@ -101,9 +101,7 @@ public class ApplicationController {
         displayView(view);
     }
 
-    /**
-     * Navigate to the registration page.
-     */
+
     public void navigateToRegistration() throws NavigationException {
         RegistrationController controller = new RegistrationController(userDao, this);
         IRegistrationView view = viewFactory.createRegistrationView(controller);
@@ -111,9 +109,7 @@ public class ApplicationController {
         displayView(view);
     }
 
-    /**
-     * Navigate to the collector home page.
-     */
+
     public void navigateToCollectorHomePage(UserBean user) throws NavigationException {
         model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
         CollectorHPController controller = new CollectorHPController(user.getUsername(), this, binderDao);
@@ -122,9 +118,7 @@ public class ApplicationController {
         displayView(view);
     }
 
-    /**
-     * Navigate to the store home page.
-     */
+
     public void navigateToStoreHomePage(UserBean user) throws NavigationException {
         StoreHPController controller = new StoreHPController(user.getUsername(), this);
         IStoreHPView view = viewFactory.createStoreHomePageView(controller);
@@ -132,9 +126,7 @@ public class ApplicationController {
         displayView(view);
     }
 
-    /**
-     * Navigate to the collection page.
-     */
+
     public void navigateToCollection(String username) throws NavigationException {
         model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
         CollectionController controller = new CollectionController(username, this, binderDao);
@@ -143,9 +135,7 @@ public class ApplicationController {
         displayView(collectionView);
     }
 
-    /**
-     * Navigate to the trade page.
-     */
+
     public void navigateToTrade(String username) throws NavigationException {
         TradeController controller = new TradeController(username, this);
         view.trade.ITradeView tradeView = viewFactory.createTradeView(controller);
@@ -153,9 +143,50 @@ public class ApplicationController {
         displayView(tradeView);
     }
 
-    /**
-     * Handle role-based navigation after login.
-     */
+
+    public void navigateToNegotiation(String proposerUsername, model.bean.CardBean targetCard) throws NavigationException {
+        // Create a NegotiationController with basic context (proposer and target owner)
+        String targetOwner = targetCard != null ? targetCard.getOwner() : null;
+        NegotiationController controller = new NegotiationController(proposerUsername, targetOwner, this);
+        view.negotiation.INegotiationView negotiationView = viewFactory.createNegotiationView(controller);
+        controller.setView(negotiationView);
+
+        // Build simple inventory/requested lists from the binder DAO
+        try {
+            model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
+            java.util.List<model.bean.CardBean> inventory = new java.util.ArrayList<>();
+            if (proposerUsername != null) {
+                java.util.List<model.domain.Binder> proposerBinders = binderDao.getUserBinders(proposerUsername);
+                for (model.domain.Binder b : proposerBinders) {
+                    if (b != null && b.getCards() != null) inventory.addAll(b.getCards());
+                }
+            }
+
+            java.util.List<model.bean.CardBean> requested = new java.util.ArrayList<>();
+            if (targetCard != null) {
+                // Show the single requested card (as bean)
+                requested.add(targetCard);
+            }
+
+            // Start the negotiation controller with assembled data
+            controller.start(inventory, requested);
+        } catch (Exception e) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Could not assemble negotiation data: {0}", e.getMessage());
+        }
+
+        // Show the negotiation UI. Let the view implementation decide how to present itself
+        try {
+            LOGGER.log(java.util.logging.Level.INFO, "Presenting negotiation view: proposer={0}, target={1}", new Object[]{proposerUsername, targetCard != null ? targetCard.getId() : "<null>"});
+            // The view implementation (FX or CLI) is responsible for presenting itself correctly.
+            negotiationView.display();
+            LOGGER.info("Negotiation view presentation requested");
+        } catch (Exception e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Failed to present negotiation view: {0}", e.getMessage());
+            throw new NavigationException("Failed to present negotiation view", e);
+        }
+    }
+
+
     public void handleRoleBasedNavigation(UserBean loggedInUser) throws NavigationException {
         if (config.AppConfig.USER_TYPE_COLLECTOR.equals(loggedInUser.getUserType())) {
             navigateToCollectorHomePage(loggedInUser);
@@ -168,9 +199,6 @@ public class ApplicationController {
         }
     }
 
-    /**
-     * Logout: clear navigation history and return to log in.
-     */
     public void logout() throws NavigationException {
         LOGGER.info("Logging out: clearing history and navigating to login");
         closeAll();
@@ -193,9 +221,6 @@ public class ApplicationController {
         }
     }
 
-    /**
-     * Close all views in the stack.
-     */
     private void closeAll() throws NavigationException {
         while (!viewStack.isEmpty()) {
             IView view = viewStack.removeLast();
@@ -203,9 +228,6 @@ public class ApplicationController {
         }
     }
 
-    /**
-     * Close a single view.
-     */
     private void closeView(IView view) throws NavigationException {
         if (view != null) {
             try {

@@ -1,7 +1,7 @@
 package view.configuration;
 
 import controller.ConfigurationManager;
-import view.InputManager;
+import config.InputManager;
 
 @SuppressWarnings("java:S106")
 public class CliConfigurationView implements IConfigurationView {

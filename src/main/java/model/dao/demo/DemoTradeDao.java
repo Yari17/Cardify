@@ -28,22 +28,23 @@ public class DemoTradeDao implements ITradeDao {
     }
 
     @Override
-    public List getAll() {
-        return List.of();
-    }
-
-    @Override
-    public void save(Object o) {
+    public void save(TradeTransaction tradeTransaction) {
 
     }
 
     @Override
-    public void update(Object o, String[] params) {
+    public void update(TradeTransaction tradeTransaction, String[] params) {
 
     }
 
     @Override
-    public void delete(Object o) {
+    public void delete(TradeTransaction tradeTransaction) {
 
     }
-}
+
+
+
+
+    }
+
+

@@ -137,11 +137,6 @@ public class JsonUserDao implements IUserDao {
                 .findFirst();
     }
 
-    @Override
-    public List<User> getAll() {
-        ensureLoaded();
-        return new ArrayList<>(users.values());
-    }
 
     @Override
     public void save(User user) {
@@ -190,5 +185,11 @@ public class JsonUserDao implements IUserDao {
         users.remove(username);
         credentials.remove(username);
         saveToJson();
+    }
+
+    @Override
+    public java.util.List<String> findAllUsernames() {
+        ensureLoaded();
+        return new java.util.ArrayList<>(users.keySet());
     }
 }

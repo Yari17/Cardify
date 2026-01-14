@@ -2,7 +2,7 @@ package view.collectorhomepage;
 
 import controller.CollectorHPController;
 import model.bean.CardBean;
-import view.InputManager;
+import config.InputManager;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,14 @@ public class CliCollectorHPView implements ICollectorHPView {
                     searchBySetMenu();
                     break;
                 case "4":
-                    System.out.println("Gestisci collezione selezionato.");
+                    // Instead of a placeholder print, delegate navigation to the controller
+                    if (controller != null) {
+                        controller.navigateToCollection();
+                        // stop the CLI loop so the current view exits and navigation can take over
+                        return; // return immediately; ApplicationController will display the new view
+                    } else {
+                        System.out.println("Controller non disponibile.");
+                    }
                     break;
                 case "5":
                     System.out.println("Effettua scambio selezionato.");
@@ -83,6 +90,7 @@ public class CliCollectorHPView implements ICollectorHPView {
 
     @Override
     public void close() {
+        // Intentionally empty for CLI: no resources to release here.
     }
 
     @Override
@@ -94,7 +102,7 @@ public class CliCollectorHPView implements ICollectorHPView {
 
     @Override
     public void showCardOverview(CardBean card) {
-
+        // CLI uses a simple modal-style text output in showCardDetails/displayCards; overview not needed here.
     }
 
     @Override
@@ -210,7 +218,7 @@ public class CliCollectorHPView implements ICollectorHPView {
                 inputManager.readString();
                 return -1;
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println("⚠ Input non valido. Inserisci un numero, N, P o 0");
             System.out.print(PRESS_ENTER_TO_CONTINUE);
             inputManager.readString();
@@ -226,10 +234,25 @@ public class CliCollectorHPView implements ICollectorHPView {
         System.out.println("🆔 ID:          " + card.getId());
         System.out.println("🎮 Gioco:       " + card.getGameType());
         System.out
-                .println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
+            .println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
         System.out.println("\n" + SEPARATOR_LINE);
-        System.out.print("\nPremi INVIO per tornare alla lista...");
-        inputManager.readString();
+        // If the card is tradable and owned by another user, offer to propose a trade
+        boolean canPropose = card.isTradable() && controller != null && !controller.getUsername().equals(card.getOwner());
+        if (canPropose) {
+            System.out.println("Opzioni: 1=Proponi scambio 0=Indietro");
+            System.out.print("Scelta: ");
+            String choice = inputManager.readString().trim();
+            if ("1".equals(choice)) {
+                // Delegate to controller to open negotiation (ApplicationController will navigate)
+                if (controller != null) {
+                    controller.openNegotiation(card);
+                    return; // navigation will take over
+                }
+            }
+        } else {
+            System.out.print("\nPremi INVIO per tornare alla lista...");
+            inputManager.readString();
+        }
     }
 
     private void showPopularCardsMenu() {
@@ -375,7 +398,7 @@ public class CliCollectorHPView implements ICollectorHPView {
             } else {
                 System.out.println("⚠ Numero set non valido. Riprova.");
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             System.out.println("⚠ Input non valido. Inserisci un numero o N/P.");
         }
         return -1; // Always stay on page or valid transition handled elsewhere (but here we just

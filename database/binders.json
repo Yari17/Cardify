@@ -1,87 +1,5 @@
 [
   {
-    "id": 1,
-    "owner": "user1",
-    "setId": "base4",
-    "setName": "Base Set 2",
-    "cards": [
-      {
-        "id": "base4-3",
-        "gameType": "POKEMON",
-        "quantity": 2,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "base4-6",
-        "gameType": "POKEMON",
-        "quantity": 3,
-        "isTradable": false,
-        "status": ""
-      },
-      {
-        "id": "base4-123",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": false,
-        "status": ""
-      },
-      {
-        "id": "pl4-1",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": false,
-        "status": ""
-      },
-      {
-        "id": "pl4-6",
-        "gameType": "POKEMON",
-        "quantity": 2,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "pl4-12",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "pl4-16",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "pl4-59",
-        "gameType": "POKEMON",
-        "quantity": 3,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "pl4-71",
-        "gameType": "POKEMON",
-        "quantity": 5,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "base4-18",
-        "name": "Venusaur",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base4/18/high.png",
-        "gameType": "POKEMON",
-        "quantity": 3,
-        "isTradable": false,
-        "status": ""
-      }
-    ],
-    "createdAt": "2026-01-10T01:12:10.668730",
-    "lastModified": "2026-01-13T15:34:52.636198"
-  },
-  {
     "id": 2,
     "owner": "marco_rossi",
     "setId": "pl4",
@@ -392,49 +310,50 @@
     "lastModified": "2026-01-13T01:29"
   },
   {
-    "id": 12,
-    "owner": "user1",
-    "setId": "base3",
-    "setName": "Fossil",
+    "id": 13,
+    "owner": "user3",
+    "setId": "swsh10.5",
+    "setName": "Pokémon GO",
     "cards": [
       {
-        "id": "base3-16",
-        "name": "Aerodactyl",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base3/16/high.png",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": false,
-        "status": ""
-      },
-      {
-        "id": "base3-23",
-        "name": "Hypno",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base3/23/high.png",
-        "gameType": "POKEMON",
-        "quantity": 3,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "base3-3",
-        "name": "Ditto",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base3/3/high.png",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "base3-4",
-        "name": "Dragonite",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base3/4/high.png",
+        "id": "swsh10.5-030",
+        "name": "Mewtwo V",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/030/high.png",
         "gameType": "POKEMON",
         "quantity": 2,
         "isTradable": true,
         "status": ""
       }
     ],
-    "createdAt": "2026-01-13T14:28:03.119244",
-    "lastModified": "2026-01-13T16:46:53.274064"
+    "createdAt": "2026-01-14T11:58:00.051488",
+    "lastModified": "2026-01-14T12:00:09.167919"
+  },
+  {
+    "id": 16,
+    "owner": "user1",
+    "setId": "base5",
+    "setName": "Team Rocket",
+    "cards": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "base5-13",
+        "name": "Dark Vileplume",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/13/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-14T14:37:39.995239",
+    "lastModified": "2026-01-14T14:37:59.385682"
   }
 ]

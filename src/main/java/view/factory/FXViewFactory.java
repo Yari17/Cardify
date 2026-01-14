@@ -17,6 +17,7 @@ import view.storehomepage.IStoreHPView;
 import view.storehomepage.FXStoreHPView;
 import view.trade.FXTradeView;
 import view.trade.ITradeView;
+import view.negotiation.INegotiationView;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -187,7 +188,7 @@ public class FXViewFactory implements IViewFactory {
     @Override
     public ITradeView createTradeView(TradeController controller) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TradePage.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TradeManagerPage.fxml"));
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
@@ -211,8 +212,40 @@ public class FXViewFactory implements IViewFactory {
             return fxController;
 
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load TradePage.fxml", e);
+            LOGGER.log(Level.SEVERE, "Failed to load TradeManagerPage.fxml", e);
             throw new IllegalStateException("Cannot create TradeView: FXML file not found or invalid", e);
+        }
+    }
+
+    @Override
+    public INegotiationView createNegotiationView(NegotiationController controller) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TradeNegotiationPage.fxml"));
+            Parent root = loader.load();
+            Object fxmlController = loader.getController();
+
+            if (!(fxmlController instanceof INegotiationView)) {
+                String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
+                throw new IllegalStateException(
+                    "FXML controller is not FXNegotiationView. Found: " + controllerClass
+                );
+            }
+
+            INegotiationView fxController = (INegotiationView) fxmlController;
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setTitle("Cardify - Trade Negotiation");
+            fxController.setStage(stage);
+
+            // Set controller
+            fxController.setController(controller);
+
+            return fxController;
+
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to load TradeNegotiationPage.fxml", e);
+            throw new IllegalStateException("Cannot create NegotiationView: FXML file not found or invalid", e);
         }
     }
 }

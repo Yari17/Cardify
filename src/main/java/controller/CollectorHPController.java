@@ -301,12 +301,33 @@ public class CollectorHPController {
 
             if (detailedCard != null) {
                 CardBean detailedBean = detailedCard.toBean();
+                // Preserve owner information from the original binder-provided bean
+                if (card != null && card.getOwner() != null && !card.getOwner().isEmpty()) {
+                    detailedBean.setOwner(card.getOwner());
+                }
+                // Preserve binder-specific flags so the view can show trade controls
+                if (card != null) {
+                    detailedBean.setTradable(card.isTradable());
+                    detailedBean.setQuantity(card.getQuantity());
+                    detailedBean.setStatus(card.getStatus());
+                }
                 view.showCardOverview(detailedBean);
             } else {
                 LOGGER.log(java.util.logging.Level.WARNING, "Could not load detailed info for card: {0}", card.getId());
                 view.showCardOverview(card);
             }
         }
+    }
+
+    /**
+     * Open the negotiation UI for the given card: collect necessary data and delegate
+     * to ApplicationController for navigation.
+     */
+    public void openNegotiation(CardBean card) {
+        if (card == null) return;
+        // Delegate to the application-level navigation controller which will assemble
+        // the inventory/requested lists and create the NegotiationController/view.
+        navigationController.navigateToNegotiation(username, card);
     }
 
     public void onExitRequested() {
@@ -389,6 +410,12 @@ public class CollectorHPController {
 
             // set owner for display
             finalBean.setOwner(owner);
+            // Preserve binder-specific properties (important: binderBean may be partial)
+            if (binderBean != null) {
+                finalBean.setTradable(binderBean.isTradable());
+                finalBean.setQuantity(binderBean.getQuantity());
+                finalBean.setStatus(binderBean.getStatus());
+            }
             result.add(finalBean);
         }
         return result;
@@ -406,6 +433,8 @@ public class CollectorHPController {
                     Card source = java.util.Objects.requireNonNullElse(cached, c);
                     CardBean bean = source.toBean();
                     bean.setOwner(idToOwner.get(id));
+                    // Mark as tradable because presence in idToOwner means some binder has it and flagged tradable
+                    bean.setTradable(true);
                     return bean;
                 })
                 .filter(Objects::nonNull)

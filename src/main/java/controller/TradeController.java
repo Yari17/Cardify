@@ -13,10 +13,13 @@ public class TradeController {
     private final String username;
     private final ApplicationController navigationController;
     private ITradeView view;
+    private final ManageTradeController manageController;
 
     public TradeController(String username, ApplicationController navigationController) {
         this.username = username;
         this.navigationController = navigationController;
+        // Delegate full trade proposal handling to ManageTradeController
+        this.manageController = new ManageTradeController(username, navigationController);
     }
 
     public void setView(ITradeView view) {
@@ -27,12 +30,16 @@ public class TradeController {
     }
 
     public void loadTrades() {
-
+        // Fully delegate responsibility to ManageTradeController
+        try {
+            if (manageController != null && view != null) {
+                manageController.loadAndDisplayTrades(view);
+            }
+        } catch (Exception e) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Failed to load trades via ManageTradeController: {0}", e.getMessage());
+        }
     }
 
-    public String getUsername() {
-        return username;
-    }
 
     public void navigateToHome() {
         LOGGER.log(java.util.logging.Level.INFO, "Navigating to home page for user: {0}", username);

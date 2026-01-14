@@ -1,12 +1,36 @@
 package model.dao.json;
 
+import config.DatabaseConfig;
 import model.dao.ITradeDao;
 import model.domain.TradeTransaction;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class JsonTradeDao implements ITradeDao {
+    private static final Logger LOGGER = Logger.getLogger(JsonTradeDao.class.getName());
+    private final String jsonFilePath;
+
+    public JsonTradeDao() {
+        this(DatabaseConfig.JSON_DIR + File.separator + "trades.json");
+    }
+
+    public JsonTradeDao(String jsonFilePath) {
+        this.jsonFilePath = jsonFilePath;
+        // ensure parent directory exists
+        try {
+            File f = new File(jsonFilePath);
+            File parent = f.getParentFile();
+            if (parent != null && !parent.exists()) parent.mkdirs();
+            if (!f.exists()) f.createNewFile();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Unable to initialize trade JSON file: {0}", e.getMessage());
+        }
+    }
+
     @Override
     public TradeTransaction getTradeTransactionById(int id) {
         return null;
@@ -23,27 +47,23 @@ public class JsonTradeDao implements ITradeDao {
     }
 
     @Override
-    public Optional get(long id) {
+    public Optional<TradeTransaction> get(long id) {
         return Optional.empty();
     }
 
     @Override
-    public List getAll() {
-        return List.of();
-    }
-
-    @Override
-    public void save(Object o) {
+    public void save(TradeTransaction tradeTransaction) {
 
     }
 
     @Override
-    public void update(Object o, String[] params) {
+    public void update(TradeTransaction tradeTransaction, String[] params) {
 
     }
 
     @Override
-    public void delete(Object o) {
+    public void delete(TradeTransaction tradeTransaction) {
 
     }
+
 }

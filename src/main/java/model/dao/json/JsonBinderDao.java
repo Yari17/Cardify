@@ -106,11 +106,6 @@ public class JsonBinderDao implements IBinderDao {
     }
 
     @Override
-    public List<Binder> getAll() {
-        return new ArrayList<>(bindersById.values());
-    }
-
-    @Override
     public void save(Binder binder) {
         // Genera un nuovo ID se non presente
         if (binder.getId() == 0) {
@@ -220,16 +215,6 @@ public class JsonBinderDao implements IBinderDao {
         }
     }
 
-    @Override
-    public List<Binder> getBindersBySet(String setId) {
-        List<Binder> result = new ArrayList<>();
-        for (Binder binder : bindersById.values()) {
-            if (setId != null && setId.equals(binder.getSetId())) {
-                result.add(binder);
-            }
-        }
-        return result;
-    }
 
     @Override
     public List<Binder> getBindersExcludingOwner(String owner) {

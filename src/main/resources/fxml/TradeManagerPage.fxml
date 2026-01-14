@@ -111,7 +111,7 @@
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
-                <Label text="Scambi In Attesa (Pending)" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Scambi In Attesa" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
                 <ListView fx:id="pendingTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
             </VBox>
 
@@ -120,7 +120,7 @@
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
-                <Label text="Scambi Programmati (Scheduled)" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                <Label text="Scambi Programmati" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
                 <ListView fx:id="scheduledTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
             </VBox>
         </SplitPane>

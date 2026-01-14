@@ -14,58 +14,16 @@
       "reviewCount": 0,
       "userType": "Collezionista"
     },
-    "Store1": {
-      "id": 18,
-      "name": "Store1",
+    "nexus_comics": {
+      "id": 14,
+      "name": "Nexus Comics",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Store"
     },
-    "marco_rossi": {
-      "id": 3,
-      "name": "Marco Rossi",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Collezionista"
-    },
-    "giulia_neri": {
-      "id": 4,
-      "name": "Giulia Neri",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Collezionista"
-    },
     "alessandro_bianchi": {
       "id": 5,
       "name": "Alessandro Bianchi",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Collezionista"
-    },
-    "lucia_ferri": {
-      "id": 6,
-      "name": "Lucia Ferri",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Collezionista"
-    },
-    "andrea_marini": {
-      "id": 7,
-      "name": "Andrea Marini",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Collezionista"
-    },
-    "francesca_ricci": {
-      "id": 8,
-      "name": "Francesca Ricci",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Collezionista"
-    },
-    "stefano_verdi": {
-      "id": 9,
-      "name": "Stefano Verdi",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Collezionista"
@@ -77,9 +35,65 @@
       "reviewCount": 0,
       "userType": "Collezionista"
     },
+    "la_tana_del_goblin": {
+      "id": 13,
+      "name": "La Tana del Goblin",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "Store1": {
+      "id": 18,
+      "name": "Store1",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "fumetti_co": {
+      "id": 15,
+      "name": "Fumetti \u0026 Co",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "user3": {
+      "id": 0,
+      "name": "user3",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "stefano_verdi": {
+      "id": 9,
+      "name": "Stefano Verdi",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "francesca_ricci": {
+      "id": 8,
+      "name": "Francesca Ricci",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
     "riccardo_galli": {
       "id": 11,
       "name": "Riccardo Galli",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "tavolo_e_fumetti": {
+      "id": 17,
+      "name": "Tavolo e Fumetti",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
+    "giulia_neri": {
+      "id": 4,
+      "name": "Giulia Neri",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Collezionista"
@@ -91,37 +105,30 @@
       "reviewCount": 0,
       "userType": "Collezionista"
     },
-    "la_tana_del_goblin": {
-      "id": 13,
-      "name": "La Tana del Goblin",
+    "lucia_ferri": {
+      "id": 6,
+      "name": "Lucia Ferri",
       "reliabilityScore": 0,
       "reviewCount": 0,
-      "userType": "Store"
+      "userType": "Collezionista"
     },
-    "nexus_comics": {
-      "id": 14,
-      "name": "Nexus Comics",
+    "marco_rossi": {
+      "id": 3,
+      "name": "Marco Rossi",
       "reliabilityScore": 0,
       "reviewCount": 0,
-      "userType": "Store"
+      "userType": "Collezionista"
     },
-    "fumetti_co": {
-      "id": 15,
-      "name": "Fumetti & Co",
+    "andrea_marini": {
+      "id": 7,
+      "name": "Andrea Marini",
       "reliabilityScore": 0,
       "reviewCount": 0,
-      "userType": "Store"
+      "userType": "Collezionista"
     },
     "giochi_di_carta": {
       "id": 16,
       "name": "Giochi di Carta",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Store"
-    },
-    "tavolo_e_fumetti": {
-      "id": 17,
-      "name": "Tavolo e Fumetti",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Store"
@@ -130,21 +137,22 @@
   "credentials": {
     "user1": "password",
     "user2": "password",
-    "Store1": "password",
-    "marco_rossi": "password",
-    "giulia_neri": "password",
-    "alessandro_bianchi": "password",
-    "lucia_ferri": "password",
-    "andrea_marini": "password",
-    "francesca_ricci": "password",
-    "stefano_verdi": "password",
-    "valentina_tosi": "password",
-    "riccardo_galli": "password",
-    "elena_sanna": "password",
-    "la_tana_del_goblin": "password",
     "nexus_comics": "password",
+    "alessandro_bianchi": "password",
+    "valentina_tosi": "password",
+    "la_tana_del_goblin": "password",
+    "Store1": "password",
     "fumetti_co": "password",
-    "giochi_di_carta": "password",
-    "tavolo_e_fumetti": "password"
+    "user3": "password",
+    "stefano_verdi": "password",
+    "francesca_ricci": "password",
+    "riccardo_galli": "password",
+    "tavolo_e_fumetti": "password",
+    "giulia_neri": "password",
+    "elena_sanna": "password",
+    "lucia_ferri": "password",
+    "marco_rossi": "password",
+    "andrea_marini": "password",
+    "giochi_di_carta": "password"
   }
 }

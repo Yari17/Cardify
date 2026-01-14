@@ -24,12 +24,32 @@ public class TradeTransaction {
     private boolean proposerReviewed;
     private boolean receiverReviewed;
 
+    public TradeTransaction() {}
+    public TradeTransaction(int transactionId) {
+        this.transactionId = transactionId;
+    }
+    public TradeTransaction(int transactionId, TradeStatus tradeStatus, String proposerId, String receiverId, String storeId,
+                            LocalDateTime creationTimestamp, LocalDateTime tradeDate,
+                            List<Card> offeredCards, List<Card> requestedCards) {
+        this.transactionId = transactionId;
+        this.tradeStatus = tradeStatus;
+        this.proposerId = proposerId;
+        this.receiverId = receiverId;
+        this.storeId = storeId;
+        this.creationTimestamp = creationTimestamp;
+        this.tradeDate = tradeDate;
+        this.offeredCards = offeredCards;
+        this.requestedCards = requestedCards;
+        this.proposerReviewed = false;
+        this.receiverReviewed = false;
+    }
     public int generateSessionCode() {
         return (int)(Math.random() * 900000) + 100000; // Generates a random 6-digit code
     }
     public void updateTradeStatus(TradeStatus newStatus) {
         this.tradeStatus = newStatus;
     }
+
     public void recordInspectionResult(String userId, InspectionResult result) {
         if (userId.equals(proposerId)) {
             this.proposerInspectionResult = result;
@@ -45,5 +65,19 @@ public class TradeTransaction {
         }
         return userId.equals(proposerId) ? proposerSessionCode : receiverSessionCode;
     }
+
+    // ===== Getters used by controllers/views =====
+    public int getTransactionId() { return transactionId; }
+    public void setTransactionId(int transactionId) { this.transactionId = transactionId; }
+    public TradeStatus getTradeStatus() { return tradeStatus; }
+    public String getProposerId() { return proposerId; }
+    public String getReceiverId() { return receiverId; }
+    public String getStoreId() { return storeId; }
+    public LocalDateTime getCreationTimestamp() { return creationTimestamp; }
+    public LocalDateTime getTradeDate() { return tradeDate; }
+    public List<Card> getOfferedCards() { return offeredCards; }
+    public List<Card> getRequestedCards() { return requestedCards; }
+    public boolean isProposerReviewed() { return proposerReviewed; }
+    public boolean isReceiverReviewed() { return receiverReviewed; }
 
 }

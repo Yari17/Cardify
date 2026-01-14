@@ -1,7 +1,7 @@
 package view.trade;
 
 import controller.TradeController;
-import view.InputManager;
+import config.InputManager;
 
 @SuppressWarnings("java:S106")
 public class CliTradeView implements ITradeView {
@@ -67,5 +67,32 @@ public class CliTradeView implements ITradeView {
 
     @Override
     public void displayTrades(java.util.List<model.bean.TradeBean> pendingTrades,
-                              java.util.List<model.bean.TradeBean> scheduledTrades) {}
+                              java.util.List<model.bean.TradeBean> scheduledTrades) {
+        System.out.println("\n--- Pending / Awaiting Review ---");
+        if (pendingTrades == null || pendingTrades.isEmpty()) {
+            System.out.println("Nessuno scambio in attesa.");
+        } else {
+            for (int i = 0; i < pendingTrades.size(); i++) {
+                model.bean.TradeBean t = pendingTrades.get(i);
+                System.out.printf("%d) ID:%s Store:%s Status:%s\n", i+1, t.getTradeId(), t.getStoreId(), t.getStatus());
+                // show participants summary
+                for (model.bean.TradeBean.ParticipantBean p : t.getParticipants()) {
+                    System.out.printf("   - %s (%s) items: %d\n", p.getUserId(), p.getRole(), p.getItems().size());
+                }
+            }
+        }
+
+        System.out.println("\n--- Scheduled / Completed ---");
+        if (scheduledTrades == null || scheduledTrades.isEmpty()) {
+            System.out.println("Nessuno scambio programmato o completato.");
+        } else {
+            for (int i = 0; i < scheduledTrades.size(); i++) {
+                model.bean.TradeBean t = scheduledTrades.get(i);
+                System.out.printf("%d) ID:%s Store:%s Status:%s\n", i+1, t.getTradeId(), t.getStoreId(), t.getStatus());
+                for (model.bean.TradeBean.ParticipantBean p : t.getParticipants()) {
+                    System.out.printf("   - %s (%s) items: %d\n", p.getUserId(), p.getRole(), p.getItems().size());
+                }
+            }
+        }
+    }
 }

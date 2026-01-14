@@ -34,10 +34,6 @@ public class DemoBinderDao implements IBinderDao {
         return Optional.ofNullable(bindersById.get(id));
     }
 
-    @Override
-    public List<Binder> getAll() {
-        return new ArrayList<>(bindersById.values());
-    }
 
     @Override
     public void save(Binder binder) {
@@ -121,14 +117,17 @@ public class DemoBinderDao implements IBinderDao {
         return findByOwner(owner);
     }
 
-    @Override
-    public List<Binder> getBindersBySet(String setId) {
-        return List.of();
-    }
 
     @Override
     public List<Binder> getBindersExcludingOwner(String owner) {
-        return List.of();
+        List<Binder> result = new ArrayList<>();
+        for (Binder b : bindersById.values()) {
+            if (b == null) continue;
+            if (owner == null || !owner.equals(b.getOwner())) {
+                result.add(b);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -149,7 +148,7 @@ public class DemoBinderDao implements IBinderDao {
             } else {
                 LOGGER.log(java.util.logging.Level.WARNING, "No binder found to delete with id: {0}", binderId);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
             LOGGER.log(java.util.logging.Level.WARNING, "Invalid binder ID format: {0}", binderId);
         }
     }

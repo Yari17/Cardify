@@ -3,7 +3,7 @@ package view.registration;
 
 import controller.RegistrationController;
 import model.bean.UserBean;
-import view.InputManager;
+import config.InputManager;
 
 @SuppressWarnings("java:S106")
 public class CliRegistrationView implements IRegistrationView {

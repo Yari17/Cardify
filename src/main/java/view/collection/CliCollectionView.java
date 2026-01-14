@@ -4,7 +4,7 @@ import controller.CollectionController;
 import model.bean.CardBean;
 import model.domain.Binder;
 import model.domain.Card;
-import view.InputManager;
+import config.InputManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +36,10 @@ public class CliCollectionView implements ICollectionView {
     // Added missing state fields
     private boolean saveButtonVisible;
     private String username;
+
+    // NEW: track the set currently being managed and a refresh flag
+    private String managingSetId = null;
+    private volatile boolean refreshRequested = false;
 
     public CliCollectionView(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -74,10 +78,15 @@ public class CliCollectionView implements ICollectionView {
 
     @Override
     public void updateCardInSet(String setId, String cardId) {
-        // In CLI, non è necessario aggiornare un singolo elemento
-        // Il refresh avviene solo quando si salva o si ricarica
-        // Use plain String logging for broader JDK compatibility
-        LOGGER.info("Card updated in cache: " + cardId + " in set " + setId);
+        // If we are currently managing the same set, request a refresh of the manage screen
+        if (setId != null && setId.equals(this.managingSetId)) {
+            this.refreshRequested = true;
+            LOGGER.info(() -> "Update requested for card " + cardId + " in managed set " + setId);
+            return;
+        }
+
+        // Otherwise, simply log (or set save button visible) - minimal CLI behavior
+        LOGGER.info(() -> "Card updated in cache (not currently managed): " + cardId + " in set " + setId);
     }
 
     @Override
@@ -139,7 +148,7 @@ public class CliCollectionView implements ICollectionView {
 
                 System.out.printf("   [%d] %s - %d carte possedute, \u001B[31m%d mancanti\u001B[0m%n",
                         index++, binder.getSetName(), ownedCards, missingCards);
-            } catch (Exception unused) {
+            } catch (Exception _) {
                 // Fallback se non si riesce a caricare il totale
                 System.out.printf("   [%d] %s - %d carte possedute%n",
                         index++, binder.getSetName(), binder.getCardCount());
@@ -211,61 +220,76 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException unused) {
+        } catch (NumberFormatException _) {
             showError(INVALID_NUMBER);
         }
     }
 
     private void manageSet(String setId, Binder binder) {
-        while (true) {
-            clearScreen();
-            System.out.println(SEPARATOR);
-            System.out.println("   📦  SET: " + binder.getSetName());
-            System.out.println(SEPARATOR);
+        // Mark which set we're managing so updateCardInSet can trigger a refresh
+        this.managingSetId = setId;
+        try {
+            while (true) {
+                clearScreen();
+                System.out.println(SEPARATOR);
+                System.out.println("   📦  SET: " + binder.getSetName());
+                System.out.println(SEPARATOR);
 
-            try {
-                List<Card> allCards = localSetCards.getOrDefault(setId, java.util.Collections.emptyList());
-                Map<String, CardBean> ownedCardsMap = new java.util.HashMap<>();
-                for (CardBean card : binder.getCards()) {
-                    ownedCardsMap.put(card.getId(), card);
-                }
+                try {
+                    List<Card> allCards = localSetCards.getOrDefault(setId, java.util.Collections.emptyList());
+                    Map<String, CardBean> ownedCardsMap = new java.util.HashMap<>();
+                    for (CardBean card : binder.getCards()) {
+                        ownedCardsMap.put(card.getId(), card);
+                    }
 
-                showSetStatistics(binder, allCards.size());
-                showCardsInSet(allCards, ownedCardsMap);
+                    showSetStatistics(binder, allCards.size());
+                    showCardsInSet(allCards, ownedCardsMap);
 
-                System.out.println(THIN_SEPARATOR);
-                System.out.println("OPZIONI:");
-                System.out.println("  1) Aggiungi Carta");
-                System.out.println("  2) Rimuovi Carta");
-                System.out.println("  3) Gestisci Carta (quantità/scambiabile)");
-                System.out.println("  4) Elimina Set");
-                System.out.println("  0) Torna Indietro");
-                System.out.print(CHOICE_PROMPT);
+                    System.out.println(THIN_SEPARATOR);
+                    System.out.println("OPZIONI:");
+                    System.out.println("  1) Aggiungi Carta");
+                    System.out.println("  2) Rimuovi Carta");
+                    System.out.println("  3) Gestisci Carta (quantità/scambiabile)");
+                    System.out.println("  4) Elimina Set");
+                    System.out.println("  0) Torna Indietro");
+                    System.out.print(CHOICE_PROMPT);
 
-                String choice = inputManager.readString().trim();
+                    String choice = inputManager.readString().trim();
 
-                switch (choice) {
-                    case "1" -> addCardToSet(setId, allCards, ownedCardsMap);
-                    case "2" -> removeCardFromSet(setId, allCards);
-                    case "3" -> manageCardDetails(setId, allCards, ownedCardsMap);
-                    case "4" -> {
-                        if (confirmDeleteSet(binder.getSetName())) {
-                            if (controller != null) {
-                                controller.deleteBinder(setId);
+                    switch (choice) {
+                        case "1" -> addCardToSet(setId, allCards, ownedCardsMap);
+                        case "2" -> removeCardFromSet(setId, allCards);
+                        case "3" -> manageCardDetails(setId, allCards, ownedCardsMap);
+                        case "4" -> {
+                            if (confirmDeleteSet(binder.getSetName())) {
+                                if (controller != null) {
+                                    controller.deleteBinder(setId);
+                                }
+                                return;
                             }
+                        }
+                        case "0" -> {
+                            displayCollection(currentBinders, localSetCards);
                             return;
                         }
+                        default -> System.out.println(INVALID_CHOICE);
                     }
-                    case "0" -> {
-                        displayCollection(currentBinders, localSetCards);
-                        return;
+
+                    // If controller requested a refresh, restart the loop to reflect latest state
+                    if (this.refreshRequested) {
+                        this.refreshRequested = false;
+                        continue;
                     }
-                    default -> System.out.println(INVALID_CHOICE);
+
+                } catch (Exception e) {
+                    showError("Errore nel caricamento delle carte del set.");
+                    return;
                 }
-            } catch (Exception e) {
-                showError("Errore nel caricamento delle carte del set.");
-                return;
             }
+        } finally {
+            // Clear managing state when leaving the manage screen
+            this.managingSetId = null;
+            this.refreshRequested = false;
         }
     }
 

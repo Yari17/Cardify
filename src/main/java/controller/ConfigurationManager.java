@@ -1,6 +1,6 @@
 package controller;
 
-import view.InputManager;
+import config.InputManager;
 import view.configuration.CliConfigurationView;
 import view.configuration.IConfigurationView;
 

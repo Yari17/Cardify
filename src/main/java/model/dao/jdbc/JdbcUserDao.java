@@ -8,6 +8,7 @@ import exception.UserAlreadyExistsException;
 import exception.UserNotFoundException;
 
 import java.sql.*;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -19,6 +20,7 @@ public class JdbcUserDao implements IUserDao {
     private static final String COLUMN_USER_TYPE = "user_type";
     private static final String COLUMN_RELIABILITY = "reliability_score";
     private static final String COLUMN_REVIEW_COUNT = "review_count";
+    private static final String SELECT = "SELECT";
 
     // Static caches to persist data until application stops
     private static final java.util.Map<String, User> userCache = new java.util.concurrent.ConcurrentHashMap<>();
@@ -65,7 +67,7 @@ public class JdbcUserDao implements IUserDao {
             return Optional.of(userCache.get(name));
         }
 
-        String sql = "SELECT " + COLUMN_USERNAME + ", " + COLUMN_RELIABILITY + ", " + COLUMN_REVIEW_COUNT + ", "
+        String sql = SELECT + COLUMN_USERNAME + ", " + COLUMN_RELIABILITY + ", " + COLUMN_REVIEW_COUNT + ", "
                 + COLUMN_USER_TYPE + " FROM users WHERE " + COLUMN_USERNAME + " = ?";
 
         try (Connection conn = getConnection();
@@ -96,7 +98,7 @@ public class JdbcUserDao implements IUserDao {
             return password.equals(credentialCache.get(username));
         }
 
-        String sql = "SELECT " + COLUMN_PASSWORD + " FROM users WHERE " + COLUMN_USERNAME + " = ?";
+        String sql = SELECT + COLUMN_PASSWORD + " FROM users WHERE " + COLUMN_USERNAME + " = ?";
 
         try (Connection conn = getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -150,6 +152,36 @@ public class JdbcUserDao implements IUserDao {
         }
     }
 
+    @Override
+    public List<String> findAllUsernames() {
+        // Try cache first
+        if (allLoaded && !userCache.isEmpty()) {
+            return new java.util.ArrayList<>(userCache.keySet());
+        }
+
+        String sql = SELECT + COLUMN_USERNAME + " FROM users";
+        List<String> result = new java.util.ArrayList<>();
+        try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                String username = rs.getString(COLUMN_USERNAME);
+                result.add(username);
+            }
+            // Optionally populate cache by fetching full records
+            for (String uname : result) {
+                if (!userCache.containsKey(uname)) {
+                    findByName(uname).ifPresent(u -> userCache.put(uname, u));
+                }
+            }
+            allLoaded = true;
+            return result;
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Failed to load usernames from DB", e);
+            // Fallback to cache keys
+            return new java.util.ArrayList<>(userCache.keySet());
+        }
+    }
+
     // ========== Implementazione metodi IDao<User> ==========
 
     @Override
@@ -190,43 +222,6 @@ public class JdbcUserDao implements IUserDao {
         }
 
         return Optional.empty();
-    }
-
-    @Override
-    public java.util.List<User> getAll() {
-        if (allLoaded) {
-            return new java.util.ArrayList<>(userCache.values());
-        }
-
-        java.util.List<User> users = new java.util.ArrayList<>();
-        String sql = "SELECT " + COLUMN_USERNAME + ", " + COLUMN_PASSWORD + ", " + COLUMN_RELIABILITY + ", "
-                + COLUMN_REVIEW_COUNT + ", "
-                + COLUMN_USER_TYPE + " FROM users";
-
-        try (Connection conn = getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                String username = rs.getString(COLUMN_USERNAME);
-                String password = rs.getString(COLUMN_PASSWORD);
-
-                User user = new User(
-                        username,
-                        rs.getInt(COLUMN_RELIABILITY),
-                        rs.getInt(COLUMN_REVIEW_COUNT));
-                user.setUserType(rs.getString(COLUMN_USER_TYPE));
-                users.add(user);
-
-                userCache.put(username, user);
-                credentialCache.put(username, password);
-            }
-            allLoaded = true;
-        } catch (SQLException e) {
-            throw new DataPersistenceException("Failed to get all users", e);
-        }
-
-        return users;
     }
 
     @Override

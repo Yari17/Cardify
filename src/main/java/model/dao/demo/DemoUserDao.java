@@ -32,10 +32,6 @@ public class DemoUserDao implements IUserDao {
                 .findFirst();
     }
 
-    @Override
-    public List<User> getAll() {
-        return new ArrayList<>(users.values());
-    }
 
     @Override
     public void save(User user) {
@@ -102,5 +98,10 @@ public class DemoUserDao implements IUserDao {
         users.put(username, user);
         credentials.put(username, password);
         LOGGER.log(java.util.logging.Level.INFO, "User registered: {0}", username);
+    }
+
+    @Override
+    public java.util.List<String> findAllUsernames() {
+        return new java.util.ArrayList<>(users.keySet());
     }
 }

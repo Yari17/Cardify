@@ -5,6 +5,10 @@ import model.dao.IBinderDao;
 import model.dao.IUserDao;
 import model.dao.json.JsonBinderDao;
 import model.dao.json.JsonUserDao;
+import model.dao.json.JsonProposalDao;
+import model.dao.json.JsonTradeDao;
+
+import java.io.File;
 
 /**
  * Concrete Factory per la creazione di DAO basati su file JSON.
@@ -38,6 +42,17 @@ public class JsonDaoFactory extends DaoFactory {
     @Override
     public IBinderDao createBinderDao() {
         return new JsonBinderDao(DatabaseConfig.BINDERS_JSON_PATH);
+    }
+
+    @Override
+    public model.dao.IProposalDao createProposalDao() {
+        return new JsonProposalDao(DatabaseConfig.JSON_DIR + File.separator + "proposals.json");
+    }
+
+    @Override
+    public model.dao.ITradeDao createTradeDao() {
+        // Use no-arg constructor (which defaults to the standard trades.json path)
+        return new JsonTradeDao();
     }
 
     // cards persistence removed: no CardDao provided by JSON factory anymore

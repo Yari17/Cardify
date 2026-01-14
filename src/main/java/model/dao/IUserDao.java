@@ -11,4 +11,6 @@ public interface IUserDao extends IDao<User> {
     Optional<User> authenticateAndGetUser(String username, String password);
 
     void register(String username, String password, String userType);
+
+    java.util.List<String> findAllUsernames();
 }

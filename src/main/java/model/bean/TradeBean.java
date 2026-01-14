@@ -6,10 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Bean class for transferring trade transaction data between layers.
- * Follows Pure Fabrication principle - exists for technical reasons, not domain modeling.
- */
+
 public class TradeBean {
     private String tradeId;
     private String storeId;
