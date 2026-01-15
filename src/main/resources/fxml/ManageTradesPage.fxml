@@ -8,7 +8,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="view.trade.FXTradeView"
+            fx:controller="view.managetrade.FXManageTradeView"
             prefHeight="800.0" prefWidth="1400.0"
             stylesheets="@../styles/theme.css, @../styles/navbar.css"
             styleClass="bg-main">
@@ -50,6 +50,22 @@
                 <Label text="Collection" styleClass="nav-label"/>
             </VBox>
 
+            <!-- Live Trade Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="liveTradeButton" onAction="#onLiveTradeClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/trading-card.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Trade" styleClass="nav-label"/>
+            </VBox>
+
             <!-- Trade Button (disabled when on trade page) -->
             <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container">
                 <Button fx:id="tradeButton" styleClass="button-transparent" disable="true">
@@ -61,7 +77,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Trade" styleClass="nav-label-disabled"/>
+                <Label text="Manage Trades" styleClass="nav-label-disabled" style="-fx-text-fill: #9CA3AF;"/>
             </VBox>
 
             <!-- Logout Button -->
@@ -105,25 +121,16 @@
 
     <!-- Center Content -->
     <center>
-        <SplitPane dividerPositions="0.5" styleClass="bg-main">
-            <!-- Left Side: Pending Trades -->
-            <VBox spacing="10" styleClass="bg-main">
-                <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
-                </padding>
-                <Label text="Scambi In Attesa" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                <ListView fx:id="pendingTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
-            </VBox>
+        <VBox spacing="10" styleClass="bg-main">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Label text="Proposte di scambio in attesa" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <ListView fx:id="pendingTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
 
-            <!-- Right Side: Scheduled Trades -->
-            <VBox spacing="10" styleClass="bg-main">
-                <padding>
-                    <Insets top="20" right="20" bottom="20" left="20"/>
-                </padding>
-                <Label text="Scambi Programmati" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-                <ListView fx:id="scheduledTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
-            </VBox>
-        </SplitPane>
+            <Label text="Proposte concluse" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #E5E7EB; -fx-padding: 10 0 0 0;"/>
+            <ListView fx:id="concludedTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
+        </VBox>
     </center>
 
 </BorderPane>

@@ -1,8 +1,13 @@
 package controller;
 
-import model.bean.TradeBean;
-import view.trade.ITradeView;
+import model.bean.CardBean;
+import model.bean.ProposalBean;
+import model.domain.Card;
+import model.domain.Proposal;
+import model.domain.enumerations.ProposalStatus;
+import view.managetrade.IManageTradeView;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -14,76 +19,162 @@ public class ManageTradeController {
 
     private final String username;
     private final model.dao.IProposalDao proposalDao;
+    private final ApplicationController navigationController;
+    private IManageTradeView view;
 
     public ManageTradeController(String username, ApplicationController navigationController) {
         this.username = username;
         // Only keep the dao reference we need for proposal operations
         this.proposalDao = navigationController != null ? navigationController.getDaoFactory().createProposalDao() : null;
+        this.navigationController = navigationController;
     }
 
     /**
-     * Load trades for the current user, classify them and dispatch to the view for rendering.
+     * Load proposals for the current user, classify them and dispatch to the view for rendering.
      */
-    public void loadAndDisplayTrades(ITradeView view) {
+    public void loadAndDisplayTrades(IManageTradeView view) {
         if (view == null) return;
 
-        List<TradeBean> pending = new ArrayList<>();
-        List<TradeBean> scheduled = new ArrayList<>();
+        List<ProposalBean> pending = new ArrayList<>();
+        List<ProposalBean> concluded = new ArrayList<>();
 
         try {
             // Fetch proposals where user is involved
-            List<model.domain.Proposal> sentPending = proposalDao != null ? proposalDao.getSentPendingProposal(username) : List.of();
-            List<model.domain.Proposal> received = proposalDao != null ? proposalDao.getReceivedProposals(username) : List.of();
-            List<model.domain.Proposal> scheduledProps = proposalDao != null ? proposalDao.getScheduledProposals(username) : List.of();
+            List<Proposal> sentPending = proposalDao != null ? proposalDao.getSentPendingProposal(username) : List.of();
+            List<Proposal> received = proposalDao != null ? proposalDao.getReceivedProposals(username) : List.of();
+            List<Proposal> scheduledProps = proposalDao != null ? proposalDao.getScheduledProposals(username) : List.of();
 
-            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            LocalDateTime now = LocalDateTime.now();
 
-            // Combine sent and received pending proposals
-            List<model.domain.Proposal> combinedPending = new ArrayList<>();
-            combinedPending.addAll(sentPending);
-            combinedPending.addAll(received);
+            // Combine sent and received proposals
+            List<model.domain.Proposal> combined = new ArrayList<>();
+            combined.addAll(sentPending);
+            combined.addAll(received);
 
-            processPendingProposals(combinedPending, pending, now);
-
-            // Scheduled proposals -> scheduled list
-            for (model.domain.Proposal p : scheduledProps) {
+            // Process combined proposals: separate pending vs concluded (rejected/expired)
+            for (Proposal p : combined) {
                 if (p == null) continue;
-                scheduled.add(mapProposalToTradeBean(p));
+                try {
+                    boolean expired = isExpired(p, now);
+                    if (expired) {
+                        p.setStatus(ProposalStatus.EXPIRED);
+                        persistProposalStatusChange(p);
+                    }
+
+                    if (p.getStatus() == ProposalStatus.PENDING) {
+                        pending.add(toBean(p));
+                    } else if (p.getStatus() == ProposalStatus.REJECTED || p.getStatus() == ProposalStatus.EXPIRED) {
+                        concluded.add(toBean(p));
+                    }
+                    // ACCEPTED proposals are handled as scheduled trades and shown elsewhere
+                } catch (Exception ex) {
+                    LOGGER.log(Level.WARNING, "Failed processing proposal {0}: {1}", new Object[]{p.getProposalId(), ex.getMessage()});
+                }
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error loading user trade transactions: {0}", e.getMessage());
             LOGGER.log(Level.FINE, "Stacktrace", e);
         }
 
-        view.displayTrades(pending, scheduled);
+        // Wire controller and display pending + concluded
+        view.setManageController(this);
+        view.displayTrades(pending, concluded);
     }
 
-    private void processPendingProposals(List<model.domain.Proposal> proposals, List<TradeBean> outPending, java.time.LocalDateTime now) {
-        if (proposals == null || proposals.isEmpty()) return;
-        for (model.domain.Proposal p : proposals) {
-            if (p == null) continue;
-            try {
-                boolean expired = isExpired(p, now);
-                if (expired) {
-                    p.setStatus(model.domain.enumerations.ProposalStatus.EXPIRED);
-                    persistProposalStatusChange(p);
+    // Accept a proposal (mark as ACCEPTED and persist)
+    public boolean acceptProposal(String proposalId) {
+        return updateProposalStatus(proposalId, ProposalStatus.ACCEPTED);
+    }
+
+    // Decline a proposal (mark as REJECTED and persist)
+    public boolean declineProposal(String proposalId) {
+        return updateProposalStatus(proposalId, ProposalStatus.REJECTED);
+    }
+
+    // Helper to set a proposal status and persist (used by accept/decline)
+    private boolean updateProposalStatus(String proposalId, ProposalStatus newStatus) {
+        if (proposalDao == null || proposalId == null || newStatus == null) return false;
+        try {
+            var opt = proposalDao.getById(proposalId);
+            if (opt.isEmpty()) return false;
+            Proposal p = opt.get();
+            p.setStatus(newStatus);
+            proposalDao.update(p);
+
+            // If the proposal became ACCEPTED, create and persist a TradeTransaction
+            if (newStatus == ProposalStatus.ACCEPTED) {
+                try {
+                    model.dao.ITradeDao tradeDao = navigationController != null ? navigationController.getDaoFactory().createTradeDao() : null;
+                    if (tradeDao != null) {
+                        model.domain.TradeTransaction tx = mapProposalToTradeTransaction(p);
+                        tradeDao.save(tx);
+                        LOGGER.log(Level.INFO, "Created trade transaction {0} for proposal {1}", new Object[]{tx.getTransactionId(), proposalId});
+                    }
+                } catch (Exception ex) {
+                    LOGGER.log(Level.WARNING, "Failed to persist TradeTransaction for proposal {0}: {1}", new Object[]{proposalId, ex.getMessage()});
                 }
-                if (p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING
-                        || p.getStatus() == model.domain.enumerations.ProposalStatus.EXPIRED) {
-                    outPending.add(mapProposalToTradeBean(p));
-                }
-            } catch (Exception ex) {
-                LOGGER.log(Level.WARNING, "Failed processing proposal {0}: {1}", new Object[]{p != null ? p.getProposalId() : "<null>", ex.getMessage()});
             }
+
+            LOGGER.log(Level.INFO, "Proposal {0}: {1}", new Object[]{newStatus.name().toLowerCase(), proposalId});
+            return true;
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to update proposal {0} to {1}: {2}", new Object[]{proposalId, newStatus, e.getMessage()});
+            return false;
         }
     }
 
-    private boolean isExpired(model.domain.Proposal p, java.time.LocalDateTime now) {
+    // Map a domain.Proposal to a domain.TradeTransaction
+    private model.domain.TradeTransaction mapProposalToTradeTransaction(Proposal p) {
+        if (p == null) return null;
+        int txId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+        java.time.LocalDateTime creation = java.time.LocalDateTime.now();
+        java.time.LocalDateTime tradeDate = creation;
+        try {
+            if (p.getMeetingDate() != null && !p.getMeetingDate().isEmpty()) {
+                tradeDate = java.time.LocalDate.parse(p.getMeetingDate()).atStartOfDay();
+            }
+        } catch (Exception e) {
+            LOGGER.fine(() -> "Could not parse meeting date for proposal " + p.getProposalId() + ": " + e.getMessage());
+        }
+
+        List<model.domain.Card> offered = new ArrayList<>();
+        if (p.getCardsOffered() != null) offered.addAll(p.getCardsOffered());
+        List<model.domain.Card> requested = new ArrayList<>();
+        if (p.getCardsRequested() != null) requested.addAll(p.getCardsRequested());
+
+        model.domain.TradeTransaction tx = new model.domain.TradeTransaction(txId,
+                model.domain.enumerations.TradeStatus.WAITING_FOR_ARRIVAL,
+                p.getProposerId(), p.getReceiverId(), p.getMeetingPlace(), creation, tradeDate, offered, requested);
+
+        return tx;
+    }
+
+    // Return proposal domain object for detailed view
+    public model.domain.Proposal getProposalById(String proposalId) {
+        if (proposalDao == null || proposalId == null) return null;
+        return proposalDao.getById(proposalId).orElse(null);
+    }
+
+    // Initiate the live trade (called when parties are meeting at store on meeting day)
+    public boolean initiateTrade(String proposalId) {
+        if (navigationController == null || proposalId == null) return false;
+        try {
+            // Delegate to ApplicationController's navigation to trade so LiveTradeController handles the use-case
+            navigationController.navigateToTrade(username, proposalId);
+            return true;
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to start trade flow for {0}: {1}", new Object[]{proposalId, e.getMessage()});
+            return false;
+        }
+    }
+
+
+    private boolean isExpired(Proposal p, LocalDateTime now) {
         if (p == null || p.getLastUpdated() == null) return false;
         return p.getLastUpdated().plusDays(1).isBefore(now);
     }
 
-    private void persistProposalStatusChange(model.domain.Proposal p) {
+    private void persistProposalStatusChange(Proposal p) {
         if (p == null) return;
         if (proposalDao == null) return;
         try {
@@ -93,55 +184,82 @@ public class ManageTradeController {
         }
     }
 
-    private TradeBean mapProposalToTradeBean(model.domain.Proposal p) {
-        TradeBean tb = new TradeBean();
-        tb.setTradeId(p.getProposalId());
-        tb.setStoreId(p.getMeetingPlace());
-        tb.setStatus(null); // TradeBean has different status semantics; leave null or reuse
-        tb.setCreatedAt(p.getLastUpdated() != null ? p.getLastUpdated().atZone(java.time.ZoneId.systemDefault()).toInstant() : java.time.Instant.now());
-        tb.setUpdatedAt(java.time.Instant.now());
+    private ProposalBean toBean(Proposal p) {
+        ProposalBean b = new ProposalBean();
+        b.setProposalId(p.getProposalId());
+        b.setFromUser(p.getProposerId());
+        b.setToUser(p.getReceiverId());
+        b.setMeetingPlace(p.getMeetingPlace());
+        b.setMeetingDate(p.getMeetingDate());
+        b.setStatus(p.getStatus() != null ? p.getStatus().name() : null);
+        b.setLastUpdated(p.getLastUpdated());
+        b.setOffered(mapCardsToBeans(p.getCardsOffered()));
+        b.setRequested(mapCardsToBeans(p.getCardsRequested()));
+        return b;
+    }
 
-        // proposer participant
-        TradeBean.ParticipantBean proposer = new TradeBean.ParticipantBean();
-        proposer.setUserId(p.getProposerId());
-        proposer.setRole("proposer");
-        if (p.getCardsOffered() != null) {
-            List<TradeBean.ItemBean> items = new ArrayList<>();
-            for (model.domain.Card c : p.getCardsOffered()) {
-                TradeBean.ItemBean ib = new TradeBean.ItemBean();
-                ib.setId(c.getId());
-                ib.setName(c.getName());
-                ib.setGameType(c.getGameType() != null ? c.getGameType().name() : null);
-                ib.setQuantity(c.getQuantity());
-                ib.setTradable(true);
-                items.add(ib);
-            }
-            proposer.setItems(items);
+    // Convert a list of domain.Card to a list of CardBean safely
+    private List<CardBean> mapCardsToBeans(List<Card> cards) {
+        List<CardBean> result = new ArrayList<>();
+        if (cards == null || cards.isEmpty()) return result;
+        for (Card c : cards) {
+            if (c == null) continue;
+            result.add(cardToBean(c));
         }
+        return result;
+    }
 
-        // receiver participant
-        TradeBean.ParticipantBean receiver = new TradeBean.ParticipantBean();
-        receiver.setUserId(p.getReceiverId());
-        receiver.setRole("receiver");
-        if (p.getCardsRequested() != null) {
-            List<TradeBean.ItemBean> items = new ArrayList<>();
-            for (model.domain.Card c : p.getCardsRequested()) {
-                TradeBean.ItemBean ib = new TradeBean.ItemBean();
-                ib.setId(c.getId());
-                ib.setName(c.getName());
-                ib.setGameType(c.getGameType() != null ? c.getGameType().name() : null);
-                ib.setQuantity(c.getQuantity());
-                ib.setTradable(true);
-                items.add(ib);
-            }
-            receiver.setItems(items);
+    // Convert single domain.Card to CardBean
+    private CardBean cardToBean(Card c) {
+        CardBean cb = new CardBean();
+        cb.setId(c.getId());
+        cb.setName(c.getName());
+        cb.setImageUrl(c.getImageUrl());
+        cb.setGameType(c.getGameType() != null ? c.getGameType().name() : null);
+        cb.setQuantity(c.getQuantity());
+        return cb;
+    }
+
+    public void setView(IManageTradeView view) {
+        this.view = view;
+        if (this.view != null) {
+            this.view.setManageController(this);
+            this.view.setUsername(this.username);
         }
+    }
 
-        List<TradeBean.ParticipantBean> parts = new ArrayList<>();
-        parts.add(proposer);
-        parts.add(receiver);
-        tb.setParticipants(parts);
+    public void navigateToHome() {
+        LOGGER.info(() -> "Navigating to home page for user: " + username);
+        if (view != null) {
+            view.close();
+        }
+        navigationController
+                .navigateToCollectorHomePage(new model.bean.UserBean(username, config.AppConfig.USER_TYPE_COLLECTOR));
+    }
 
-        return tb;
+    public void navigateToCollection() {
+        LOGGER.log(java.util.logging.Level.INFO, "Navigating to collection page for user: {0}", username);
+        if (view != null) {
+            view.close();
+        }
+        navigationController.navigateToCollection(username);
+    }
+    public void onLogoutRequested() {
+        LOGGER.info(() -> "User " + username + " logging out");
+        if (view != null) {
+            view.close();
+        }
+        navigationController.logout();
+    }
+
+    public void navigateToLiveTrades() {
+        LOGGER.log(java.util.logging.Level.INFO, "Navigating to Live Trades for user: {0}", username);
+        if (view != null) view.close();
+        try {
+            navigationController.navigateToLiveTrades(username);
+        } catch (exception.NavigationException e) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Failed to navigate to Live Trades: {0}", e.getMessage());
+            if (view != null) view.showError("Impossibile aprire la sezione Trade");
+        }
     }
 }

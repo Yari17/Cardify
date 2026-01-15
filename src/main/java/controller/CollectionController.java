@@ -393,7 +393,14 @@ public class CollectionController {
         if (view != null) {
             view.close();
         }
-        navigationController.navigateToTrade(username);
+        try {
+            navigationController.navigateToLiveTrades(username);
+        } catch (exception.NavigationException e) {
+            LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + e.getMessage());
+            if (view != null) {
+                view.showError("Impossibile aprire la sezione Manage Trades");
+            }
+        }
     }
 
     public void onLogoutRequested() {

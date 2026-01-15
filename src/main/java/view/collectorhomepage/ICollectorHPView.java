@@ -9,11 +9,6 @@ import java.util.Map;
 
 public interface ICollectorHPView extends IView {
 
-    enum SearchType {
-        BY_NAME,
-        BY_SET
-    }
-
     void setController(CollectorHPController controller);
 
     void showWelcomeMessage(String username);
@@ -23,5 +18,9 @@ public interface ICollectorHPView extends IView {
     void displayCards(List<CardBean> cards);
 
     void displayAvailableSets(Map<String, String> setsMap);
+
+    // Generic UI feedback methods (errors/success) to keep controllers decoupled from implementation
+    void showSuccess(String message);
+    void showError(String message);
 
 }

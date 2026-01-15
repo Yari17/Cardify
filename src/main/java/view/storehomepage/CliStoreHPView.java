@@ -72,6 +72,11 @@ public class CliStoreHPView implements IStoreHPView {
     }
 
     @Override
+    public void showError(String errorMessage) {
+
+    }
+
+    @Override
     public void showWelcomeMessage(String username) {
         System.out.println("\n╔════════════════════════════════════╗");
         System.out.println("║   Benvenuto STORE " + username + "!      ║");

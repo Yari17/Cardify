@@ -17,8 +17,12 @@ import model.bean.ProposalBean;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 public class FXNegotiationView implements INegotiationView {
+    // Simple logger for view-level diagnostics
+    private static final Logger LOGGER = Logger.getLogger(FXNegotiationView.class.getName());
+
     @FXML
     private ListView<CardBean> requestedList;
     @FXML
@@ -94,7 +98,14 @@ public class FXNegotiationView implements INegotiationView {
     @Override
     public void showRequested(List<CardBean> requested) {
         requestedList.getItems().clear();
-        if (requested != null) requestedList.getItems().addAll(requested);
+        if (requested != null) {
+            for (CardBean cb : requested) {
+                CardBean copy = new CardBean(cb);
+                // The requested card in a proposal must be exactly one unit
+                copy.setQuantity(1);
+                requestedList.getItems().add(copy);
+            }
+        }
     }
 
     @Override
@@ -149,6 +160,11 @@ public class FXNegotiationView implements INegotiationView {
     @Override
     public void close() {
         if (stage != null) stage.close();
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+
     }
 
     @Override
@@ -250,8 +266,16 @@ public class FXNegotiationView implements INegotiationView {
         }
 
         ProposalBean bean = new ProposalBean();
+        // build offered as-is (may contain quantities >1)
         bean.setOffered(new ArrayList<>(proposedList.getItems()));
-        bean.setRequested(new ArrayList<>(requestedList.getItems()));
+        // ensure each requested card is exactly one unit when sending proposal
+        List<CardBean> requestedCopies = new ArrayList<>();
+        for (CardBean cb : requestedList.getItems()) {
+            CardBean copy = new CardBean(cb);
+            copy.setQuantity(1);
+            requestedCopies.add(copy);
+        }
+        bean.setRequested(requestedCopies);
         bean.setFromUser(controller != null ? controller.getProposerUsername() : null);
         bean.setToUser(controller != null ? controller.getTargetOwnerUsername() : null);
         bean.setMeetingPlace(meetingPlace);
@@ -289,12 +313,20 @@ public class FXNegotiationView implements INegotiationView {
                     if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
                         Image img = new Image(item.getImageUrl(), 40, 60, true, true, true);
                         if (!img.isError()) thumb.setImage(img);
-                        else thumb.setImage(new Image(getClass().getResourceAsStream("/icons/nocardimage.svg")));
+                        else {
+                            java.io.InputStream is = getClass().getResourceAsStream("/icons/nocardimage.svg");
+                            if (is != null) thumb.setImage(new Image(is));
+                        }
                     } else {
-                        thumb.setImage(new Image(getClass().getResourceAsStream("/icons/nocardimage.svg")));
+                        java.io.InputStream is = getClass().getResourceAsStream("/icons/nocardimage.svg");
+                        if (is != null) thumb.setImage(new Image(is));
                     }
                 } catch (Exception ex) {
-                    try { thumb.setImage(new Image(getClass().getResourceAsStream("/icons/nocardimage.svg"))); } catch (Exception ignored) {}
+                    LOGGER.fine(() -> "Failed to load thumbnail for negotiation cell: " + ex.getMessage());
+                    java.io.InputStream is = getClass().getResourceAsStream("/icons/nocardimage.svg");
+                    if (is != null) {
+                        try { thumb.setImage(new Image(is)); } catch (Exception e) { LOGGER.fine(() -> "Fallback image failed: " + e.getMessage()); }
+                    }
                 }
 
                 name.setText(item.getName() != null ? item.getName() : item.getId());

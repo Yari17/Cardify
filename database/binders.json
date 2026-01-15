@@ -323,10 +323,64 @@
         "quantity": 2,
         "isTradable": true,
         "status": ""
+      },
+      {
+        "id": "swsh10.5-008",
+        "name": "Charmander",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/008/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "swsh10.5-011",
+        "name": "Radiant Charizard",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/011/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "swsh10.5-049",
+        "name": "Dragonite V",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/049/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "swsh10.5-072",
+        "name": "Mewtwo V",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/072/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "swsh10.5-080",
+        "name": "Melmetal VMAX",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/080/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "swsh10.5-079",
+        "name": "Mewtwo VSTAR",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/079/high.png",
+        "gameType": "POKEMON",
+        "quantity": 12,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-14T11:58:00.051488",
-    "lastModified": "2026-01-14T12:00:09.167919"
+    "lastModified": "2026-01-15T19:46:09.850337"
   },
   {
     "id": 16,
@@ -351,9 +405,147 @@
         "quantity": 3,
         "isTradable": true,
         "status": ""
+      },
+      {
+        "id": "base5-5",
+        "name": "Dark Dragonite",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/5/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-14T14:37:39.995239",
-    "lastModified": "2026-01-14T14:37:59.385682"
+    "lastModified": "2026-01-14T18:45:11.488861"
+  },
+  {
+    "id": 17,
+    "owner": "user2",
+    "setId": "ecard3",
+    "setName": "Skyridge",
+    "cards": [
+      {
+        "id": "ecard3-13",
+        "name": "Jolteon",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/13/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "ecard3-16",
+        "name": "Machamp",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/16/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "ecard3-10",
+        "name": "Gengar",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/10/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "ecard3-1",
+        "name": "Aerodactyl",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/1/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "ecard3-2",
+        "name": "Alakazam",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/2/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "ecard3-31",
+        "name": "Steelix",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/31/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "ecard3-36",
+        "name": "Electrode",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/36/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-14T18:30:47.597867",
+    "lastModified": "2026-01-15T19:43:21.514299"
+  },
+  {
+    "id": 19,
+    "owner": "user2",
+    "setId": "A2",
+    "setName": "Space-Time Smackdown",
+    "cards": [
+      {
+        "id": "A2-007",
+        "name": "Yanmega ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/007/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "A2-035",
+        "name": "Piplup",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/035/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "A2-047",
+        "name": "Wash Rotom",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 10,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-15T19:43:46.581327",
+    "lastModified": "2026-01-15T19:44:16.914233"
+  },
+  {
+    "id": 20,
+    "owner": "user2",
+    "setId": "ecard2",
+    "setName": "Aquapolis",
+    "cards": [
+      {
+        "id": "ecard2-18",
+        "name": "Jynx",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard2/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-15T19:45:00.297884",
+    "lastModified": "2026-01-15T19:45:14.132401"
   }
 ]

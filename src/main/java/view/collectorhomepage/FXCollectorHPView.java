@@ -763,6 +763,14 @@ public class FXCollectorHPView implements ICollectorHPView {
     }
 
     @FXML
+    private void onManageTradesClicked() {
+        LOGGER.info("Manage Trades button clicked - navigating to manage trades");
+        if (controller != null) {
+            controller.navigateToManageTrade();
+        }
+    }
+
+    @FXML
     private void onExitClicked() {
         if (controller != null) {
             controller.onExitRequested();
@@ -920,5 +928,37 @@ public class FXCollectorHPView implements ICollectorHPView {
         if (event.getSource() instanceof VBox container) {
             container.setStyle(NORMAL_STYLE);
         }
+    }
+
+    @Override
+    public void showSuccess(String message) {
+        javafx.application.Platform.runLater(() -> {
+            Dialog<Void> dlg = new Dialog<>();
+            dlg.setTitle("Success");
+            dlg.initOwner(stage);
+            Label lbl = new Label(message != null ? message : "");
+            lbl.setStyle("-fx-text-fill: #66BB6A; -fx-font-size: 14px;");
+            VBox content = new VBox(lbl);
+            content.setPadding(new javafx.geometry.Insets(12));
+            dlg.getDialogPane().setContent(content);
+            dlg.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.CLOSE);
+            dlg.show();
+        });
+    }
+
+    @Override
+    public void showError(String message) {
+        javafx.application.Platform.runLater(() -> {
+            Dialog<Void> dlg = new Dialog<>();
+            dlg.setTitle("Errore");
+            dlg.initOwner(stage);
+            Label lbl = new Label(message != null ? message : "");
+            lbl.setStyle("-fx-text-fill: #F44336; -fx-font-size: 14px;");
+            VBox content = new VBox(lbl);
+            content.setPadding(new javafx.geometry.Insets(12));
+            dlg.getDialogPane().setContent(content);
+            dlg.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.CLOSE);
+            dlg.show();
+        });
     }
 }

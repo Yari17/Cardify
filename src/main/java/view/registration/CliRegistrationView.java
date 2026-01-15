@@ -65,4 +65,9 @@ public class CliRegistrationView implements IRegistrationView {
     public void close() {
 
     }
+
+    @Override
+    public void showError(String errorMessage) {
+
+    }
 }

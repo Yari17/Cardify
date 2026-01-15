@@ -123,7 +123,12 @@ public class FXRegistrationView implements IRegistrationView {
         }
     }
 
-    
+    @Override
+    public void showError(String errorMessage) {
+
+    }
+
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }

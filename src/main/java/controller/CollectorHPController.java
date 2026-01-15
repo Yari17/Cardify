@@ -273,7 +273,25 @@ public class CollectorHPController {
         if (view != null) {
             view.close();
         }
-        navigationController.navigateToTrade(username);
+        try {
+            navigationController.navigateToLiveTrades(username);
+         } catch (exception.NavigationException e) {
+             LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + e.getMessage());
+             // UI feedback omitted here to keep controller decoupled from specific view capabilities;
+             // the ApplicationController or destination view may show errors as needed.
+         }
+    }
+
+    public void navigateToManageTrade() {
+        LOGGER.log(java.util.logging.Level.INFO, "Navigating to Manage Trades for user: {0}", username);
+        if (view != null) {
+            view.close();
+        }
+        try {
+            navigationController.navigateToManageTrade(username);
+        } catch (exception.NavigationException e) {
+            LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + e.getMessage());
+        }
     }
 
     public void onLogoutRequested() {

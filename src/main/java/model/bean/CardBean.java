@@ -79,9 +79,29 @@ public class CardBean {
         return imageUrl;
     }
 
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
 
     public CardGameType getGameType() {
         return gameType;
+    }
+
+    public void setGameType(CardGameType gameType) {
+        this.gameType = gameType;
+    }
+
+    public void setGameType(String gameTypeName) {
+        if (gameTypeName == null) {
+            this.gameType = null;
+            return;
+        }
+        try {
+            this.gameType = CardGameType.valueOf(gameTypeName);
+        } catch (Exception e) {
+            this.gameType = null;
+        }
     }
 
     public int getQuantity() {

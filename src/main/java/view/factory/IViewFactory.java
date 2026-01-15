@@ -1,18 +1,13 @@
 package view.factory;
 
-import controller.CollectionController;
-import controller.CollectorHPController;
-import controller.LoginController;
-import controller.RegistrationController;
-import controller.StoreHPController;
-import controller.TradeController;
-import controller.NegotiationController;
+import controller.*;
 import view.collection.ICollectionView;
 import view.collectorhomepage.ICollectorHPView;
 import view.login.ILoginView;
+import view.managetrade.IManageTradeView;
 import view.registration.IRegistrationView;
 import view.storehomepage.IStoreHPView;
-import view.trade.ITradeView;
+import view.trade.ILiveTradeView;
 import view.negotiation.INegotiationView;
 
 public interface IViewFactory {
@@ -21,6 +16,9 @@ public interface IViewFactory {
     ICollectorHPView createCollectorHomePageView(CollectorHPController controller);
     IStoreHPView createStoreHomePageView(StoreHPController controller);
     ICollectionView createCollectionView(CollectionController controller);
-    ITradeView createTradeView(TradeController controller);
+    ILiveTradeView createTradeView(LiveTradeController controller);
     INegotiationView createNegotiationView(NegotiationController controller);
+    IManageTradeView createManageTradeView(ManageTradeController controller);
 }
+
+

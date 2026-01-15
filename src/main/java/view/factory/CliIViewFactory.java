@@ -8,12 +8,13 @@ import view.collectorhomepage.CliCollectorHPView;
 import view.collectorhomepage.ICollectorHPView;
 import view.login.CliILoginView;
 import view.login.ILoginView;
+import view.managetrade.IManageTradeView;
 import view.registration.CliRegistrationView;
 import view.registration.IRegistrationView;
 import view.storehomepage.CliStoreHPView;
 import view.storehomepage.IStoreHPView;
-import view.trade.CliTradeView;
-import view.trade.ITradeView;
+import view.trade.CliLiveTradeView;
+import view.trade.ILiveTradeView;
 import view.negotiation.CliNegotiationView;
 import view.negotiation.INegotiationView;
 
@@ -61,8 +62,8 @@ public class CliIViewFactory implements IViewFactory {
     }
 
     @Override
-    public ITradeView createTradeView(TradeController controller) {
-        CliTradeView view = new CliTradeView(inputManager);
+    public ILiveTradeView createTradeView(LiveTradeController controller) {
+        CliLiveTradeView view = new CliLiveTradeView(inputManager);
         view.setController(controller);
         return view;
     }
@@ -72,5 +73,10 @@ public class CliIViewFactory implements IViewFactory {
         CliNegotiationView view = new CliNegotiationView(inputManager);
         view.setController(controller);
         return view;
+    }
+
+    @Override
+    public IManageTradeView createManageTradeView(ManageTradeController controller) {
+        return null;
     }
 }

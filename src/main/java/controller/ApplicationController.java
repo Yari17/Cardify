@@ -3,6 +3,7 @@ package controller;
 import exception.NavigationException;
 import javafx.application.Platform;
 import model.bean.UserBean;
+import model.dao.IBinderDao;
 import model.dao.IUserDao;
 import model.dao.factory.DaoFactory;
 import config.InputManager;
@@ -14,8 +15,11 @@ import view.factory.CliIViewFactory;
 import view.factory.FXViewFactory;
 import view.factory.IViewFactory;
 import view.login.ILoginView;
+import view.managetrade.IManageTradeView;
 import view.registration.IRegistrationView;
 import view.storehomepage.IStoreHPView;
+import view.trade.ILiveTradeView;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.logging.Logger;
@@ -128,7 +132,7 @@ public class ApplicationController {
 
 
     public void navigateToCollection(String username) throws NavigationException {
-        model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
+        IBinderDao binderDao = daoFactory.createBinderDao();
         CollectionController controller = new CollectionController(username, this, binderDao);
         ICollectionView collectionView = viewFactory.createCollectionView(controller);
         controller.setView(collectionView);
@@ -136,11 +140,56 @@ public class ApplicationController {
     }
 
 
-    public void navigateToTrade(String username) throws NavigationException {
-        TradeController controller = new TradeController(username, this);
-        view.trade.ITradeView tradeView = viewFactory.createTradeView(controller);
-        controller.setView(tradeView);
-        displayView(tradeView);
+    /**
+     * Show the Manage Trade UI (list of proposals / scheduled) for the given user.
+     * This is navigation-only: it creates the LiveTradeController and the view, preloads manage data
+     * and presents the view.
+     */
+    public void navigateToManageTrade(String username) throws NavigationException {
+        try {
+            // If already displaying ManageTrades, do nothing
+            if (!viewStack.isEmpty()) {
+                IView top = viewStack.getLast();
+                if (top instanceof view.managetrade.IManageTradeView) {
+                    LOGGER.fine("Already on Manage Trades view; skipping navigation");
+                    return;
+                }
+            }
+            ManageTradeController controller = new ManageTradeController(username, this);
+            IManageTradeView manageView = viewFactory.createManageTradeView(controller);
+            controller.setView(manageView);
+            displayView(manageView);
+        } catch (Exception err) {
+            throw new NavigationException("Failed to navigate to Manage Trades", err);
+        }
+    }
+
+
+    public void navigateToTrade(String username, String proposalId) throws NavigationException {
+        if (username == null || proposalId == null) throw new NavigationException("Invalid parameters for navigateToTrade");
+        try {
+            LiveTradeController controller = new LiveTradeController(username, this);
+            ILiveTradeView tradeView = viewFactory.createTradeView(controller);
+            controller.setView(tradeView);
+            // Present the trade view to the user (ensure navbar and logout are visible)
+            displayView(tradeView);
+        } catch (Exception e) {
+            throw new NavigationException("Failed to navigate to trade transaction", e);
+        }
+    }
+
+
+    public void navigateToLiveTrades(String username) throws NavigationException {
+        try {
+            LiveTradeController controller = new LiveTradeController(username, this);
+            ILiveTradeView tradeView = viewFactory.createTradeView(controller);
+            controller.setView(tradeView);
+            // Ask controller to load scheduled trades and present them in the live trade view
+            controller.loadScheduledTrades();
+            displayView(tradeView);
+        } catch (Exception e) {
+            throw new NavigationException("Failed to navigate to Live Trades", e);
+        }
     }
 
 
@@ -164,8 +213,10 @@ public class ApplicationController {
 
             java.util.List<model.bean.CardBean> requested = new java.util.ArrayList<>();
             if (targetCard != null) {
-                // Show the single requested card (as bean)
-                requested.add(targetCard);
+                // Show the single requested card (as bean) - copy and ensure quantity = 1
+                model.bean.CardBean copy = new model.bean.CardBean(targetCard);
+                copy.setQuantity(1);
+                requested.add(copy);
             }
 
             // Start the negotiation controller with assembled data
@@ -180,9 +231,8 @@ public class ApplicationController {
             // The view implementation (FX or CLI) is responsible for presenting itself correctly.
             negotiationView.display();
             LOGGER.info("Negotiation view presentation requested");
-        } catch (Exception e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, "Failed to present negotiation view: {0}", e.getMessage());
-            throw new NavigationException("Failed to present negotiation view", e);
+        } catch (Exception _) {
+            throw new NavigationException("Failed to present negotiation view");
         }
     }
 
@@ -238,4 +288,5 @@ public class ApplicationController {
             }
         }
     }
+
 }

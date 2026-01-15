@@ -48,11 +48,27 @@
                 <Label text="Collection" styleClass="nav-label"/>
             </VBox>
 
-            <!-- Trade Button -->
+            <!-- Live Trade Button -->
             <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
                   onMouseEntered="#onNavButtonHoverEnter"
                   onMouseExited="#onNavButtonHoverExit">
-                <Button fx:id="tradeButton" onAction="#onTradeClicked" styleClass="button-transparent">
+                <Button fx:id="liveTradeButton" onAction="#onTradeClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/trading-card.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Trade" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Manage Trades Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter"
+                  onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="tradeButton" onAction="#onManageTradesClicked" styleClass="button-transparent">
                     <graphic>
                         <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
                             <image>
@@ -61,7 +77,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Trade" styleClass="nav-label"/>
+                <Label text="Manage Trades" styleClass="nav-label"/>
             </VBox>
 
             <!-- Logout Button -->

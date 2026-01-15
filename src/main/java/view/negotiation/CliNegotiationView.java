@@ -38,7 +38,14 @@ public class CliNegotiationView implements INegotiationView {
 
     @Override
     public void showRequested(List<CardBean> requested) {
-        this.requested = requested != null ? requested : new ArrayList<>();
+        this.requested = new ArrayList<>();
+        if (requested != null) {
+            for (CardBean cb : requested) {
+                CardBean copy = new CardBean(cb);
+                copy.setQuantity(1); // requested card must be one unit
+                this.requested.add(copy);
+            }
+        }
     }
 
     @Override
@@ -167,8 +174,15 @@ public class CliNegotiationView implements INegotiationView {
         }
 
         ProposalBean bean = new ProposalBean();
-        bean.setOffered(proposed);
-        bean.setRequested(requested);
+        bean.setOffered(new ArrayList<>(proposed));
+        // ensure requested copies are quantity 1
+        List<CardBean> requestedCopies = new ArrayList<>();
+        for (CardBean cb : requested) {
+            CardBean copy = new CardBean(cb);
+            copy.setQuantity(1);
+            requestedCopies.add(copy);
+        }
+        bean.setRequested(requestedCopies);
         bean.setFromUser(controller != null ? controller.getProposerUsername() : null);
         bean.setToUser(controller != null ? controller.getTargetOwnerUsername() : null);
         bean.setMeetingPlace(chosenStore);
@@ -178,5 +192,10 @@ public class CliNegotiationView implements INegotiationView {
 
     @Override
     public void close() {
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+
     }
 }

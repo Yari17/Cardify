@@ -87,4 +87,9 @@ public class CliILoginView implements ILoginView {
     public void close() {
         // Intentionally empty for CLI (no resources to free).
     }
+
+    @Override
+    public void showError(String errorMessage) {
+
+    }
 }

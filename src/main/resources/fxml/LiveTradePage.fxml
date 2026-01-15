@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.trade.FXLiveTradeView"
+            prefHeight="800.0" prefWidth="1400.0"
+            stylesheets="@../styles/theme.css, @../styles/navbar.css"
+            styleClass="bg-main">
+
+    <!-- Top Navigation Bar (reuse pattern) -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20" styleClass="nav-bar">
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container">
+                <Button fx:id="homeButton" onAction="#onHomeClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/homepage.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Homepage" styleClass="nav-label"/>
+            </VBox>
+
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container">
+                <Button fx:id="collectionButton" onAction="#onCollectionClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/collection.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Collection" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- New Trade (Live Trades) Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter" onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="liveTradeButton" onAction="#onLiveTradeClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/trading-card.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Trade" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Manage Trades Button -->
+            <VBox alignment="CENTER" spacing="5" styleClass="nav-button-container">
+                <Button fx:id="manageTradesButton" onAction="#onManageTradesClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/trade.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Manage Trades" styleClass="nav-label"/>
+            </VBox>
+
+            <!-- Logout Button -->
+            <VBox fx:id="logoutButtonContainer" alignment="CENTER" spacing="5" styleClass="nav-button-container"
+                  onMouseEntered="#onNavButtonHoverEnter" onMouseExited="#onNavButtonHoverExit">
+                <Button fx:id="logoutButton" onAction="#onLogoutClicked" styleClass="button-transparent">
+                    <graphic>
+                        <ImageView fitWidth="32" fitHeight="32" preserveRatio="true">
+                            <image>
+                                <javafx.scene.image.Image url="@../icons/logout.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Label text="Logout" styleClass="nav-label"/>
+            </VBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <VBox alignment="CENTER" spacing="5">
+                <ImageView fx:id="profileImageView" fitWidth="40" fitHeight="40" preserveRatio="false">
+                    <image>
+                        <javafx.scene.image.Image url="@../icons/collectorpp.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="usernameLabel" text="Username" styleClass="profile-username"/>
+            </VBox>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10" styleClass="bg-main">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Label text="Scambi Programmati" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <ListView fx:id="scheduledTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
+        </VBox>
+    </center>
+
+</BorderPane>

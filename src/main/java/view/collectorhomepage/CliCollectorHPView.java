@@ -211,13 +211,12 @@ public class CliCollectorHPView implements ICollectorHPView {
             if (cardIndex >= 0 && cardIndex < cards.size()) {
                 CardBean selectedCard = cards.get(cardIndex);
                 showCardDetails(selectedCard);
-                return -1; // Stay on page after viewing details
             } else {
                 System.out.println("⚠ Numero carta non valido. Deve essere tra 1 e " + cards.size());
                 System.out.print(PRESS_ENTER_TO_CONTINUE);
                 inputManager.readString();
-                return -1;
             }
+            return -1; // Stay on page after viewing details
         } catch (NumberFormatException _) {
             System.out.println("⚠ Input non valido. Inserisci un numero, N, P o 0");
             System.out.print(PRESS_ENTER_TO_CONTINUE);
@@ -234,7 +233,7 @@ public class CliCollectorHPView implements ICollectorHPView {
         System.out.println("🆔 ID:          " + card.getId());
         System.out.println("🎮 Gioco:       " + card.getGameType());
         System.out
-            .println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
+                .println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
         System.out.println("\n" + SEPARATOR_LINE);
         // If the card is tradable and owned by another user, offer to propose a trade
         boolean canPropose = card.isTradable() && controller != null && !controller.getUsername().equals(card.getOwner());
@@ -244,10 +243,10 @@ public class CliCollectorHPView implements ICollectorHPView {
             String choice = inputManager.readString().trim();
             if ("1".equals(choice)) {
                 // Delegate to controller to open negotiation (ApplicationController will navigate)
-                if (controller != null) {
-                    controller.openNegotiation(card);
-                    return; // navigation will take over
-                }
+
+                controller.openNegotiation(card);
+                // navigation will take over
+
             }
         } else {
             System.out.print("\nPremi INVIO per tornare alla lista...");
@@ -347,7 +346,7 @@ public class CliCollectorHPView implements ICollectorHPView {
     }
 
     private void displaySetsPage(List<Map.Entry<String, String>> setsList, int currentPage, int pageSize,
-            int totalPages) {
+                                 int totalPages) {
         System.out.println(HEADER_TOP_BORDER);
         System.out.println("║                      RICERCA PER SET                              ║");
         System.out.println(HEADER_BOTTOM_BORDER);
@@ -377,7 +376,7 @@ public class CliCollectorHPView implements ICollectorHPView {
     }
 
     private int handleSetNavigationInput(String choice, int currentPage, int totalPages,
-            List<Map.Entry<String, String>> setsList) {
+                                         List<Map.Entry<String, String>> setsList) {
         if ("0".equals(choice)) {
             return -2;
         } else if ("N".equalsIgnoreCase(choice)) {
@@ -402,7 +401,7 @@ public class CliCollectorHPView implements ICollectorHPView {
             System.out.println("⚠ Input non valido. Inserisci un numero o N/P.");
         }
         return -1; // Always stay on page or valid transition handled elsewhere (but here we just
-                   // load and stay)
+        // load and stay)
     }
 
     private void loadSet(Map.Entry<String, String> selectedSet) {
@@ -425,5 +424,15 @@ public class CliCollectorHPView implements ICollectorHPView {
         } else {
             System.out.println("⚠ Nessun set disponibile");
         }
+    }
+
+    @Override
+    public void showSuccess(String message) {
+
+    }
+
+    @Override
+    public void showError(String message) {
+
     }
 }

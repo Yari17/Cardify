@@ -46,6 +46,11 @@ public class FXStoreHPView implements IStoreHPView {
     }
 
     @Override
+    public void showError(String errorMessage) {
+
+    }
+
+    @Override
     public void showWelcomeMessage(String username) {
         if (welcomeLabel != null) {
             welcomeLabel.setText("Benvenuto Store " + username + "!");

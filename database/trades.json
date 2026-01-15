@@ -1,0 +1,33 @@
+[
+  {
+    "transactionId": 1130252604,
+    "tradeStatus": "WAITING_FOR_ARRIVAL",
+    "proposerId": "user1",
+    "receiverId": "user2",
+    "proposerSessionCode": 0,
+    "receiverSessionCode": 0,
+    "storeId": "La Tana del Goblin",
+    "creationTimestamp": "2026-01-15T21:34:54.085007",
+    "tradeDate": "2026-01-16T00:00",
+    "offeredCards": [
+      {
+        "id": "base5-13",
+        "name": "Dark Vileplume",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/13/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "ecard3-2",
+        "name": "Alakazam",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/2/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
+  }
+]

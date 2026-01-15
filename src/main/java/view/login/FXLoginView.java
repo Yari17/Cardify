@@ -121,7 +121,12 @@ public class FXLoginView implements ILoginView {
         }
     }
 
-    
+    @Override
+    public void showError(String errorMessage) {
+
+    }
+
+
     public void setStage(Stage stage) {
         this.stage = stage;
     }

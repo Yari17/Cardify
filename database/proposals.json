@@ -21,8 +21,8 @@
         "quantity": 1
       }
     ],
-    "lastUpdated": "2026-01-14T14:43:58.937110",
-    "status": "PENDING",
+    "lastUpdated": "2026-01-15T15:44:10.721501",
+    "status": "EXPIRED",
     "meetingPlace": "Nexus Comics",
     "meetingDate": "2026-01-15"
   },
@@ -48,9 +48,97 @@
         "quantity": 1
       }
     ],
-    "lastUpdated": "2026-01-14T16:19:38.090520",
-    "status": "PENDING",
+    "lastUpdated": "2026-01-15T16:33:02.267255",
+    "status": "EXPIRED",
     "meetingPlace": "Store1",
     "meetingDate": "2026-01-15"
+  },
+  {
+    "proposalId": "3",
+    "proposerId": "user2",
+    "receiverId": "user1",
+    "cardsOffered": [
+      {
+        "id": "ecard3-10",
+        "name": "Gengar",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/10/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4
+      }
+    ],
+    "lastUpdated": "2026-01-14T19:11:47.810522",
+    "status": "REJECTED",
+    "meetingPlace": "Fumetti \u0026 Co",
+    "meetingDate": "2027-01-15"
+  },
+  {
+    "proposalId": "4",
+    "proposerId": "user2",
+    "receiverId": "user1",
+    "cardsOffered": [
+      {
+        "id": "ecard3-13",
+        "name": "Jolteon",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/13/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      },
+      {
+        "id": "ecard3-1",
+        "name": "Aerodactyl",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/1/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "base5-5",
+        "name": "Dark Dragonite",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/5/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-15T15:44:13.752390",
+    "status": "ACCEPTED",
+    "meetingPlace": "Giochi di Carta",
+    "meetingDate": "2026-01-16"
+  },
+  {
+    "proposalId": "5",
+    "proposerId": "user1",
+    "receiverId": "user2",
+    "cardsOffered": [
+      {
+        "id": "base5-13",
+        "name": "Dark Vileplume",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/13/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "ecard3-2",
+        "name": "Alakazam",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/2/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-15T21:34:54.079806",
+    "status": "ACCEPTED",
+    "meetingPlace": "La Tana del Goblin",
+    "meetingDate": "2026-01-16"
   }
 ]

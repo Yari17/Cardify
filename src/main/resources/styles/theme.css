@@ -271,3 +271,122 @@
     -fx-background-color: #039BE5;
 }
 
+/* ===== LIST VIEW DARK THEME (used in trade manager and other dark lists) ===== */
+.list-view-dark {
+    -fx-background-color: transparent; /* container transparent, cells will define their own background */
+    -fx-control-inner-background: transparent;
+    -fx-padding: 6;
+}
+
+/* Default list cell in dark lists */
+.list-view-dark .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #FFFFFF;    /* ensure text is white on dark backgrounds */
+    -fx-padding: 10 12;
+    -fx-border-color: transparent;
+}
+
+/* Hovered or selected cell */
+.list-view-dark .list-cell:hover,
+.list-view-dark .list-cell:focused,
+.list-view-dark .list-cell:selected {
+    -fx-background-color: rgba(41,182,246,0.12); /* subtle blue highlight */
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Make selected cell more prominent when focused */
+.list-view-dark .list-cell:filled:selected:focused {
+    -fx-background-color: rgba(41,182,246,0.25);
+    -fx-text-fill: #FFFFFF;
+}
+
+/* Small secondary text style inside list cells (if you choose to use labels inside cells) */
+.list-view-dark .cell-secondary {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-size: 11px;
+}
+
+/* Ensure scroll bars on dark lists match theme */
+.list-view-dark .scroll-bar .thumb {
+    -fx-background-color: #29B6F6;
+    -fx-background-radius: 5;
+}
+
+/* Trade list specific styling */
+.list-view-dark .trade-list-cell {
+    -fx-padding: 10 12;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+}
+
+.list-view-dark .trade-list-cell:hover,
+.list-view-dark .trade-list-cell:focused,
+.list-view-dark .trade-list-cell:selected {
+    -fx-background-color: rgba(41,182,246,0.12);
+    -fx-text-fill: #FFFFFF;
+}
+
+.list-view-dark .trade-list-cell .cell-secondary {
+    -fx-text-fill: #9CA3AF;
+}
+
+/* Trade list buttons */
+.list-view-dark .button-accept {
+    -fx-background-color: #2ecc71; /* green */
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10;
+}
+.list-view-dark .button-accept:hover {
+    -fx-background-color: #27ae60;
+}
+
+.list-view-dark .button-decline {
+    -fx-background-color: #e53e3e; /* red */
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10;
+}
+.list-view-dark .button-decline:hover {
+    -fx-background-color: #c53030;
+}
+
+.list-view-dark .button-view {
+    -fx-background-color: transparent;
+    -fx-border-color: #29B6F6;
+    -fx-text-fill: #29B6F6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10;
+}
+.list-view-dark .button-view:hover {
+    -fx-background-color: rgba(41,182,246,0.08);
+}
+
+/* Label inside trade cell */
+.list-view-dark .trade-cell-label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+/* Rejected proposals: slightly red tint and muted text */
+.list-view-dark .trade-list-cell.rejected {
+    -fx-background-color: rgba(229,62,62,0.08); /* slight red */
+    -fx-border-color: rgba(229,62,62,0.25);
+    -fx-border-width: 1;
+    -fx-text-fill: #FFD2D2;
+}
+.list-view-dark .trade-list-cell.rejected .trade-cell-label {
+    -fx-text-fill: #FFD2D2;
+}
+
+/* Expired proposals: greyed out, italic */
+.list-view-dark .trade-list-cell.expired {
+    -fx-opacity: 0.7;
+    -fx-background-color: rgba(156,162,175,0.04);
+}
+.list-view-dark .trade-list-cell.expired .trade-cell-label {
+    -fx-text-fill: #9CA3AF;
+    -fx-font-style: italic;
+}
+
+/* End of list styles */
