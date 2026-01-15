@@ -99,7 +99,7 @@ public class CardBean {
         }
         try {
             this.gameType = CardGameType.valueOf(gameTypeName);
-        } catch (Exception e) {
+        } catch (Exception _) {
             this.gameType = null;
         }
     }

@@ -72,51 +72,14 @@ public class CollectionController {
 
             // Prepare setId -> List<Card> map by fetching card details via provider for card ids in binders
             Map<String, List<Card>> setCardsMap = new HashMap<>();
-            model.api.ICardProvider provider = null;
-            try {
-                provider = apiFactory.getCardProvider(AppConfig.POKEMON_GAME);
-            } catch (Exception ex) {
-                LOGGER.warning(() -> "Could not obtain ICardProvider: " + ex.getMessage());
-            }
+            ICardProvider provider = getCardProviderSafe();
 
-            for (String setId : bindersBySet.keySet()) {
-                try {
-                    // First try to fetch the entire set from the provider so we can
-                    // show both owned and non-owned cards for that set.
-                    List<Card> allSetCards = null;
-                    if (provider != null) {
-                        try {
-                            allSetCards = provider.searchSet(setId);
-                        } catch (Exception e) {
-                            LOGGER.fine(() -> "Provider.searchSet failed for " + setId + ": " + e.getMessage());
-                        }
-                    }
-
-                    // If the provider returned nothing, fall back to fetching only
-                    // details for the card ids present in the binder (legacy behavior).
-                    if (allSetCards == null || allSetCards.isEmpty()) {
-                        allSetCards = new java.util.ArrayList<>();
-                        Binder binder = bindersBySet.get(setId);
-                        if (binder != null && binder.getCards() != null) {
-                            for (CardBean cb : binder.getCards()) {
-                                if (cb == null || cb.getId() == null) continue;
-                                if (provider != null) {
-                                    try {
-                                        Card detail = provider.getCardDetails(cb.getId());
-                                        if (detail != null) allSetCards.add(detail);
-                                    } catch (Exception provEx) {
-                                        LOGGER.fine(() -> "Provider failed to fetch details for " + cb.getId() + ": " + provEx.getMessage());
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    setCardsMap.put(setId, allSetCards != null ? allSetCards : java.util.Collections.emptyList());
-                } catch (Exception ex) {
-                    LOGGER.warning(() -> "Failed to load provider cards for set " + setId + ": " + ex.getMessage());
-                    setCardsMap.put(setId, java.util.Collections.emptyList());
-                }
+            // Iterate entries and fetch cards in a delegated helper to keep method simple
+            for (Map.Entry<String, Binder> entry : bindersBySet.entrySet()) {
+                String setId = entry.getKey();
+                Binder binder = entry.getValue();
+                List<Card> cards = fetchCardsForSet(setId, binder, provider);
+                setCardsMap.put(setId, cards);
             }
 
             // Clear pending changes since we're loading fresh data
@@ -409,5 +372,47 @@ public class CollectionController {
             view.close();
         }
         navigationController.logout();
+    }
+
+    private ICardProvider getCardProviderSafe() {
+        try {
+            return apiFactory.getCardProvider(AppConfig.POKEMON_GAME);
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "Could not obtain ICardProvider: " + ex.getMessage());
+            return null;
+        }
+    }
+
+    private List<Card> fetchCardsForSet(String setId, Binder binder, ICardProvider provider) {
+        // Try to fetch the full set; if unavailable or empty, fall back to fetching details only for owned cards
+        List<Card> fromSearch = trySearchSet(setId, provider);
+        if (!fromSearch.isEmpty()) return fromSearch;
+        return fetchDetailsFromBinder(binder, provider);
+    }
+
+    private List<Card> trySearchSet(String setId, ICardProvider provider) {
+        if (provider == null) return java.util.Collections.emptyList();
+        try {
+            List<Card> res = provider.searchSet(setId);
+            return res != null ? res : java.util.Collections.emptyList();
+        } catch (Exception e) {
+            LOGGER.fine(() -> "Provider.searchSet failed for " + setId + ": " + e.getMessage());
+            return java.util.Collections.emptyList();
+        }
+    }
+
+    private List<Card> fetchDetailsFromBinder(Binder binder, ICardProvider provider) {
+        List<Card> details = new java.util.ArrayList<>();
+        if (binder == null || binder.getCards() == null || provider == null) return details;
+        for (CardBean cb : binder.getCards()) {
+            if (cb == null || cb.getId() == null) continue;
+            try {
+                Card detail = provider.getCardDetails(cb.getId());
+                if (detail != null) details.add(detail);
+            } catch (Exception provEx) {
+                LOGGER.fine(() -> "Provider failed to fetch details for " + cb.getId() + ": " + provEx.getMessage());
+            }
+        }
+        return details;
     }
 }

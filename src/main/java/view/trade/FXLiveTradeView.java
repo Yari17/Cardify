@@ -9,12 +9,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import model.bean.TradeTransactionBean;
 import model.bean.CardBean;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.geometry.Insets;
@@ -71,19 +73,102 @@ public class FXLiveTradeView implements ILiveTradeView {
 
     @FXML
     public void initialize() {
-        if (scheduledTradesList != null) scheduledTradesList.setCellFactory(listView -> new javafx.scene.control.ListCell<>() {
+        if (scheduledTradesList != null) scheduledTradesList.setCellFactory(lv -> new javafx.scene.control.ListCell<>() {
             @Override
             protected void updateItem(model.bean.TradeTransactionBean item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) { setText(null); setGraphic(null); return; }
-                String label = (item.getProposalId() != null ? item.getProposalId() + " • " : "") + (item.getProposerId() != null ? item.getProposerId() : "?") + " vs " + (item.getReceiverId() != null ? item.getReceiverId() : "?");
-                Button viewBtn = new Button("View");
-                viewBtn.getStyleClass().add("button-view");
-                viewBtn.setOnAction(evt -> { if (controller != null) controller.startTrade(item.getProposalId()); });
-                javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
-                HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-                HBox box = new HBox(8, new Label(label), spacer, viewBtn);
-                setGraphic(box);
+
+                HBox root = new HBox(12);
+                root.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+                root.getStyleClass().add("trade-list-cell");
+
+                // icon
+                ImageView icon = null;
+                try {
+                    java.net.URL res = getClass().getResource("/icons/trade.png");
+                    if (res != null) {
+                        javafx.scene.image.Image img = new javafx.scene.image.Image(res.toExternalForm(), 26, 26, true, true);
+                        icon = new ImageView(img);
+                        icon.getStyleClass().add("trade-direction-icon");
+                      }
+                } catch (Exception err) {LOGGER.log(Level.WARNING, err.getMessage(), err);}
+                if (icon != null) root.getChildren().add(icon);
+
+                // Title + meta
+                VBox txt = new VBox(4);
+                String title = item.getProposalId() != null ? item.getProposalId() : "Scheduled";
+                Label titleLabel = new Label(title);
+                titleLabel.getStyleClass().add("trade-cell-label");
+
+                String participants = (item.getProposerId() != null ? item.getProposerId() : "?") + " → " + (item.getReceiverId() != null ? item.getReceiverId() : "?");
+                Label participantsLabel = new Label(participants);
+                participantsLabel.getStyleClass().add("cell-secondary");
+
+                // meeting info
+                String dateText = item.getTradeDate() != null ? item.getTradeDate().toLocalDate().toString() : "TBD";
+                String storeText = item.getStoreId() != null ? item.getStoreId() : "TBD";
+                Label meta = new Label(dateText + " • " + storeText);
+                meta.getStyleClass().add("cell-secondary");
+
+                txt.getChildren().addAll(titleLabel, participantsLabel, meta);
+                root.getChildren().add(txt);
+
+                Region spacer = new Region(); HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+                root.getChildren().add(spacer);
+
+                // Badge for status
+                Label badge = new Label(item.getStatus() != null ? item.getStatus().toUpperCase() : "UNKNOWN");
+                badge.getStyleClass().addAll("status-badge");
+                switch ((item.getStatus() != null ? item.getStatus().toUpperCase() : "UNKNOWN")) {
+                    case "ACCEPTED" -> badge.getStyleClass().add("badge-accepted");
+                    case "PENDING" -> badge.getStyleClass().add("badge-pending");
+                    case "REJECTED" -> badge.getStyleClass().add("badge-rejected");
+                    case "EXPIRED" -> badge.getStyleClass().add("badge-expired");
+                    default -> badge.getStyleClass().add("badge-unknown");
+                }
+
+                // Card counts
+                int offeredCount = item.getOffered() != null ? item.getOffered().size() : 0;
+                int requestedCount = item.getRequested() != null ? item.getRequested().size() : 0;
+                Label counts = new Label("Offerte: " + offeredCount + "  •  Richieste: " + requestedCount);
+                counts.getStyleClass().add("cell-secondary");
+
+                VBox rightBox = new VBox(6);
+                rightBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+                rightBox.getChildren().addAll(badge, counts);
+
+                // Actions
+                HBox actions = new HBox(6);
+                actions.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
+                Button tradeNowBtn = new Button("Trade Now");
+                tradeNowBtn.getStyleClass().add("button-accent");
+                tradeNowBtn.setOnAction(evt -> {
+                    // Show details dialog (reuse displayTrade)
+                    displayTrade(item);
+                });
+                actions.getChildren().add(tradeNowBtn);
+
+                // Show 'Trade' only on trade day
+                boolean isToday = false;
+                try {
+                    if (item.getTradeDate() != null) {
+                        isToday = item.getTradeDate().toLocalDate().equals(java.time.LocalDate.now());
+                    }
+                } catch (Exception err) {LOGGER.log(Level.WARNING, err.getMessage(), err);}
+
+                if (isToday) {
+                    Button tradeBtn = new Button("Trade");
+                    tradeBtn.getStyleClass().add("button-filter");
+                    tradeBtn.setOnAction(evt -> { if (controller != null) controller.startTrade(item.getProposalId()); });
+                    actions.getChildren().add(tradeBtn);
+                }
+
+                rightBox.getChildren().add(actions);
+                root.getChildren().add(rightBox);
+
+                setGraphic(root);
             }
         });
     }
@@ -114,7 +199,7 @@ public class FXLiveTradeView implements ILiveTradeView {
 
     @Override
     public void showError(String errorMessage) {
-
+        //not implemented
     }
 
     @Override
@@ -247,11 +332,11 @@ public class FXLiveTradeView implements ILiveTradeView {
     }
 
     @Override
-    public void onConfirmPresence(String Id) {
-        if (Id == null) return;
+    public void onConfirmPresence(String userId) {
+        if (userId == null) return;
         javafx.application.Platform.runLater(() -> {
             if (controller != null) {
-                int code = controller.confirmPresence(Id);
+                int code = controller.confirmPresence(userId);
                 // show simple feedback dialog
                 Stage dlg = new Stage();
                 dlg.initOwner(stage);
@@ -319,12 +404,12 @@ public class FXLiveTradeView implements ILiveTradeView {
     }
 
     @Override
-    public void onTradeComplete(String Id) {
+    public void onTradeComplete(String tradeId) {
         // minimal feedback: inform user the trade is complete
         javafx.application.Platform.runLater(() -> {
             Stage dlg = new Stage(); dlg.initOwner(stage); dlg.initModality(Modality.WINDOW_MODAL); dlg.setTitle("Trade completato");
             VBox box = new VBox(10); box.setPadding(new Insets(12));
-            Label msg = new Label("Trade " + (Id != null ? Id : "<id>") + " completato"); msg.setStyle("-fx-text-fill: white;");
+            Label msg = new Label("Trade " + (tradeId != null ? tradeId : "<id>") + " completato"); msg.setStyle("-fx-text-fill: white;");
             Button ok = new Button("OK"); ok.setOnAction(e -> dlg.close()); box.getChildren().addAll(msg, ok); box.setStyle("-fx-background-color: #1E2530;");
             Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource("/styles/theme.css"); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception e) { LOGGER.fine(() -> "Unable to apply theme stylesheet: " + e.getMessage()); }
             dlg.setScene(s); dlg.showAndWait();

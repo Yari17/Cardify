@@ -51,8 +51,4 @@ public class RegistrationController {
             view.showInputError("Si è verificato un errore. Riprova.");
         }
     }
-
-    public void onBackToLoginRequested() {
-        navigationController.navigateToLogin();
-    }
 }

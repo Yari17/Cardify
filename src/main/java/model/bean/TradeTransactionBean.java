@@ -10,7 +10,6 @@ public class TradeTransactionBean {
     private String receiverId;
     private String storeId;
     private LocalDateTime tradeDate;
-    private LocalDateTime firstCheckIn;//quando il primo dei due collezionisti conferma la presenza, serve per contare il tempo prima di annullare lo scambio(30 min)
     private List<CardBean> offered = new ArrayList<>();
     private List<CardBean> requested = new ArrayList<>();
     private String status;

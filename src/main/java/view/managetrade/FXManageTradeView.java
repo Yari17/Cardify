@@ -111,139 +111,80 @@ public class FXManageTradeView implements IManageTradeView {
         }
 
         private javafx.scene.Node createCellGraphic(ProposalBean item, OtherInfo info) {
-            // This view no longer contains a scheduledTradesList; ManageTradeView only renders pending proposals.
-            String labelText;
-            if (info.other == null || info.other.isEmpty()) {
-                String participants = (item.getFromUser() == null ? "" : item.getFromUser()) + " vs " + (item.getToUser() == null ? "" : item.getToUser());
-                labelText = String.format("%s — %s", item.getProposalId(), participants);
-            } else {
-                String arrow = info.incoming ? "←" : "→";
-                labelText = String.format("%s %s", arrow, info.other);
+            // Build a richer cell UI: left icon, center text block (title + subtitle), right actions + status badge
+            HBox root = new HBox(12);
+            root.getStyleClass().add("trade-list-cell");
+            root.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+            // Icon
+            ImageView dir = loadDirectionIcon(info.incoming);
+            if (dir != null) {
+                dir.setFitWidth(28);
+                dir.setFitHeight(28);
+                dir.getStyleClass().add("trade-direction-icon");
+                root.getChildren().add(dir);
             }
 
-            Label mainLabel = new Label(labelText);
-            mainLabel.getStyleClass().add("trade-cell-label");
+            // Text block: title and subtitle
+            VBox textBlock = new VBox(4);
+            String title = item.getProposalId() != null ? item.getProposalId() : "Proposal";
+            Label titleLabel = new Label(title);
+            titleLabel.getStyleClass().add("trade-cell-label");
 
-            ImageView directionIcon = loadDirectionIcon(info.incoming);
+            // subtitle shows participants and meeting info
+            String participants = (item.getFromUser() == null ? "?" : item.getFromUser()) + " → " + (item.getToUser() == null ? "?" : item.getToUser());
+            Label subtitle = new Label(participants);
+            subtitle.getStyleClass().add("cell-secondary");
 
-            HBox box = new HBox(8);
-            if (directionIcon != null) box.getChildren().add(directionIcon);
-            box.getChildren().add(mainLabel);
+            // small meeting info (date/place) as secondary
+            String meet = (item.getMeetingDate() != null ? item.getMeetingDate() : "TBD") + " • " + (item.getMeetingPlace() != null ? item.getMeetingPlace() : "TBD");
+            Label meetingLabel = new Label(meet);
+            meetingLabel.getStyleClass().add("cell-secondary");
+
+            textBlock.getChildren().addAll(titleLabel, subtitle, meetingLabel);
+            root.getChildren().add(textBlock);
+
             Region spacer = new Region();
             HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
-            box.getChildren().add(spacer);
+            root.getChildren().add(spacer);
 
-            // View button for all rows
+            // Status badge
+            String status = item.getStatus() != null ? item.getStatus().toUpperCase() : "UNKNOWN";
+            Label badge = new Label(status);
+            badge.getStyleClass().addAll("status-badge");
+            switch (status) {
+                case "ACCEPTED" -> badge.getStyleClass().add("badge-accepted");
+                case "PENDING" -> badge.getStyleClass().add("badge-pending");
+                case "REJECTED" -> badge.getStyleClass().add("badge-rejected");
+                case "EXPIRED" -> badge.getStyleClass().add("badge-expired");
+                default -> badge.getStyleClass().add("badge-unknown");
+            }
+
+            // Actions container
+            HBox actions = new HBox(8);
+            actions.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
             Button viewBtn = new Button("View");
             viewBtn.getStyleClass().add("button-view");
             viewBtn.setOnAction(evt -> showProposalDetails(item));
-            box.getChildren().add(viewBtn);
+            actions.getChildren().add(viewBtn);
 
-            String status = item.getStatus();
-            boolean showIncomingActions = !readOnly && info.incoming && status != null && status.equalsIgnoreCase("PENDING");
+            boolean showIncomingActions = !readOnly && info.incoming && status.equals("PENDING");
             if (showIncomingActions) {
-                final Button acceptBtn = new Button("Accept");
+                Button acceptBtn = new Button("Accept");
                 acceptBtn.getStyleClass().add("button-accept");
+                acceptBtn.setOnAction(e -> onAcceptTradeProposal(item.getProposalId()));
 
-                final Button declineBtn = new Button("Decline");
+                Button declineBtn = new Button("Decline");
                 declineBtn.getStyleClass().add("button-decline");
+                declineBtn.setOnAction(e -> onDeclineTradeProposal(item.getProposalId()));
 
-                acceptBtn.setOnAction(evt -> {
-                    // confirmation
-                    javafx.application.Platform.runLater(() -> {
-                        Alert confirm = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION,
-                                "Accettare la proposta " + item.getProposalId() + "?", javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.NO);
-                        confirm.initOwner(stage);
-                        var opt = confirm.showAndWait();
-                        if (opt.isPresent() && opt.get() == javafx.scene.control.ButtonType.YES) {
-                            // disable buttons while processing
-                            acceptBtn.setDisable(true);
-                            declineBtn.setDisable(true);
-
-                            javafx.concurrent.Task<Boolean> task = new javafx.concurrent.Task<>() {
-                                @Override
-                                protected Boolean call() throws Exception {
-                                    return manageController != null && manageController.acceptProposal(item.getProposalId());
-                                }
-                            };
-                            task.setOnSucceeded(onSucc -> {
-                                boolean ok = Boolean.TRUE.equals(task.getValue());
-                                if (ok) {
-                                    // refresh lists
-                                    if (manageController != null) manageController.loadAndDisplayTrades(FXManageTradeView.this);
-                                    // show feedback
-                                    javafx.scene.control.Alert infoAccepted = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION, "Proposal accepted.");
-                                    infoAccepted.initOwner(stage);
-                                    infoAccepted.showAndWait();
-                                } else {
-                                    javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR, "Failed to accept proposal.");
-                                    err.initOwner(stage);
-                                    err.showAndWait();
-                                    acceptBtn.setDisable(false);
-                                    declineBtn.setDisable(false);
-                                }
-                            });
-                            task.setOnFailed(onFail -> {
-                                acceptBtn.setDisable(false);
-                                declineBtn.setDisable(false);
-                                javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR, "Error during accept operation.");
-                                err.initOwner(stage);
-                                err.showAndWait();
-                            });
-                            new Thread(task).start();
-                        }
-                    });
-                });
-
-                declineBtn.setOnAction(evt -> {
-                    javafx.application.Platform.runLater(() -> {
-                        javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION,
-                                "Rifiutare la proposta " + item.getProposalId() + "?", javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.NO);
-                        confirm.initOwner(stage);
-                        var opt = confirm.showAndWait();
-                        if (opt.isPresent() && opt.get() == javafx.scene.control.ButtonType.YES) {
-                            acceptBtn.setDisable(true);
-                            declineBtn.setDisable(true);
-
-                            javafx.concurrent.Task<Boolean> task = new javafx.concurrent.Task<>() {
-                                @Override
-                                protected Boolean call() throws Exception {
-                                    return manageController != null && manageController.declineProposal(item.getProposalId());
-                                }
-                            };
-                            task.setOnSucceeded(onSucc -> {
-                                boolean ok = Boolean.TRUE.equals(task.getValue());
-                                if (ok) {
-                                    if (manageController != null) manageController.loadAndDisplayTrades(FXManageTradeView.this);
-                                    javafx.scene.control.Alert infoDeclined = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION, "Proposal declined.");
-                                    infoDeclined.initOwner(stage);
-                                    infoDeclined.showAndWait();
-                                } else {
-                                    javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR, "Failed to decline proposal.");
-                                    err.initOwner(stage);
-                                    err.showAndWait();
-                                    acceptBtn.setDisable(false);
-                                    declineBtn.setDisable(false);
-                                }
-                            });
-                            task.setOnFailed(onFail -> {
-                                acceptBtn.setDisable(false);
-                                declineBtn.setDisable(false);
-                                javafx.scene.control.Alert err = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR, "Error during decline operation.");
-                                err.initOwner(stage);
-                                err.showAndWait();
-                            });
-                            new Thread(task).start();
-                        }
-                    });
-                });
-
-                box.getChildren().addAll(acceptBtn, declineBtn);
+                actions.getChildren().addAll(acceptBtn, declineBtn);
             }
 
-            // No trade buttons in ManageTradeView; scheduled trades (ACCEPTED meeting today) are handled in LiveTrade view
+            root.getChildren().addAll(badge, actions);
 
-            return box;
+            return root;
         }
 
         private ImageView loadDirectionIcon(boolean incoming) {

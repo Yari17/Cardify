@@ -17,17 +17,11 @@ public class TradeTransaction {
     private String storeId;
     private LocalDateTime creationTimestamp;
     private LocalDateTime tradeDate;
-    private InspectionResult proposerInspectionResult;
-    private InspectionResult receiverInspectionResult;
     private List<Card> offeredCards;
     private List<Card> requestedCards;
     private boolean proposerReviewed;
     private boolean receiverReviewed;
 
-    public TradeTransaction() {}
-    public TradeTransaction(int transactionId) {
-        this.transactionId = transactionId;
-    }
     public TradeTransaction(int transactionId, TradeStatus tradeStatus, String proposerId, String receiverId, String storeId,
                             LocalDateTime creationTimestamp, LocalDateTime tradeDate,
                             List<Card> offeredCards, List<Card> requestedCards) {
@@ -50,13 +44,6 @@ public class TradeTransaction {
         this.tradeStatus = newStatus;
     }
 
-    public void recordInspectionResult(String userId, InspectionResult result) {
-        if (userId.equals(proposerId)) {
-            this.proposerInspectionResult = result;
-        } else if (userId.equals(receiverId)) {
-            this.receiverInspectionResult = result;
-        }
-    }
     public int confirmPresence(String userId) {
         if (userId.equals(proposerId)) {
             this.proposerSessionCode = generateSessionCode();

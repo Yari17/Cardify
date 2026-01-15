@@ -20,10 +20,6 @@ public final class AppConfig {
         currentPersistenceType = type;
     }
 
-    public static String getPersistenceType() {
-        return currentPersistenceType;
-    }
-
     public static String getPersistenceLabel() {
         return switch (currentPersistenceType) {
             case DAO_TYPE_JDBC -> "Persistenza: Database (JDBC)";

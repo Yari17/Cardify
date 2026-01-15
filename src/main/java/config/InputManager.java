@@ -13,14 +13,5 @@ public class InputManager {
         return scanner.nextLine();
     }
 
-    public int readInt() {
-        while (!scanner.hasNextInt()) {
-            System.out.println("Inserisci un numero valido!");
-            scanner.next();
-        }
-        int numero = scanner.nextInt();
-        scanner.nextLine();
-        return numero;
-    }
 
 }

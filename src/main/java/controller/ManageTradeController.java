@@ -4,7 +4,9 @@ import model.bean.CardBean;
 import model.bean.ProposalBean;
 import model.domain.Card;
 import model.domain.Proposal;
+import model.domain.TradeTransaction;
 import model.domain.enumerations.ProposalStatus;
+import model.domain.enumerations.TradeStatus;
 import view.managetrade.IManageTradeView;
 
 import java.time.LocalDateTime;
@@ -42,7 +44,6 @@ public class ManageTradeController {
             // Fetch proposals where user is involved
             List<Proposal> sentPending = proposalDao != null ? proposalDao.getSentPendingProposal(username) : List.of();
             List<Proposal> received = proposalDao != null ? proposalDao.getReceivedProposals(username) : List.of();
-            List<Proposal> scheduledProps = proposalDao != null ? proposalDao.getScheduledProposals(username) : List.of();
 
             LocalDateTime now = LocalDateTime.now();
 
@@ -54,22 +55,7 @@ public class ManageTradeController {
             // Process combined proposals: separate pending vs concluded (rejected/expired)
             for (Proposal p : combined) {
                 if (p == null) continue;
-                try {
-                    boolean expired = isExpired(p, now);
-                    if (expired) {
-                        p.setStatus(ProposalStatus.EXPIRED);
-                        persistProposalStatusChange(p);
-                    }
-
-                    if (p.getStatus() == ProposalStatus.PENDING) {
-                        pending.add(toBean(p));
-                    } else if (p.getStatus() == ProposalStatus.REJECTED || p.getStatus() == ProposalStatus.EXPIRED) {
-                        concluded.add(toBean(p));
-                    }
-                    // ACCEPTED proposals are handled as scheduled trades and shown elsewhere
-                } catch (Exception ex) {
-                    LOGGER.log(Level.WARNING, "Failed processing proposal {0}: {1}", new Object[]{p.getProposalId(), ex.getMessage()});
-                }
+                processProposal(p, pending, concluded, now);
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error loading user trade transactions: {0}", e.getMessage());
@@ -103,16 +89,7 @@ public class ManageTradeController {
 
             // If the proposal became ACCEPTED, create and persist a TradeTransaction
             if (newStatus == ProposalStatus.ACCEPTED) {
-                try {
-                    model.dao.ITradeDao tradeDao = navigationController != null ? navigationController.getDaoFactory().createTradeDao() : null;
-                    if (tradeDao != null) {
-                        model.domain.TradeTransaction tx = mapProposalToTradeTransaction(p);
-                        tradeDao.save(tx);
-                        LOGGER.log(Level.INFO, "Created trade transaction {0} for proposal {1}", new Object[]{tx.getTransactionId(), proposalId});
-                    }
-                } catch (Exception ex) {
-                    LOGGER.log(Level.WARNING, "Failed to persist TradeTransaction for proposal {0}: {1}", new Object[]{proposalId, ex.getMessage()});
-                }
+                persistTradeTransactionIfNeeded(p, proposalId);
             }
 
             LOGGER.log(Level.INFO, "Proposal {0}: {1}", new Object[]{newStatus.name().toLowerCase(), proposalId});
@@ -137,16 +114,14 @@ public class ManageTradeController {
             LOGGER.fine(() -> "Could not parse meeting date for proposal " + p.getProposalId() + ": " + e.getMessage());
         }
 
-        List<model.domain.Card> offered = new ArrayList<>();
+        List<Card> offered = new ArrayList<>();
         if (p.getCardsOffered() != null) offered.addAll(p.getCardsOffered());
-        List<model.domain.Card> requested = new ArrayList<>();
+        List<Card> requested = new ArrayList<>();
         if (p.getCardsRequested() != null) requested.addAll(p.getCardsRequested());
 
-        model.domain.TradeTransaction tx = new model.domain.TradeTransaction(txId,
-                model.domain.enumerations.TradeStatus.WAITING_FOR_ARRIVAL,
+        return new TradeTransaction(txId,
+                TradeStatus.WAITING_FOR_ARRIVAL,
                 p.getProposerId(), p.getReceiverId(), p.getMeetingPlace(), creation, tradeDate, offered, requested);
-
-        return tx;
     }
 
     // Return proposal domain object for detailed view
@@ -260,6 +235,44 @@ public class ManageTradeController {
         } catch (exception.NavigationException e) {
             LOGGER.log(java.util.logging.Level.WARNING, "Failed to navigate to Live Trades: {0}", e.getMessage());
             if (view != null) view.showError("Impossibile aprire la sezione Trade");
+        }
+    }
+
+    // Helper to process a single proposal into pending or concluded lists; keeps loadUserCollection concise
+    private void processProposal(Proposal p, List<ProposalBean> pending, List<ProposalBean> concluded, LocalDateTime now) {
+        try {
+            boolean expired = isExpired(p, now);
+            if (expired) {
+                p.setStatus(ProposalStatus.EXPIRED);
+                persistProposalStatusChange(p);
+            }
+
+            if (p.getStatus() == ProposalStatus.PENDING) {
+                pending.add(toBean(p));
+            } else if (p.getStatus() == ProposalStatus.REJECTED || p.getStatus() == ProposalStatus.EXPIRED) {
+                concluded.add(toBean(p));
+            }
+            // ACCEPTED proposals are handled as scheduled trades and shown elsewhere
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Failed processing proposal {0}: {1}", new Object[]{p.getProposalId(), ex.getMessage()});
+        }
+    }
+
+    // Extracted persistence logic for trade transactions when a proposal is accepted
+    private void persistTradeTransactionIfNeeded(Proposal p, String proposalId) {
+        try {
+            model.dao.ITradeDao tradeDao = navigationController != null ? navigationController.getDaoFactory().createTradeDao() : null;
+            if (tradeDao != null) {
+                model.domain.TradeTransaction tx = mapProposalToTradeTransaction(p);
+                if (tx == null) {
+                    LOGGER.fine(() -> "mapProposalToTradeTransaction returned null for proposal " + proposalId);
+                    return;
+                }
+                tradeDao.save(tx);
+                LOGGER.log(Level.INFO, "Created trade transaction {0} for proposal {1}", new Object[]{tx.getTransactionId(), proposalId});
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Failed to persist TradeTransaction for proposal {0}: {1}", new Object[]{proposalId, ex.getMessage()});
         }
     }
 }

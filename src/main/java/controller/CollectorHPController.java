@@ -277,8 +277,7 @@ public class CollectorHPController {
             navigationController.navigateToLiveTrades(username);
          } catch (exception.NavigationException e) {
              LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + e.getMessage());
-             // UI feedback omitted here to keep controller decoupled from specific view capabilities;
-             // the ApplicationController or destination view may show errors as needed.
+             // UI feedback omitted here to keep controller decoupled from specific view capabilities the ApplicationController or destination view may show errors as needed.
          }
     }
 
@@ -320,15 +319,15 @@ public class CollectorHPController {
             if (detailedCard != null) {
                 CardBean detailedBean = detailedCard.toBean();
                 // Preserve owner information from the original binder-provided bean
-                if (card != null && card.getOwner() != null && !card.getOwner().isEmpty()) {
+                if (card.getOwner() != null && !card.getOwner().isEmpty()) {
                     detailedBean.setOwner(card.getOwner());
                 }
                 // Preserve binder-specific flags so the view can show trade controls
-                if (card != null) {
+
                     detailedBean.setTradable(card.isTradable());
                     detailedBean.setQuantity(card.getQuantity());
                     detailedBean.setStatus(card.getStatus());
-                }
+
                 view.showCardOverview(detailedBean);
             } else {
                 LOGGER.log(java.util.logging.Level.WARNING, "Could not load detailed info for card: {0}", card.getId());
