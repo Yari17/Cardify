@@ -7,8 +7,9 @@ import view.ILoginView;
 import view.IManageTradeView;
 import view.IRegistrationView;
 import view.IStoreHPView;
-import view.ILiveTradeView;
+import view.ICollectorTradeView;
 import view.INegotiationView;
+import view.IStoreTradeView;
 
 public interface IViewFactory {
     ILoginView createLoginView(LoginController controller);
@@ -16,9 +17,8 @@ public interface IViewFactory {
     ICollectorHPView createCollectorHomePageView(CollectorHPController controller);
     IStoreHPView createStoreHomePageView(StoreHPController controller);
     ICollectionView createCollectionView(CollectionController controller);
-    ILiveTradeView createTradeView(LiveTradeController controller);
+    ICollectorTradeView createTradeView(LiveTradeController controller);
+    IStoreTradeView createStoreTradeView(LiveTradeController controller);
     INegotiationView createNegotiationView(NegotiationController controller);
     IManageTradeView createManageTradeView(ManageTradeController controller);
 }
-
-

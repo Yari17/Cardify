@@ -525,5 +525,70 @@
     ],
     "createdAt": "2026-01-15T19:45:00.297884",
     "lastModified": "2026-01-15T19:45:14.132401"
+  },
+  {
+    "id": 21,
+    "owner": "user1",
+    "setId": "B1",
+    "setName": "Mega Rising",
+    "cards": [
+      {
+        "id": "B1-052",
+        "name": "Mega Gyarados ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/052/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-16T20:28:18.256579",
+    "lastModified": "2026-01-16T20:28:31.882350"
+  },
+  {
+    "id": 22,
+    "owner": "user3",
+    "setId": "A2a",
+    "setName": "Triumphant Light",
+    "cards": [
+      {
+        "id": "A2a-013",
+        "name": "Heatran",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/013/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "A2a-035",
+        "name": "Rotom",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/035/high.png",
+        "gameType": "POKEMON",
+        "quantity": 5,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "A2a-023",
+        "name": "Origin Forme Palkia",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/023/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "A2a-047",
+        "name": "Garchomp ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 10,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-16T20:29:35.728634",
+    "lastModified": "2026-01-16T20:30:06.846206"
   }
 ]

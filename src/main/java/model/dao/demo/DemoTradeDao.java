@@ -3,6 +3,7 @@ package model.dao.demo;
 import model.dao.ITradeDao;
 import model.domain.TradeTransaction;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +34,7 @@ public class DemoTradeDao implements ITradeDao {
     }
 
     @Override
-    public Optional get(long id) {
+    public Optional<TradeTransaction> get(long id) {
         return Optional.empty();
     }
 
@@ -52,9 +53,14 @@ public class DemoTradeDao implements ITradeDao {
         //TODO implementare delete
     }
 
-
-
-
+    @Override
+    public Optional<TradeTransaction> findByParticipantsAndDate(String proposerId, String receiverId, LocalDateTime tradeDate) {
+        return Optional.empty();
     }
 
+    @Override
+    public TradeTransaction getTradeTransactionBySessionCodes(int proposerCode, int receiverCode) {
+        return null;
+    }
 
+}

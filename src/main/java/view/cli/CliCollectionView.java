@@ -289,7 +289,8 @@ public class CliCollectionView implements ICollectionView {
                         this.refreshRequested = false;
                     }
 
-                } catch (Exception _) {
+                } catch (Exception ex) {
+                    LOGGER.fine(() -> "Error while loading cards for set " + setId + ": " + ex.getMessage());
                     showError("Errore nel caricamento delle carte del set.");
                     return;
                 }

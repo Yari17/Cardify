@@ -121,7 +121,20 @@ public class JsonTradeDao implements ITradeDao {
 
     @Override
     public List<TradeTransaction> getStoreTradeScheduledTransactions(String userId, String tradeId) {
-        return List.of();
+        List<TradeTransaction> result = new ArrayList<>();
+        if (userId == null) return result;
+        for (TradeTransaction t : tradesById.values()) {
+            if (t == null) continue;
+            if (!userId.equals(t.getStoreId())) continue;
+            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+            // Include trades where at least one collector has arrived, or the trade is in inspection phase
+            if (s == model.domain.enumerations.TradeStatus.PARTIALLY_ARRIVED
+                    || s == model.domain.enumerations.TradeStatus.BOTH_ARRIVED
+                    || s == model.domain.enumerations.TradeStatus.INSPECTION_PHASE) {
+                result.add(t);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -161,6 +174,33 @@ public class JsonTradeDao implements ITradeDao {
         tradesById.remove(tradeTransaction.getTransactionId());
         saveToJson();
         LOGGER.log(Level.INFO, "Deleted trade transaction {0}", tradeTransaction.getTransactionId());
+    }
+
+    @Override
+    public Optional<TradeTransaction> findByParticipantsAndDate(String proposerId, String receiverId, LocalDateTime tradeDate) {
+        for (TradeTransaction t : tradesById.values()) {
+            if (t == null) continue;
+            boolean match = true;
+            if (proposerId != null) match = proposerId.equals(t.getProposerId());
+            if (match && receiverId != null) match = receiverId.equals(t.getReceiverId());
+            if (match && tradeDate != null) {
+                if (t.getTradeDate() == null) match = false;
+                else match = t.getTradeDate().toLocalDate().equals(tradeDate.toLocalDate());
+            }
+            if (match) return Optional.of(t);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public TradeTransaction getTradeTransactionBySessionCodes(int proposerCode, int receiverCode) {
+        for (TradeTransaction t : tradesById.values()) {
+            if (t == null) continue;
+            if (t.getProposerSessionCode() == proposerCode && t.getReceiverSessionCode() == receiverCode) {
+                return t;
+            }
+        }
+        return null;
     }
 
 }

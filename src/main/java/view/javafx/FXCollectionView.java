@@ -80,7 +80,8 @@ public class FXCollectionView implements ICollectionView {
 
     private CollectionController controller;
     private Stage stage;
-    // GUI must not hold DAO references. Controller supplies setCardsMap via displayCollection.
+    // GUI must not hold DAO references. Controller supplies setCardsMap via
+    // displayCollection.
     private Map<String, List<Card>> setCardsMap;
 
     // Track currently displayed binders to enable partial refresh
@@ -157,7 +158,10 @@ public class FXCollectionView implements ICollectionView {
         Button button = new Button("+ Aggiungi Nuovo Set");
         button.getStyleClass().add(BUTTON_ACCENT);
         button.setStyle("-fx-font-size: 16px; -fx-padding: 15 30;");
-        button.setOnAction(ev -> { showAddSetDialog(); ev.consume(); });
+        button.setOnAction(ev -> {
+            showAddSetDialog();
+            ev.consume();
+        });
 
         VBox.setMargin(button, new Insets(0, 0, 20, 0));
 
@@ -192,7 +196,8 @@ public class FXCollectionView implements ICollectionView {
         Label missingLabel = new Label(missingCards + " mancanti");
         missingLabel.setStyle("-fx-text-fill: #ed4747; -fx-font-size: 16px; -fx-font-weight: bold;");
 
-        // If there are no cards available for this set (persistence/provider returned nothing),
+        // If there are no cards available for this set (persistence/provider returned
+        // nothing),
         // make it explicit in the UI so user knows why the grid is empty.
         if (totalCards == 0) {
             Label noCardsNote = new Label("Nessuna carta disponibile per questo set (dati non caricati)");
@@ -228,8 +233,9 @@ public class FXCollectionView implements ICollectionView {
         try {
             assert allCards != null;
             loadCardsPage(setId, allCards, binder, cardsGrid, paginationControls);
-        } catch (Exception _) {
-            LOGGER.warning("Error loading cards for set: " + setId);
+        } catch (Exception ex) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Error loading cards for set {0}: {1}", new Object[]{setId, ex.getMessage()});
+            LOGGER.log(java.util.logging.Level.FINE, "Stacktrace", ex);
         }
 
         setSection.getChildren().addAll(header, cardsGrid, paginationControls);
@@ -241,7 +247,7 @@ public class FXCollectionView implements ICollectionView {
      * Load a specific page of cards for a set
      */
     private void loadCardsPage(String setId, List<Card> allCards, Binder binder, FlowPane cardsGrid,
-                               HBox paginationControls) {
+            HBox paginationControls) {
         int currentPage = setCurrentPages.getOrDefault(setId, 0);
         int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
 
@@ -254,7 +260,7 @@ public class FXCollectionView implements ICollectionView {
         int displayStart = allCards.isEmpty() ? 0 : (startIndex + 1);
         LOGGER.log(java.util.logging.Level.INFO,
                 "Loading page {0}/{1} for set {2} (cards {3}-{4} of {5})",
-                new Object[]{currentPage + 1, totalPages, setId, displayStart, endIndex, allCards.size()});
+                new Object[] { currentPage + 1, totalPages, setId, displayStart, endIndex, allCards.size() });
 
         List<Card> pageCards = allCards.subList(startIndex, endIndex);
 
@@ -430,7 +436,8 @@ public class FXCollectionView implements ICollectionView {
             }
         }
 
-        // Applica opacità se non posseduta (slightly obscured to distinguish from owned)
+        // Applica opacità se non posseduta (slightly obscured to distinguish from
+        // owned)
         if (!isOwned) {
             cardImage.setOpacity(0.5);
         }
@@ -484,10 +491,12 @@ public class FXCollectionView implements ICollectionView {
         plusIcon.setIconSize(28);
         plusIcon.setIconColor(javafx.scene.paint.Color.web("#29B6F6"));
         addButton.setGraphic(plusIcon);
-        // do not add the 'card-add-button' class which may define a rectangular background
+        // do not add the 'card-add-button' class which may define a rectangular
+        // background
         // Make the button visually just the icon: remove default rectangular background
         addButton.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;");
-        // ensure clicks only register on the visible icon, avoiding the larger rectangular hitbox
+        // ensure clicks only register on the visible icon, avoiding the larger
+        // rectangular hitbox
         addButton.setPickOnBounds(false);
 
         addButton.setOnAction(_ -> {
@@ -511,7 +520,10 @@ public class FXCollectionView implements ICollectionView {
         deleteButton.getStyleClass().add("button-danger");
         deleteButton.setStyle("-fx-background-color: transparent; -fx-padding: 8; -fx-cursor: hand;");
 
-        deleteButton.setOnAction(ev -> { showDeleteConfirmationDialog(setId, setName); ev.consume(); });
+        deleteButton.setOnAction(ev -> {
+            showDeleteConfirmationDialog(setId, setName);
+            ev.consume();
+        });
 
         return deleteButton;
     }
@@ -538,7 +550,8 @@ public class FXCollectionView implements ICollectionView {
         // Stile per il dialog (guard resource)
         DialogPane dialogPane = confirmDialog.getDialogPane();
         java.net.URL themeRes = getClass().getResource("/styles/theme.css");
-        if (themeRes != null) dialogPane.getStylesheets().add(themeRes.toExternalForm());
+        if (themeRes != null)
+            dialogPane.getStylesheets().add(themeRes.toExternalForm());
         dialogPane.getStyleClass().add("dialog-pane");
 
         Optional<ButtonType> result = confirmDialog.showAndWait();
@@ -636,7 +649,10 @@ public class FXCollectionView implements ICollectionView {
         Button addButton = new Button("Aggiungi Set");
         addButton.getStyleClass().add(BUTTON_ACCENT);
         addButton.setStyle("-fx-font-size: 18px; -fx-padding: 15 40;");
-        addButton.setOnAction(ev -> { showAddSetDialog(); ev.consume(); });
+        addButton.setOnAction(ev -> {
+            showAddSetDialog();
+            ev.consume();
+        });
 
         emptyState.getChildren().addAll(titleLabel, subtitleLabel, addButton);
 
@@ -776,7 +792,9 @@ public class FXCollectionView implements ICollectionView {
             return;
 
         try {
-            List<Card> allCards = setCardsMap != null ? setCardsMap.getOrDefault(setId, java.util.Collections.emptyList()) : java.util.Collections.emptyList();
+            List<Card> allCards = setCardsMap != null
+                    ? setCardsMap.getOrDefault(setId, java.util.Collections.emptyList())
+                    : java.util.Collections.emptyList();
             Card card = allCards.stream().filter(c -> c.getId().equals(cardId)).findFirst().orElse(null);
 
             if (card != null) {
@@ -812,7 +830,8 @@ public class FXCollectionView implements ICollectionView {
         } else {
             LOGGER.warning("Stage not set, cannot display");
         }
-        // When showing collection page, mark the collection nav item as selected and others unselected
+        // When showing collection page, mark the collection nav item as selected and
+        // others unselected
         markNavSelected(NAV_COLLECTION);
     }
 
@@ -874,7 +893,8 @@ public class FXCollectionView implements ICollectionView {
 
     @SuppressWarnings("unused")
     private void unusedSuppressOnCollection() {
-        // helper to suppress 'unused' false positive for FXML binding in some static analyzers
+        // helper to suppress 'unused' false positive for FXML binding in some static
+        // analyzers
     }
 
     @FXML
@@ -884,7 +904,8 @@ public class FXCollectionView implements ICollectionView {
             controller.navigateToTrade();
         }
         // 'trade' action may map to live or manage depending on which button fired
-        // to keep behavior consistent, detect which button was used via focused property
+        // to keep behavior consistent, detect which button was used via focused
+        // property
         if (liveTradeButton != null && liveTradeButton.isFocused()) {
             markNavSelected("live");
         } else if (tradeButton != null && tradeButton.isFocused()) {
@@ -922,6 +943,7 @@ public class FXCollectionView implements ICollectionView {
             container.setStyle("");
         }
     }
+
     @Override
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -933,10 +955,13 @@ public class FXCollectionView implements ICollectionView {
             try {
                 // Instead of referencing non-existing controls (cardsList/setsListView),
                 // re-render the collection using the cached data already stored in this view.
-                Map<String, Binder> binders = (this.currentBinders != null) ? this.currentBinders : java.util.Collections.emptyMap();
-                Map<String, List<Card>> cards = (this.setCardsMap != null) ? this.setCardsMap : java.util.Collections.emptyMap();
+                Map<String, Binder> binders = (this.currentBinders != null) ? this.currentBinders
+                        : java.util.Collections.emptyMap();
+                Map<String, List<Card>> cards = (this.setCardsMap != null) ? this.setCardsMap
+                        : java.util.Collections.emptyMap();
 
-                // displayCollection expects Map<String, Binder>, Map<String, List<model.domain.Card>>
+                // displayCollection expects Map<String, Binder>, Map<String,
+                // List<model.domain.Card>>
                 displayCollection(binders, cards);
 
             } catch (Exception ex) {

@@ -7,7 +7,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="view.javafx.FXLiveTradeView"
+            fx:controller="view.javafx.FXCollectorTradeView"
             prefHeight="800.0" prefWidth="1400.0"
             stylesheets="@../styles/theme.css, @../styles/navbar.css"
             styleClass="bg-main">
@@ -99,12 +99,15 @@
     </top>
 
     <center>
-        <VBox spacing="10" styleClass="bg-main">
+        <VBox spacing="20" styleClass="bg-main">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20"/>
+                <Insets top="30" right="40" bottom="30" left="40"/>
             </padding>
-            <Label text="Scambi Programmati" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            <ListView fx:id="scheduledTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark"/>
+            <Label text="Scambi Programmati" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #00BFFF;"/>
+            <Separator/>
+            <!-- RIMOSSI: HBox con tradeStatusLabel e refreshTradeButton -->
+            <Separator/>
+            <ListView fx:id="scheduledTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #00BFFF; -fx-border-width: 2;"/>
         </VBox>
     </center>
 

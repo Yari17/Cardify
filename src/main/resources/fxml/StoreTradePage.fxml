@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="view.javafx.FXStoreTradeView"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <children>
+        <VBox spacing="10.0" AnchorPane.topAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.bottomAnchor="10.0">
+            <children>
+                <Label text="Scambi programmati" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                <ListView fx:id="scheduledList" prefHeight="280.0" />
+                <HBox spacing="8.0">
+                    <children>
+                        <Button fx:id="backButton" text="Back" />
+                        <Button fx:id="refreshButton" text="Refresh"/>
+                        <Label fx:id="messageLabel" text="" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+
+</AnchorPane>

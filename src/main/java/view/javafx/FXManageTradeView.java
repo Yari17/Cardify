@@ -16,6 +16,7 @@ import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 
 import model.bean.ProposalBean;
+import model.domain.Proposal;
 import view.IManageTradeView;
 
 import java.util.List;
@@ -402,24 +403,30 @@ public class FXManageTradeView implements IManageTradeView {
             return centerBox;
         }
 
-        private String[] resolveParticipants(model.domain.Proposal p, ProposalBean item) {
+        private String[] resolveParticipants(Proposal p, ProposalBean item) {
             String proposer = p != null && p.getProposerId() != null ? p.getProposerId() : item.getFromUser();
             String receiver = p != null && p.getReceiverId() != null ? p.getReceiverId() : item.getToUser();
             return new String[]{proposer, receiver};
         }
 
         private String[] resolveMeeting(model.domain.Proposal p, ProposalBean item) {
+            // Restituisce un array con: [0]=date, [1]=time, [2]=place
             String meetingDate;
             if (item.getMeetingDate() != null) meetingDate = item.getMeetingDate();
             else if (p != null && p.getMeetingDate() != null) meetingDate = p.getMeetingDate();
             else meetingDate = "TBD";
+
+            String meetingTime;
+            if (item.getMeetingTime() != null) meetingTime = item.getMeetingTime();
+            else if (p != null && p.getMeetingTime() != null) meetingTime = p.getMeetingTime();
+            else meetingTime = "--:--";
 
             String meetingPlace;
             if (item.getMeetingPlace() != null) meetingPlace = item.getMeetingPlace();
             else if (p != null && p.getMeetingPlace() != null) meetingPlace = p.getMeetingPlace();
             else meetingPlace = "TBD";
 
-            return new String[]{meetingDate, meetingPlace};
+            return new String[]{meetingDate, meetingTime, meetingPlace};
         }
 
         private void populateCardPane(javafx.scene.layout.FlowPane pane, List<model.domain.Card> cards) {
@@ -460,6 +467,7 @@ public class FXManageTradeView implements IManageTradeView {
             return footer;
         }
     }
+
     @Override
     public void setStage(Stage stage) {
         this.stage = stage;
@@ -513,11 +521,30 @@ public class FXManageTradeView implements IManageTradeView {
     public void registerOnTradeNowClick(java.util.function.Consumer<String> onTradeNowClick) { this.onTradeNowClickCallback = onTradeNowClick; }
 
     public void onAcceptTradeProposal(String id) {
-        if (id == null || manageController == null) return;
+        if (id == null) return;
+        // Prefer the registered callback (decoupled approach). If not provided, fall back to using the
+        // internal manageController to perform the operation.
+        if (onAcceptCallback != null) {
+            try {
+                onAcceptCallback.accept(id);
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "onAccept callback failed: " + ex.getMessage());
+            }
+            // After callback executed, attempt to refresh the view by asking the controller to reload
+            // the lists. This handles the common case where the callback is the controller's accept
+            // method which updates persistence but does not trigger the view refresh itself.
+            try {
+                if (manageController != null) manageController.loadAndDisplayTrades(this);
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Post-accept refresh failed: " + ex.getMessage());
+            }
+            return;
+        }
+        if (manageController == null) return;
         boolean ok = manageController.acceptProposal(id);
         if (ok) {
-            if (onAcceptCallback != null) onAcceptCallback.accept(id);
-            else manageController.loadAndDisplayTrades(this);
+            // After changing status, refresh the lists
+            manageController.loadAndDisplayTrades(this);
         }
     }
 
@@ -544,11 +571,25 @@ public class FXManageTradeView implements IManageTradeView {
     }
 
     public void onDeclineTradeProposal(String id) {
-        if (id == null || manageController == null) return;
+        if (id == null) return;
+        if (onDeclineCallback != null) {
+            try {
+                onDeclineCallback.accept(id);
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "onDecline callback failed: " + ex.getMessage());
+            }
+            // Attempt to refresh the lists after the decline callback
+            try {
+                if (manageController != null) manageController.loadAndDisplayTrades(this);
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Post-decline refresh failed: " + ex.getMessage());
+            }
+            return;
+        }
+        if (manageController == null) return;
         boolean ok = manageController.declineProposal(id);
         if (ok) {
-            if (onDeclineCallback != null) onDeclineCallback.accept(id);
-            else manageController.loadAndDisplayTrades(this);
+            manageController.loadAndDisplayTrades(this);
         }
     }
 

@@ -54,8 +54,9 @@ public class NegotiationController {
                 view.setAvailableStores(stores);
                 // set tomorrow as hint
                 view.setMeetingDateHint(LocalDate.now().plusDays(1).toString());
-            } catch (Exception _) {
-                // ignore store loading errors
+            } catch (Exception ex) {
+                // Log store loading errors for diagnostics but continue (non-fatal)
+                LOGGER.fine(() -> "Failed to load stores for negotiation view: " + ex.getMessage());
             }
         }
     }
@@ -74,17 +75,28 @@ public class NegotiationController {
     private void onConfirmRequested(ProposalBean proposalBean) {
         LOGGER.info(() -> "Confirm requested: " + proposalBean);
         try {
-            if (proposalDao != null) {
-                model.domain.Proposal p = mapToDomainProposal(proposalBean);
-                proposalDao.save(p);
-                if (view != null) view.showConfirmationResult(true, "Proposta inviata");
+            // VALIDATION: ensure at least one offered card with positive quantity
+            if (proposalBean == null || proposalBean.getOffered() == null || proposalBean.getOffered().isEmpty()) {
+                if (view != null) view.showConfirmationResult(false, "Devi offrire almeno una carta prima di inviare la proposta.");
                 return;
             }
-        } catch (Exception ex) {
-            LOGGER.warning("Failed to persist proposal: " + ex.getMessage());
-        }
-        if (view != null) view.showConfirmationResult(false, "Impossibile salvare la proposta");
-    }
+            int totalOffered = 0;
+            for (model.bean.CardBean cb : proposalBean.getOffered()) totalOffered += cb.getQuantity();
+            if (totalOffered <= 0) {
+                if (view != null) view.showConfirmationResult(false, "La quantità delle carte offerte deve essere almeno 1.");
+                return;
+            }
+             if (proposalDao != null) {
+                 model.domain.Proposal p = mapToDomainProposal(proposalBean);
+                 proposalDao.save(p);
+                 if (view != null) view.showConfirmationResult(true, "Proposta inviata");
+                 return;
+             }
+         } catch (Exception ex) {
+             LOGGER.warning("Failed to persist proposal: " + ex.getMessage());
+         }
+         if (view != null) view.showConfirmationResult(false, "Impossibile salvare la proposta");
+     }
 
     private model.domain.Proposal mapToDomainProposal(ProposalBean bean) {
         model.domain.Proposal p = new model.domain.Proposal();

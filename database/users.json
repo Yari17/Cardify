@@ -7,19 +7,19 @@
       "reviewCount": 0,
       "userType": "Collezionista"
     },
-    "user2": {
-      "id": 1,
-      "name": "user2",
-      "reliabilityScore": 0,
-      "reviewCount": 0,
-      "userType": "Collezionista"
-    },
     "nexus_comics": {
       "id": 14,
       "name": "Nexus Comics",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Store"
+    },
+    "user2": {
+      "id": 1,
+      "name": "user2",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
     },
     "alessandro_bianchi": {
       "id": 5,
@@ -126,6 +126,13 @@
       "reviewCount": 0,
       "userType": "Collezionista"
     },
+    "CiccioGamer89TCG": {
+      "id": 0,
+      "name": "CiccioGamer89TCG",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Store"
+    },
     "giochi_di_carta": {
       "id": 16,
       "name": "Giochi di Carta",
@@ -136,8 +143,8 @@
   },
   "credentials": {
     "user1": "password",
-    "user2": "password",
     "nexus_comics": "password",
+    "user2": "password",
     "alessandro_bianchi": "password",
     "valentina_tosi": "password",
     "la_tana_del_goblin": "password",
@@ -153,6 +160,7 @@
     "lucia_ferri": "password",
     "marco_rossi": "password",
     "andrea_marini": "password",
+    "CiccioGamer89TCG": "password",
     "giochi_di_carta": "password"
   }
 }

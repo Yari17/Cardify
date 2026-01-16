@@ -1,3 +1,6 @@
+---
+trigger: always_on
+---
 
 # Istruzioni di Sistema: Architetto Software Java (GRASP/MVC Avanzato)
 

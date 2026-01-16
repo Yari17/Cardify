@@ -19,7 +19,8 @@ public class FXStoreHPView implements IStoreHPView {
 
     @FXML
     private void initialize() {
-        //TODO any initialization if needed
+        // Inizializzazione UI: eventuali impostazioni locali della view
+        // Non eseguiamo logica di business qui (passare al controller)
     }
 
     @Override
@@ -48,7 +49,7 @@ public class FXStoreHPView implements IStoreHPView {
 
     @Override
     public void showError(String errorMessage) {
-        LOGGER.severe("Error: " + errorMessage);
+        LOGGER.log(java.util.logging.Level.SEVERE, "Error: {0}", errorMessage);
     }
 
     @Override
@@ -79,6 +80,13 @@ public class FXStoreHPView implements IStoreHPView {
     private void onExitClicked() {
         if (controller != null) {
             controller.onExitRequested();
+        }
+    }
+
+    @FXML
+    private void onManageTradesClicked() {
+        if (controller != null) {
+            controller.onManageTradesRequested();
         }
     }
 

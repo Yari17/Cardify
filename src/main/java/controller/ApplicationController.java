@@ -14,7 +14,7 @@ import view.factory.FXViewFactory;
 import view.factory.IViewFactory;
 import view.IRegistrationView;
 import view.IStoreHPView;
-import view.ILiveTradeView;
+import view.ICollectorTradeView;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -24,17 +24,22 @@ public class ApplicationController {
     private static final Logger LOGGER = Logger.getLogger(ApplicationController.class.getName());
     private static final String JAVAFX = "JavaFX";
     private final Deque<IView> viewStack = new ArrayDeque<>();
-    //configurazione
+    // configurazione
     private String currentInterface;
     private String currentPersistence;
-    //factory
+    private String currentGameType = config.AppConfig.POKEMON_GAME; // default, può essere configurato
+    // factory
     private DaoFactory daoFactory;
-    public DaoFactory getDaoFactory() { return daoFactory; }
+
+    public DaoFactory getDaoFactory() {
+        return daoFactory;
+    }
 
     private IViewFactory viewFactory;
-    //DAO
+    // DAO
     private IUserDao userDao;
 
+    private model.api.ICardProvider cardProvider;
 
     public void start() {
         InputManager inputManager = new InputManager();
@@ -58,13 +63,17 @@ public class ApplicationController {
             navigateToLogin();
         }
     }
-    // Restituisce la factory di view appropriata in base all'interfaccia selezionata
+
+    // Restituisce la factory di view appropriata in base all'interfaccia
+    // selezionata
     private IViewFactory createViewFactory(InputManager inputManager) {
         return JAVAFX.equals(currentInterface)
                 ? new FXViewFactory()
                 : new CliIViewFactory(inputManager);
     }
-    // Restituisce la factory di DAO appropriata in base alla persistenza selezionata
+
+    // Restituisce la factory di DAO appropriata in base alla persistenza
+    // selezionata
     private DaoFactory createDaoFactory() {
         PersistenceType persistenceType = switch (currentPersistence) {
             case "DEMO" -> PersistenceType.DEMO;
@@ -75,7 +84,6 @@ public class ApplicationController {
 
         return DaoFactory.getFactory(persistenceType);
     }
-
 
     private void updateAppConfigPersistence() {
         String appConfigType = switch (currentPersistence) {
@@ -92,8 +100,6 @@ public class ApplicationController {
         Platform.startup(() -> Platform.runLater(this::navigateToLogin));
     }
 
-
-
     public void navigateToLogin() throws NavigationException {
         LoginController controller = new LoginController(userDao, this);
         ILoginView view = viewFactory.createLoginView(controller);
@@ -101,14 +107,12 @@ public class ApplicationController {
         displayView(view);
     }
 
-
     public void navigateToRegistration() throws NavigationException {
         RegistrationController controller = new RegistrationController(userDao, this);
         IRegistrationView view = viewFactory.createRegistrationView(controller);
         controller.setView(view);
         displayView(view);
     }
-
 
     public void navigateToCollectorHomePage(UserBean user) throws NavigationException {
         model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
@@ -118,14 +122,15 @@ public class ApplicationController {
         displayView(view);
     }
 
-
     public void navigateToStoreHomePage(UserBean user) throws NavigationException {
         StoreHPController controller = new StoreHPController(user.getUsername(), this);
         IStoreHPView view = viewFactory.createStoreHomePageView(controller);
 
+        // Associo la view al controller grafico in modo che la view possa invocare i
+        // metodi del controller
+        controller.setView(view);
         displayView(view);
     }
-
 
     public void navigateToCollection(String username) throws NavigationException {
         IBinderDao binderDao = daoFactory.createBinderDao();
@@ -135,10 +140,10 @@ public class ApplicationController {
         displayView(collectionView);
     }
 
-
     /**
      * Show the Manage Trade UI (list of proposals / scheduled) for the given user.
-     * This is navigation-only: it creates the LiveTradeController and the view, preloads manage data
+     * This is navigation-only: it creates the LiveTradeController and the view,
+     * preloads manage data
      * and presents the view.
      */
     public void navigateToManageTrade(String username) throws NavigationException {
@@ -160,12 +165,12 @@ public class ApplicationController {
         }
     }
 
-
     public void navigateToTrade(String username, String proposalId) throws NavigationException {
-        if (username == null || proposalId == null) throw new NavigationException("Invalid parameters for navigateToTrade");
+        if (username == null || proposalId == null)
+            throw new NavigationException("Invalid parameters for navigateToTrade");
         try {
             LiveTradeController controller = new LiveTradeController(username, this);
-            ILiveTradeView tradeView = viewFactory.createTradeView(controller);
+            ICollectorTradeView tradeView = viewFactory.createTradeView(controller);
             controller.setView(tradeView);
             // Present the trade view to the user (ensure navbar and logout are visible)
             displayView(tradeView);
@@ -174,13 +179,13 @@ public class ApplicationController {
         }
     }
 
-
     public void navigateToLiveTrades(String username) throws NavigationException {
         try {
             LiveTradeController controller = new LiveTradeController(username, this);
-            ILiveTradeView tradeView = viewFactory.createTradeView(controller);
+            ICollectorTradeView tradeView = viewFactory.createTradeView(controller);
             controller.setView(tradeView);
-            // Ask controller to load scheduled trades and present them in the live trade view
+            // Ask controller to load scheduled trades and present them in the live trade
+            // view
             controller.loadScheduledTrades();
             displayView(tradeView);
         } catch (Exception ex) {
@@ -188,8 +193,29 @@ public class ApplicationController {
         }
     }
 
+    /**
+     * Naviga alla vista LiveTrade in modalità Store: la stessa view viene
+     * riutilizzata ma viene messa in "store mode" così da mostrare il form
+     * di inserimento session code e il pulsante refresh come richiesto dallo store.
+     */
+    public void navigateToStoreTrades(String username) throws NavigationException {
+        try {
+            LiveTradeController controller = new LiveTradeController(username, this);
+            // Create the store-specific trade view and associate it with the controller
+            view.IStoreTradeView storeView = viewFactory.createStoreTradeView(controller);
+            // controller.setStoreView(storeView); // already done by factory, but safe to call
+            controller.setStoreView(storeView);
+            // Ensure the view is shown first so its FXML controls are initialized
+            displayView(storeView);
+            // Load scheduled trades after the view is displayed to guarantee UI is ready
+            controller.loadScheduledTrades();
+        } catch (Exception ex) {
+            throw new NavigationException("Failed to navigate to Store Trades", ex);
+        }
+    }
 
-    public void navigateToNegotiation(String proposerUsername, model.bean.CardBean targetCard) throws NavigationException {
+    public void navigateToNegotiation(String proposerUsername, model.bean.CardBean targetCard)
+            throws NavigationException {
         // Create a NegotiationController with basic context (proposer and target owner)
         String targetOwner = targetCard != null ? targetCard.getOwner() : null;
         NegotiationController controller = new NegotiationController(proposerUsername, targetOwner, this);
@@ -203,7 +229,8 @@ public class ApplicationController {
             if (proposerUsername != null) {
                 java.util.List<model.domain.Binder> proposerBinders = binderDao.getUserBinders(proposerUsername);
                 for (model.domain.Binder b : proposerBinders) {
-                    if (b != null && b.getCards() != null) inventory.addAll(b.getCards());
+                    if (b != null && b.getCards() != null)
+                        inventory.addAll(b.getCards());
                 }
             }
 
@@ -221,17 +248,20 @@ public class ApplicationController {
             LOGGER.log(java.util.logging.Level.WARNING, "Could not assemble negotiation data: {0}", ex.getMessage());
         }
 
-        // Show the negotiation UI. Let the view implementation decide how to present itself
+        // Show the negotiation UI. Let the view implementation decide how to present
+        // itself
         try {
-            LOGGER.log(java.util.logging.Level.INFO, "Presenting negotiation view: proposer={0}, target={1}", new Object[]{proposerUsername, targetCard != null ? targetCard.getId() : "<null>"});
-            // The view implementation (FX or CLI) is responsible for presenting itself correctly.
+            LOGGER.log(java.util.logging.Level.INFO, "Presenting negotiation view: proposer={0}, target={1}",
+                    new Object[] { proposerUsername, targetCard != null ? targetCard.getId() : "<null>" });
+            // The view implementation (FX or CLI) is responsible for presenting itself
+            // correctly.
             negotiationView.display();
             LOGGER.info("Negotiation view presentation requested");
-        } catch (Exception _) {
-            throw new NavigationException("Failed to present negotiation view");
+        } catch (Exception ex) {
+            // Wrap original exception to provide context while preserving cause
+            throw new NavigationException("Failed to present negotiation view", ex);
         }
     }
-
 
     public void handleRoleBasedNavigation(UserBean loggedInUser) throws NavigationException {
         if (config.AppConfig.USER_TYPE_COLLECTOR.equals(loggedInUser.getUserType())) {
@@ -283,6 +313,13 @@ public class ApplicationController {
                 throw new NavigationException("Failed to close view: " + viewName, ex);
             }
         }
+    }
+
+    public model.api.ICardProvider getCardProvider() {
+        if (cardProvider == null) {
+            cardProvider = new model.api.ApiFactory().getCardProvider(currentGameType);
+        }
+        return cardProvider;
     }
 
 }

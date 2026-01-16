@@ -1,9 +1,12 @@
 package model.bean;
 
 
+import java.util.logging.Logger;
 import model.domain.enumerations.CardGameType;
 
 public class CardBean {
+    private static final Logger LOGGER = Logger.getLogger(CardBean.class.getName());
+
     private String id;
     private String name;
     private String imageUrl;
@@ -100,6 +103,7 @@ public class CardBean {
         try {
             this.gameType = CardGameType.valueOf(gameTypeName);
         } catch (Exception _) {
+            LOGGER.fine(() -> "Failed to parse gameType: " + gameTypeName);
             this.gameType = null;
         }
     }

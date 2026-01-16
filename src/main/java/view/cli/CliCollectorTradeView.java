@@ -3,10 +3,10 @@ package view.cli;
 import controller.LiveTradeController;
 import config.InputManager;
 import model.bean.TradeTransactionBean;
-import view.ILiveTradeView;
+import view.ICollectorTradeView;
 
 
-public class CliLiveTradeView implements ILiveTradeView {
+public class CliCollectorTradeView implements ICollectorTradeView {
 
     private static final String CONTROLLER_NOT_CONNECTED = "Controller non connesso";
 
@@ -15,7 +15,7 @@ public class CliLiveTradeView implements ILiveTradeView {
     // lazily created to avoid write-only warning when analyzer can't see usages
     private CliManageTradeView manageView;
 
-    public CliLiveTradeView(InputManager inputManager) {
+    public CliCollectorTradeView(InputManager inputManager) {
         if (inputManager == null) {
             throw new IllegalArgumentException("InputManager cannot be null");
         }
@@ -95,7 +95,7 @@ public class CliLiveTradeView implements ILiveTradeView {
         }
 
         // Use printf with %n for platform-specific line separator
-        System.out.printf("%n=== OVERVIEW SCAMBIO: %s ===%n", (t.getProposalId() != null ? t.getProposalId() : "<unknown>"));
+        System.out.printf("%n=== OVERVIEW SCAMBIO: tx-%d ===%n", t.getTransactionId());
         System.out.println("Proposer: " + (t.getProposerId() != null ? t.getProposerId() : "?"));
         System.out.println("Receiver: " + (t.getReceiverId() != null ? t.getReceiverId() : "?"));
         System.out.println("Store: " + (t.getStoreId() != null ? t.getStoreId() : "?"));
@@ -116,23 +116,6 @@ public class CliLiveTradeView implements ILiveTradeView {
             manageView = new CliManageTradeView();
         }
         manageView.setUsername(username);
-    }
-
-    public void onConfirmPresence(String id) {
-        if (id == null) {
-            System.out.println("Proposal id mancante");
-            return;
-        }
-        if (controller == null) {
-            System.out.println("Controller non connesso: impossibile confermare presenza");
-            return;
-        }
-        int code = controller.confirmPresence(id);
-        if (code > 0) {
-            System.out.println("Presenza confermata. Codice: " + code);
-        } else {
-            System.out.println("Errore durante la conferma della presenza.");
-        }
     }
 
     @Override
@@ -163,9 +146,9 @@ public class CliLiveTradeView implements ILiveTradeView {
         }
         for (int i = 0; i < scheduled.size(); i++) {
             TradeTransactionBean t = scheduled.get(i);
-            System.out.printf("%d) %s: %s vs %s @ %s%n", i + 1,
-                    t.getProposalId() != null ? t.getProposalId() : ("tx-" + t.getTransactionId()),
-                    t.getProposerId(), t.getReceiverId(), t.getStoreId());
+            System.out.printf("%d) tx-%d: %s vs %s @ %s%n", i + 1,
+                    t.getTransactionId(),
+                     t.getProposerId(), t.getReceiverId(), t.getStoreId());
         }
     }
 
@@ -179,7 +162,13 @@ public class CliLiveTradeView implements ILiveTradeView {
             System.out.print("Scegli un'opzione: ");
             String choice = inputManager.readString();
             switch (choice) {
-                case "1" -> onConfirmPresence(t.getProposalId());
+                case "1" -> {
+                    if (controller != null) {
+                        int code = controller.confirmPresence(t.getTransactionId());
+                        if (code > 0) System.out.println("Presenza confermata. Codice: " + code);
+                        else System.out.println("Errore durante la conferma della presenza.");
+                    } else System.out.println(CONTROLLER_NOT_CONNECTED);
+                }
 
                 case "2" -> displayIspection();
 

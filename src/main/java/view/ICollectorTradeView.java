@@ -2,14 +2,13 @@ package view;
 
 import model.bean.TradeTransactionBean;
 
+import java.util.List;
+
 /**
- * Interfaccia per la View di Live Trades (scambi programmati).
- * Responsabilità della View:
- * - Visualizzare i dettagli di uno scambio o la lista degli scambi schedulati.
- * - Fornire un metodo per ricevere il controller (`setController`) e delegare
- *   le azioni (confirm presence, start trade, etc.) al controller applicativo.
+ * Interfaccia per la View di Live Trades (scambi programmati) destinata al collezionista.
+ * La view del collezionista non deve esporre metodi specifici della modalità store.
  */
-public interface ILiveTradeView extends IView {
+public interface ICollectorTradeView extends IView {
 
     // Mostra i dettagli di uno scambio (usato per aprire dialog sullo scambio)
     void displayTrade(TradeTransactionBean tradeTransaction);
@@ -23,7 +22,13 @@ public interface ILiveTradeView extends IView {
     // Eventi di presentazione: mostra l'interfaccia per ispezione (es. store manager)
     void displayIspection();
 
+    // Invocato dal controller quando l'ispezione è completata per mostrare feedback
+    void onIspectionComplete(String username);
+
+    // Invocato dal controller quando lo scambio è completato per mostrare feedback
+    void onTradeComplete(String tradeId);
+
     // Mostra la lista di scambi schedulati per questo utente
-    void displayScheduledTrades(java.util.List<model.bean.TradeTransactionBean> scheduled);
+    void displayScheduledTrades(List<TradeTransactionBean> scheduled);
 
 }

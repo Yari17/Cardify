@@ -2,6 +2,7 @@ package view;
 
 import model.bean.ProposalBean;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Interfaccia per la View di "Manage Trades".
@@ -19,16 +20,15 @@ public interface IManageTradeView extends IView {
     // Mostra le proposte in attesa e le proposte concluse/programmati
     void displayTrades(List<ProposalBean> pending, List<ProposalBean> scheduled);
 
-    // Imposta l'username corrente per adattare la UI (es. evidenziare incoming proposals)
+
     void setUsername(String username);
 
-    // API basata su callback: la view registra i callback che il controller
-    // fornisce per le azioni utente (accept/decline/trade). Questo riduce
-    // il coupling perché la view non deve conoscere il tipo concreto del controller.
-    void registerOnAccept(java.util.function.Consumer<String> onAccept);
-    void registerOnDecline(java.util.function.Consumer<String> onDecline);
-    void registerOnCancel(java.util.function.Consumer<String> onCancel);
-    void registerOnTradeClick(java.util.function.Consumer<String> onTradeClick);
-    void registerOnTradeNowClick(java.util.function.Consumer<String> onTradeNowClick);
+
+
+    void registerOnAccept(Consumer<String> onAccept);
+    void registerOnDecline(Consumer<String> onDecline);
+    void registerOnCancel(Consumer<String> onCancel);
+    void registerOnTradeClick(Consumer<String> onTradeClick);
+    void registerOnTradeNowClick(Consumer<String> onTradeNowClick);
 
 }

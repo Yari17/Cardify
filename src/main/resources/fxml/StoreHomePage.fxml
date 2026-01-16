@@ -20,35 +20,20 @@
 
                 <Separator styleClass="nav-separator"/>
 
-                <!-- Store Actions -->
+                <!-- Store Actions: mantenere solo Gestisci scambi come richiesto -->
                 <Label text="Gestione Store" styleClass="text-primary"
                        style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
 
                 <HBox spacing="15.0">
                     <children>
-                        <Button text="Gestisci Inventario" prefWidth="200.0" prefHeight="50.0"
-                                styleClass="button-accent"/>
-                        <Button text="Visualizza Ordini" prefWidth="200.0" prefHeight="50.0"
-                                styleClass="button-accent"/>
-                        <Button text="Statistiche Vendite" prefWidth="200.0" prefHeight="50.0"
-                                styleClass="button-accent"/>
+                        <Button text="Gestisci scambi" prefWidth="200.0" prefHeight="50.0"
+                                styleClass="button-accent" onAction="#onManageTradesClicked"/>
                     </children>
                 </HBox>
 
                 <Separator styleClass="nav-separator"/>
 
-                <!-- Store Info -->
-                <Label text="Informazioni Store" styleClass="text-primary"
-                       style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
-
-                <HBox spacing="15.0">
-                    <children>
-                        <Button text="Profilo Store" prefWidth="200.0" prefHeight="50.0"
-                                styleClass="button-accent"/>
-                        <Button text="Impostazioni" prefWidth="200.0" prefHeight="50.0"
-                                styleClass="button-accent"/>
-                    </children>
-                </HBox>
+                <!-- Store Info - removed per request -->
 
             </children>
         </VBox>
@@ -58,8 +43,6 @@
             <children>
                 <Button text="Logout" onAction="#onLogoutClicked" prefWidth="100.0"
                         style="-fx-background-color: #ff6b6b; -fx-text-fill: white; -fx-cursor: hand;"/>
-                <Button text="Esci" onAction="#onExitClicked" prefWidth="100.0"
-                        style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-cursor: hand;"/>
             </children>
         </HBox>
 

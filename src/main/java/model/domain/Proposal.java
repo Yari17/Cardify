@@ -110,7 +110,6 @@ public class Proposal {
      * Returns null if insufficient data.
      */
     public TradeTransaction toTradeTransaction() {
-        // lazy-import to avoid circular references in some build setups
         TradeStatus defaultStatus = TradeStatus.WAITING_FOR_ARRIVAL;
         int txId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
         LocalDateTime creation = LocalDateTime.now();
@@ -122,7 +121,20 @@ public class Proposal {
         List<Card> offered = this.cardsOffered != null ? new java.util.ArrayList<>(this.cardsOffered) : java.util.Collections.emptyList();
         List<Card> requested = this.cardsRequested != null ? new java.util.ArrayList<>(this.cardsRequested) : java.util.Collections.emptyList();
 
-        return new TradeTransaction(txId, defaultStatus, this.proposerId, this.receiverId, this.meetingPlace, creation, tradeDate, offered, requested);
+        // Crea i value object richiesti dal costruttore
+        TradeTransaction.TradeParticipants participants = new TradeTransaction.TradeParticipants(
+            this.proposerId,
+            this.receiverId,
+            this.meetingPlace
+        );
+        TradeTransaction.TradeDetails details = new TradeTransaction.TradeDetails(
+            creation,
+            tradeDate,
+            offered,
+            requested
+        );
+
+        return new TradeTransaction(txId, defaultStatus, participants, details);
     }
 
 }

@@ -13,7 +13,12 @@ public class TradeTransactionBean {
     private List<CardBean> offered = new ArrayList<>();
     private List<CardBean> requested = new ArrayList<>();
     private String status;
-    private String proposalId;
+    private int proposerSessionCode;
+    private int receiverSessionCode;
+    private Boolean proposerInspectionOk;
+    private Boolean receiverInspectionOk;
+    private boolean proposerArrived;
+    private boolean receiverArrived;
 
     public int getTransactionId() { return transactionId; }
     public void setTransactionId(int transactionId) { this.transactionId = transactionId; }
@@ -39,6 +44,21 @@ public class TradeTransactionBean {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getProposalId() { return proposalId; }
-    public void setProposalId(String proposalId) { this.proposalId = proposalId; }
+    public int getProposerSessionCode() { return proposerSessionCode; }
+    public void setProposerSessionCode(int proposerSessionCode) { this.proposerSessionCode = proposerSessionCode; }
+
+    public int getReceiverSessionCode() { return receiverSessionCode; }
+    public void setReceiverSessionCode(int receiverSessionCode) { this.receiverSessionCode = receiverSessionCode; }
+
+    public Boolean getProposerInspectionOk() { return proposerInspectionOk; }
+    public void setProposerInspectionOk(Boolean proposerInspectionOk) { this.proposerInspectionOk = proposerInspectionOk; }
+
+    public Boolean getReceiverInspectionOk() { return receiverInspectionOk; }
+    public void setReceiverInspectionOk(Boolean receiverInspectionOk) { this.receiverInspectionOk = receiverInspectionOk; }
+
+    public boolean isProposerArrived() { return proposerArrived; }
+    public void setProposerArrived(boolean proposerArrived) { this.proposerArrived = proposerArrived; }
+
+    public boolean isReceiverArrived() { return receiverArrived; }
+    public void setReceiverArrived(boolean receiverArrived) { this.receiverArrived = receiverArrived; }
 }

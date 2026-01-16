@@ -22,10 +22,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.geometry.Insets;
-import view.ILiveTradeView;
+import view.ICollectorTradeView;
 
-public class FXLiveTradeView implements ILiveTradeView {
-    private static final Logger LOGGER = Logger.getLogger(FXLiveTradeView.class.getName());
+public class FXCollectorTradeView implements ICollectorTradeView {
+    private static final Logger LOGGER = Logger.getLogger(FXCollectorTradeView.class.getName());
 
     // Constants to avoid duplicated literals
     private static final String NAV_SELECTED = "nav-selected";
@@ -85,8 +85,10 @@ public class FXLiveTradeView implements ILiveTradeView {
 
     private LiveTradeController controller;
     private Stage stage;
+    private boolean storeMode = false; // quando true la view si comporta come interfaccia dello store
+    private String currentUsername;
 
-    public FXLiveTradeView() {
+    public FXCollectorTradeView() {
         // FXML fields will be injected by FXMLLoader
     }
 
@@ -159,7 +161,7 @@ public class FXLiveTradeView implements ILiveTradeView {
 
     private VBox buildTextVBox(TradeTransactionBean item) {
         VBox txt = new VBox(4);
-        String title = item.getProposalId() != null ? item.getProposalId() : "Scheduled";
+        String title = "tx-" + item.getTransactionId();
         Label titleLabel = new Label(title);
         titleLabel.getStyleClass().add("trade-cell-label");
 
@@ -229,7 +231,7 @@ public class FXLiveTradeView implements ILiveTradeView {
             Button tradeBtn = new Button("Trade");
             tradeBtn.getStyleClass().add("button-filter");
             tradeBtn.setOnAction(evt -> {
-                if (controller != null) controller.startTrade(item.getProposalId());
+                if (controller != null) controller.startTrade(String.valueOf(item.getTransactionId()));
                 evt.consume();
             });
             actions.getChildren().add(tradeBtn);
@@ -309,6 +311,7 @@ public class FXLiveTradeView implements ILiveTradeView {
         if (usernameLabel != null) {
             usernameLabel.setText(username);
         }
+        this.currentUsername = username;
     }
 
 
@@ -379,7 +382,7 @@ public class FXLiveTradeView implements ILiveTradeView {
             Stage dialog = new Stage();
             dialog.initOwner(stage);
             dialog.initModality(Modality.WINDOW_MODAL);
-            dialog.setTitle("Trade - " + (transaction.getProposalId() != null ? transaction.getProposalId() : "-"));
+            dialog.setTitle("Trade - tx-" + transaction.getTransactionId());
 
             Scene scene = createTradeDialogScene(transaction);
 
@@ -404,13 +407,112 @@ public class FXLiveTradeView implements ILiveTradeView {
         }
         Label date = new Label("Data: " + dateStr); date.setStyle(TEXT_FILL_WHITE);
 
-        content.getChildren().addAll(hdr, store, date);
+        // Label stato e bottone refresh (definiti una sola volta)
+        Label statusLabel = new Label("Stato: " + (transaction.getStatus() != null ? transaction.getStatus() : "--"));
+        statusLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FFD700;");
+        Button refreshBtn = new Button("Aggiorna");
+        refreshBtn.setStyle("-fx-font-size: 16px;");
+        refreshBtn.getStyleClass().add("button-accent");
+        refreshBtn.setOnAction(ev -> {
+            TradeTransactionBean refreshed = controller.refreshTradeStatus(transaction.getTransactionId());
+            if (refreshed != null) {
+                statusLabel.setText("Stato: " + (refreshed.getStatus() != null ? refreshed.getStatus() : "--"));
+            } else {
+                statusLabel.setText("Stato: Errore");
+            }
+            ev.consume();
+        });
+        HBox statusBox = new HBox(12, statusLabel, refreshBtn);
+        statusBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        content.getChildren().addAll(hdr, store, date, statusBox);
 
         HBox lists = buildTradeLists(transaction);
         content.getChildren().addAll(lists);
 
-        Button confirmBtn = buildConfirmButton(transaction);
-        content.getChildren().add(confirmBtn);
+        // Se la view è in modalità store mostriamo una UI diversa con refresh e form per il session code
+        if (storeMode) {
+            boolean nobodyArrived = (transaction.getProposerSessionCode() == 0 && transaction.getReceiverSessionCode() == 0);
+            if (nobodyArrived) {
+                Label msg = new Label("Nessuno dei due collezionisti è ancora arrivato in negozio, quando arriverà il primo ti fornirà il suo session code da inserire qui");
+                msg.setWrapText(true);
+                msg.setStyle(TEXT_FILL_WHITE);
+                content.getChildren().add(msg);
+
+                javafx.scene.control.TextField codeField = new javafx.scene.control.TextField();
+                codeField.setPromptText("Inserisci session code");
+                content.getChildren().add(codeField);
+
+                HBox buttons = new HBox(8);
+                Button submit = new Button("Conferma codice");
+                buttons.getChildren().addAll(submit, refreshBtn); // usa lo stesso refreshBtn
+                content.getChildren().add(buttons);
+
+                submit.setOnAction(ev -> {
+                    String txt = codeField.getText();
+                    try {
+                        int code = Integer.parseInt(txt.trim());
+                        boolean ok = controller.verifySessionCode(transaction.getTransactionId(), code);
+                        if (ok) {
+                            model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                            if (updated != null) {
+                                statusLabel.setText("Codice valido. Stato corrente: " + (updated.getStatus() != null ? updated.getStatus() : "?"));
+                                codeField.setDisable(true);
+                                submit.setDisable(true);
+                            }
+                        } else {
+                            Label err = new Label("Codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); content.getChildren().add(err);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        Label err = new Label("Formato codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); content.getChildren().add(err);
+                    }
+                    ev.consume();
+                });
+            } else {
+                // Almeno uno è arrivato: mostra informazioni e pulsante refresh
+                content.getChildren().addAll(statusLabel, refreshBtn);
+            }
+        } else {
+            // Collector mode: if current user already arrived, show persistent code and hide confirm button
+            VBox actionArea = new VBox(6);
+            actionArea.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+            boolean userIsProposer = currentUsername != null && currentUsername.equals(transaction.getProposerId());
+            boolean userIsReceiver = currentUsername != null && currentUsername.equals(transaction.getReceiverId());
+
+            if ((userIsProposer && transaction.isProposerArrived()) || (userIsReceiver && transaction.isReceiverArrived())) {
+                int code = userIsProposer ? transaction.getProposerSessionCode() : transaction.getReceiverSessionCode();
+                Label codeLabel = new Label("Presenza confermata. Codice: " + (code > 0 ? code : "---") + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
+                codeLabel.setStyle(TEXT_FILL_WHITE);
+                actionArea.getChildren().add(codeLabel);
+            } else {
+                Button confirmBtn = new Button("Conferma la tua presenza");
+                confirmBtn.setOnAction(ev -> {
+                    if (controller == null) {
+                        showError("Controller non connesso");
+                        ev.consume();
+                        return;
+                    }
+                    int code = controller.confirmPresence(transaction.getTransactionId());
+                    if (code > 0) {
+                        Label codeLabel = new Label("Presenza confermata. Codice: " + code + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
+                        codeLabel.setStyle(TEXT_FILL_WHITE);
+                        actionArea.getChildren().setAll(codeLabel);
+                        model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                        if (updated != null) {
+                            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception ignore) {}
+                        }
+                        displayScheduledTrades(java.util.List.of(updated != null ? updated : transaction));
+                        refresh();
+                    } else {
+                        confirmBtn.setText("Errore durante la conferma");
+                    }
+                    ev.consume();
+                });
+                actionArea.getChildren().add(confirmBtn);
+            }
+
+            content.getChildren().add(actionArea);
+        }
 
         Scene scene = new Scene(content, 700, 500);
         try {
@@ -441,50 +543,49 @@ public class FXLiveTradeView implements ILiveTradeView {
     private Button buildConfirmButton(TradeTransactionBean transaction) {
         Button confirmBtn = new Button("Conferma la tua presenza");
         confirmBtn.setOnAction(ev -> {
-            if (controller != null) {
-                int code = controller.confirmPresence(transaction.getProposalId());
-                if (code > 0) {
-                    confirmBtn.setText("Presenza confermata. Codice: " + code);
-                    confirmBtn.setDisable(true);
-                } else {
-                    confirmBtn.setText("Errore durante la conferma");
-                }
+            if (controller == null) {
+                showError("Controller non connesso");
+                ev.consume();
+                return;
             }
-            ev.consume();
-        });
-        return confirmBtn;
-    }
 
-    public void onConfirmPresence(String userId) {
-        if (userId == null) return;
-        javafx.application.Platform.runLater(() -> {
-            if (controller != null) {
-                int code = controller.confirmPresence(userId);
-                // show simple feedback dialog
+            int code = controller.confirmPresence(transaction.getTransactionId());
+            if (code > 0) {
+                // Show modal dialog with the session code and clear instructions
                 Stage dlg = new Stage();
                 dlg.initOwner(stage);
                 dlg.initModality(Modality.WINDOW_MODAL);
-                dlg.setTitle("Presenza");
+                dlg.setTitle("Presenza confermata");
                 VBox box = new VBox(10);
-                box.setPadding(new Insets(12));
-                Label msg = new Label(code > 0 ? "Presenza confermata. Codice: " + code : "Errore durante la conferma");
+                box.setPadding(new javafx.geometry.Insets(12));
+                Label msg = new Label("Presenza confermata. Codice: " + code);
                 msg.setStyle(TEXT_FILL_WHITE);
+                Label instr = new Label("Mostra questo codice allo store manager per confermare la tua presenza allo scambio");
+                instr.setStyle(TEXT_FILL_WHITE);
                 Button ok = new Button("OK");
-                ok.setOnAction(ex -> { dlg.close(); ex.consume(); });
-                box.getChildren().addAll(msg, ok);
+                ok.setOnAction(ae -> { dlg.close(); ae.consume(); });
+                box.getChildren().addAll(msg, instr, ok);
                 box.setStyle(BG_COLOR_STYLE);
-                Scene s = new Scene(box, 360, 120);
+                Scene s = new Scene(box, 420, 150);
                 try {
                     java.net.URL res = getClass().getResource(view.IView.themeCssPath());
                     if (res != null) s.getStylesheets().add(res.toExternalForm());
-                } catch (Exception ex) {
-                    LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage());
-                }
+                } catch (Exception ex) { LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage()); }
                 dlg.setScene(s);
                 dlg.showAndWait();
+
+                confirmBtn.setDisable(true);
+            } else {
+                // show inline message
+                confirmBtn.setText("Errore durante la conferma");
             }
+
+            ev.consume();
         });
+
+        return confirmBtn;
     }
+
 
     public void displayIspection() {
         // Minimal placeholder: show a dialog indicating inspection should happen

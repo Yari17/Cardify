@@ -1,28 +1,30 @@
 [
   {
-    "transactionId": 1130252604,
-    "tradeStatus": "WAITING_FOR_ARRIVAL",
-    "proposerId": "user1",
-    "receiverId": "user2",
-    "proposerSessionCode": 0,
-    "receiverSessionCode": 0,
-    "storeId": "La Tana del Goblin",
-    "creationTimestamp": "2026-01-15T21:34:54.085007",
-    "tradeDate": "2026-01-16T00:00",
+    "transactionId": 1214693586,
+    "tradeStatus": "INSPECTION_PHASE",
+    "proposerId": "user3",
+    "receiverId": "user1",
+    "proposerSessionCode": 781346,
+    "receiverSessionCode": 260562,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "CiccioGamer89TCG",
+    "creationTimestamp": "2026-01-16T21:02:15.067427",
+    "tradeDate": "2026-01-18T22:20",
     "offeredCards": [
       {
-        "id": "base5-13",
-        "name": "Dark Vileplume",
-        "imageUrl": "https://assets.tcgdex.net/en/base/base5/13/high.png",
+        "id": "A2a-047",
+        "name": "Garchomp ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/047/high.png",
         "gameType": "POKEMON",
         "quantity": 1
       }
     ],
     "requestedCards": [
       {
-        "id": "ecard3-2",
-        "name": "Alakazam",
-        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/2/high.png",
+        "id": "B1-052",
+        "name": "Mega Gyarados ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/052/high.png",
         "gameType": "POKEMON",
         "quantity": 1
       }

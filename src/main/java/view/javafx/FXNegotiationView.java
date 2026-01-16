@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.beans.binding.Bindings;
 import model.bean.CardBean;
 import model.bean.ProposalBean;
 import view.INegotiationView;
@@ -83,6 +84,16 @@ public class FXNegotiationView implements INegotiationView {
             proposedList.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2) handleRemove();
             });
+        }
+
+        // Disabilita il pulsante Confirm se non ci sono carte proposte (UX improvement)
+        try {
+            if (confirmButton != null && proposedList != null) {
+                // Bind the disable property to the emptiness of the proposed list
+                confirmButton.disableProperty().bind(Bindings.isEmpty(proposedList.getItems()));
+            }
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Failed to bind confirm button disable property: " + ex.getMessage());
         }
     }
 
@@ -167,7 +178,12 @@ public class FXNegotiationView implements INegotiationView {
 
     @Override
     public void showError(String errorMessage) {
-
+        javafx.application.Platform.runLater(() -> {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+            alert.setTitle("Errore");
+            alert.setHeaderText(errorMessage != null ? errorMessage : "Si è verificato un errore");
+            alert.showAndWait();
+        });
     }
 
     @Override
@@ -279,21 +295,22 @@ public class FXNegotiationView implements INegotiationView {
             try {
                 java.time.LocalDate d = java.time.LocalDate.parse(meetingDate.trim());
                 if (!d.isAfter(java.time.LocalDate.now())) dateOk = false;
-            } catch (Exception _) { dateOk = false; }
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Invalid meeting date input in FXNegotiationView: " + ex.getMessage());
+                dateOk = false;
+            }
         }
 
         if (meetingPlace == null || meetingPlace.trim().isEmpty()) {
             // indicate error to user (simple close or ignored)
             // showConfirmationResult used for messages; reuse to indicate error
-            if (onConfirm != null) {
-                // pass failure
-                // view-level: maybe show an alert; for now call showConfirmationResult(false,...)
-                if (stage != null) {
+            if (onConfirm != null&&stage != null) {
+
                     javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
                     a.setTitle("Errore proposta");
                     a.setHeaderText("Seleziona uno store per effettuare lo scambio");
                     a.showAndWait();
-                }
+
             }
             return;
         }

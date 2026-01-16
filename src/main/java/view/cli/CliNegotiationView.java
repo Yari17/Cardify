@@ -5,6 +5,7 @@ import model.bean.CardBean;
 import model.bean.ProposalBean;
 import config.InputManager;
 import org.jetbrains.annotations.NotNull;
+import java.util.logging.Logger;
 import view.INegotiationView;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("java:S106")
 public class CliNegotiationView implements INegotiationView {
+    private static final Logger LOGGER = Logger.getLogger(CliNegotiationView.class.getName());
     private final InputManager inputManager;
     private NegotiationController controller;
     private List<CardBean> inventory = new ArrayList<>();
@@ -152,6 +154,11 @@ public class CliNegotiationView implements INegotiationView {
         } catch (NumberFormatException _) {System.out.println(INVALID_INDEX_MSG);}    }
 
     private void handleConfirm() {
+        // VALIDATION: ensure at least one offered card
+        if (proposed == null || proposed.isEmpty()) {
+            System.out.println("Devi offrire almeno una carta prima di confermare la proposta.");
+            return;
+        }
         // Ask for meeting place and date in CLI
         System.out.println("Available stores:");
         for (int i = 0; i < availableStores.size(); i++) {
@@ -176,7 +183,8 @@ public class CliNegotiationView implements INegotiationView {
                 System.out.println("Date must be after today");
                 return;
             }
-        } catch (Exception _) {
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Invalid date format input in CLI negotiation: " + ex.getMessage());
             System.out.println("Invalid date format");
             return;
         }
@@ -215,7 +223,8 @@ public class CliNegotiationView implements INegotiationView {
             try {
                 java.time.LocalTime.parse(timeIn);
                 bean.setMeetingTime(timeIn);
-            } catch (Exception _) {
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Invalid meeting time provided in CLI negotiation: " + ex.getMessage());
                 System.out.println("Invalid time format, ignoring time");
                 bean.setMeetingTime(null);
             }

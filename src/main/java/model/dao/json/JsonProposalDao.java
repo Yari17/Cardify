@@ -96,6 +96,7 @@ public class JsonProposalDao implements IProposalDao {
 
     @Override
     public Optional<Proposal> getById(String proposalId) {
+        if (proposalId == null) return Optional.empty();
         return Optional.ofNullable(proposalsById.get(proposalId));
     }
 

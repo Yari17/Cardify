@@ -14,10 +14,12 @@ import view.cli.CliRegistrationView;
 import view.IRegistrationView;
 import view.cli.CliStoreHPView;
 import view.IStoreHPView;
-import view.cli.CliLiveTradeView;
-import view.ILiveTradeView;
+import view.cli.CliCollectorTradeView;
+import view.ICollectorTradeView;
 import view.cli.CliNegotiationView;
 import view.INegotiationView;
+import view.cli.CliStoreTradeView;
+import view.IStoreTradeView;
 
 public class CliIViewFactory implements IViewFactory {
 
@@ -63,8 +65,8 @@ public class CliIViewFactory implements IViewFactory {
     }
 
     @Override
-    public ILiveTradeView createTradeView(LiveTradeController controller) {
-        CliLiveTradeView view = new CliLiveTradeView(inputManager);
+    public ICollectorTradeView createTradeView(LiveTradeController controller) {
+        CliCollectorTradeView view = new CliCollectorTradeView(inputManager);
         view.setController(controller);
         return view;
     }
@@ -86,6 +88,13 @@ public class CliIViewFactory implements IViewFactory {
         view.registerOnCancel(controller::declineProposal);
         view.registerOnTradeClick(controller::initiateTrade);
         view.registerOnTradeNowClick(controller::initiateTrade);
+        return view;
+    }
+
+    @Override
+    public IStoreTradeView createStoreTradeView(LiveTradeController controller) {
+        CliStoreTradeView view = new CliStoreTradeView();
+        view.setController(controller);
         return view;
     }
 }

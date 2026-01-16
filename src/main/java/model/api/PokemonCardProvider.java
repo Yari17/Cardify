@@ -55,7 +55,8 @@ public class PokemonCardProvider implements ICardProvider {
             }
 
             return cardList;
-        } catch (NullPointerException _) {
+        } catch (NullPointerException ex) {
+            LOGGER.fine(() -> "NullPointer while processing set data: " + ex.getMessage());
             return new ArrayList<>();
         }
     }
@@ -83,11 +84,13 @@ public class PokemonCardProvider implements ICardProvider {
             JsonArray jsonArray = gson.fromJson(response.body(), JsonArray.class);
 
             return getCards(jsonArray);
-        } catch (InterruptedException _) {
+        } catch (InterruptedException ex) {
             // Re-interrompi il thread per preservare lo stato di interruzione
             Thread.currentThread().interrupt();
+            LOGGER.fine(() -> "HTTP request interrupted: " + ex.getMessage());
             return new ArrayList<>();
-        } catch (Exception _) {
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Failed to search cards by name: " + ex.getMessage());
             return new ArrayList<>();
         }
     }

@@ -83,6 +83,8 @@ public class CliManageTradeView implements IManageTradeView {
         if (manageController == null) { System.out.println("[CLI] No manage controller wired - cannot accept proposal"); return; }
         boolean ok = manageController.acceptProposal(id);
         System.out.println(ok ? "[CLI] Proposal accepted: " + id : "[CLI] Failed to accept proposal: " + id);
+        // refresh view after accept
+        manageController.loadAndDisplayTrades(this);
     }
 
     public void onCancelTradeProposal(String id) {
@@ -101,6 +103,8 @@ public class CliManageTradeView implements IManageTradeView {
         if (manageController == null) { System.out.println("[CLI] No manage controller wired - cannot decline proposal"); return; }
         boolean ok = manageController.declineProposal(id);
         System.out.println(ok ? "[CLI] Proposal declined: " + id : "[CLI] Failed to decline proposal: " + id);
+        // refresh view after decline
+        manageController.loadAndDisplayTrades(this);
     }
 
     public void onTradeClick(String id) {
