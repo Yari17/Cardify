@@ -14,17 +14,24 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JsonTradeDaoIntegrationTest {
+class JsonTradeDaoIntegrationTest {
 
     @Test
-    public void saveTrade_persistsEntryInJsonFile() throws Exception {
+    void saveTrade_persistsEntryInJsonFile() throws Exception {
         File tmp = Files.createTempFile("trades-test", ".json").toFile();
         tmp.deleteOnExit();
 
         JsonTradeDao dao = new JsonTradeDao(tmp.getAbsolutePath());
         Card c = new Card("id1","n","http://img", CardGameType.POKEMON);
         c.setQuantity(1);
-        TradeTransaction tx = new TradeTransaction(0, TradeStatus.WAITING_FOR_ARRIVAL, "user1", "user2", "storeX", LocalDateTime.now(), LocalDateTime.now().plusDays(1), List.of(c), List.of());
+        TradeTransaction.TradeParticipants participants = new TradeTransaction.TradeParticipants("user1", "user2", "storeX");
+        TradeTransaction.TradeDetails details = new TradeTransaction.TradeDetails(
+            LocalDateTime.now(),
+            LocalDateTime.now().plusDays(1),
+            List.of(c),
+            List.of()
+        );
+        TradeTransaction tx = new TradeTransaction(0, TradeStatus.WAITING_FOR_ARRIVAL, participants, details);
         dao.save(tx);
 
         // reload from file to ensure it's persisted
