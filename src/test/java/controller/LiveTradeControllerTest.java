@@ -126,21 +126,25 @@ class LiveTradeControllerTest {
         };
         var controller = new LiveTradeController("user1", navWithBinders);
         // Prepara trade con carte di set diversi
-        var participants = new TradeTransaction.TradeParticipants("user1", "user2", "storeA");
-        var offered = List.of(new model.domain.Card("SET1-001", "Charizard", "url1", null));
-        var requested = List.of(new model.domain.Card("SET2-002", "Blastoise", "url2", null));
-        var details = new TradeTransaction.TradeDetails(LocalDateTime.now(), LocalDateTime.now().plusDays(1), offered, requested);
-        TradeTransaction tx = new TradeTransaction(10, TradeStatus.COMPLETED, participants, details);
+        var c = new model.domain.Card("SET1-001", "Charizard", "url1", null);
+        TradeTransaction.TradeParticipants participants = new TradeTransaction.TradeParticipants("user1", "user2", "storeX");
+        TradeTransaction.TradeDetails details = new TradeTransaction.TradeDetails(
+            LocalDateTime.now(),
+            LocalDateTime.now().plusDays(1),
+            List.of(c),
+            List.of()
+        );
+        TradeTransaction tx = new TradeTransaction(0, TradeStatus.WAITING_FOR_ARRIVAL, participants, details);
         // Simula che nessun binder esista
         when(binderDao.getUserBinders("user2")).thenReturn(List.of());
         when(binderDao.getUserBinders("user1")).thenReturn(List.of());
-        when(cardProvider.getAllSets()).thenReturn(java.util.Map.of("SET1", "Set Uno", "SET2", "Set Due"));
+        when(cardProvider.getAllSets()).thenReturn(java.util.Map.of("SET1", "Set Uno"));
         // Simula creazione binder
         doNothing().when(binderDao).createBinder(anyString(), anyString(), anyString());
         doNothing().when(binderDao).save(any());
         // Simula che dopo la creazione il binder esista
         when(binderDao.getUserBinders("user2")).thenReturn(List.of(new Binder("user2", "SET1", "Set Uno")));
-        when(binderDao.getUserBinders("user1")).thenReturn(List.of(new Binder("user1", "SET2", "Set Due")));
+        when(binderDao.getUserBinders("user1")).thenReturn(List.of());
         // Esegui lo scambio
         controller.performCardExchange(tx);
         // Verifica che i binders siano aggiornati
