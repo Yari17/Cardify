@@ -118,7 +118,7 @@ public class PokemonCardProvider implements ICardProvider {
     }
 
 
-    @SuppressWarnings("unchecked")
+
     @Override
     public <T extends Card> T getCardDetails(String cardId) {
 

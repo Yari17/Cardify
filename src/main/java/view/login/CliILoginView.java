@@ -4,7 +4,7 @@ import controller.LoginController;
 import model.bean.UserBean;
 import config.InputManager;
 
-@SuppressWarnings("java:S106")
+
 public class CliILoginView implements ILoginView {
     private final InputManager inputManager;
     private LoginController controller;

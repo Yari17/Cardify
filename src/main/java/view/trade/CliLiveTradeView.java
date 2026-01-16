@@ -5,7 +5,7 @@ import config.InputManager;
 import model.bean.TradeTransactionBean;
 import view.managetrade.CliManageTradeView;
 
-@SuppressWarnings("java:S106")
+
 public class CliLiveTradeView implements ILiveTradeView {
 
     private final InputManager inputManager;

@@ -37,9 +37,11 @@ public class TradeTransaction {
         this.proposerReviewed = false;
         this.receiverReviewed = false;
     }
+
     public int generateSessionCode() {
-        return (int)(Math.random() * 900000) + 100000; // Generates a random 6-digit code
+        return (int) (Math.random() * 900000) + 100000; // Generates a random 6-digit code
     }
+
     public void updateTradeStatus(TradeStatus newStatus) {
         this.tradeStatus = newStatus;
     }
@@ -54,17 +56,52 @@ public class TradeTransaction {
     }
 
     // ===== Getters used by controllers/views =====
-    public int getTransactionId() { return transactionId; }
-    public void setTransactionId(int transactionId) { this.transactionId = transactionId; }
-    public TradeStatus getTradeStatus() { return tradeStatus; }
-    public String getProposerId() { return proposerId; }
-    public String getReceiverId() { return receiverId; }
-    public String getStoreId() { return storeId; }
-    public LocalDateTime getCreationTimestamp() { return creationTimestamp; }
-    public LocalDateTime getTradeDate() { return tradeDate; }
-    public List<Card> getOfferedCards() { return offeredCards; }
-    public List<Card> getRequestedCards() { return requestedCards; }
-    public boolean isProposerReviewed() { return proposerReviewed; }
-    public boolean isReceiverReviewed() { return receiverReviewed; }
+    public int getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public TradeStatus getTradeStatus() {
+        return tradeStatus;
+    }
+
+    public String getProposerId() {
+        return proposerId;
+    }
+
+    public String getReceiverId() {
+        return receiverId;
+    }
+
+    public String getStoreId() {
+        return storeId;
+    }
+
+    public LocalDateTime getCreationTimestamp() {
+        return creationTimestamp;
+    }
+
+    public LocalDateTime getTradeDate() {
+        return tradeDate;
+    }
+
+    public List<Card> getOfferedCards() {
+        return offeredCards;
+    }
+
+    public List<Card> getRequestedCards() {
+        return requestedCards;
+    }
+
+    public boolean isProposerReviewed() {
+        return proposerReviewed;
+    }
+
+    public boolean isReceiverReviewed() {
+        return receiverReviewed;
+    }
 
 }
