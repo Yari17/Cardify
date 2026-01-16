@@ -237,7 +237,7 @@ public class FXNegotiationView implements INegotiationView {
             try {
                 java.time.LocalDate d = java.time.LocalDate.parse(meetingDate.trim());
                 if (!d.isAfter(java.time.LocalDate.now())) dateOk = false;
-            } catch (Exception ex) { dateOk = false; }
+            } catch (Exception ignored) { dateOk = false; }
         }
 
         if (meetingPlace == null || meetingPlace.trim().isEmpty()) {
@@ -325,7 +325,7 @@ public class FXNegotiationView implements INegotiationView {
                     LOGGER.fine(() -> "Failed to load thumbnail for negotiation cell: " + ex.getMessage());
                     java.io.InputStream is = getClass().getResourceAsStream("/icons/nocardimage.svg");
                     if (is != null) {
-                        try { thumb.setImage(new Image(is)); } catch (Exception e) { LOGGER.fine(() -> "Fallback image failed: " + e.getMessage()); }
+                        try { thumb.setImage(new Image(is)); } catch (Exception innerEx) { LOGGER.fine(() -> "Fallback image failed: " + innerEx.getMessage()); }
                     }
                 }
 

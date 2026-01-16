@@ -188,8 +188,8 @@ public class FXCollectionView implements ICollectionView {
         // Load first page of cards
         try {
             loadCardsPage(setId, allCards, binder, cardsGrid, paginationControls);
-        } catch (Exception e) {
-            LOGGER.severe("Error loading cards for set: " + setId);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error loading cards for set: " + setId, ex);
         }
 
         setSection.getChildren().addAll(header, cardsGrid, paginationControls);
@@ -368,9 +368,9 @@ public class FXCollectionView implements ICollectionView {
                 Image image = new Image(imageUrl, true);
                 cardImage.setImage(image);
                 imageLoaded = true;
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 LOGGER.warning("Failed to load image for card: " + card.getName() + " from URL: " + imageUrl
-                        + ". Error: " + e.getMessage());
+                        + ". Error: " + ex.getMessage());
             }
         }
 
@@ -381,8 +381,8 @@ public class FXCollectionView implements ICollectionView {
                 cardImage.setImage(placeholderImage);
                 cardImage.setFitWidth(80);
                 cardImage.setFitHeight(120);
-            } catch (Exception e) {
-                LOGGER.warning("Failed to load placeholder image");
+            } catch (Exception ex) {
+                LOGGER.warning("Failed to load placeholder image: " + ex.getMessage());
             }
         }
 
@@ -746,8 +746,8 @@ public class FXCollectionView implements ICollectionView {
 
                 LOGGER.info(() -> "Updated card " + cardId + " in UI");
             }
-        } catch (Exception e) {
-            LOGGER.warning("Failed to update card in UI: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Failed to update card in UI", ex);
         }
     }
 

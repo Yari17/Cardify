@@ -35,27 +35,26 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof FXLoginView fxController)) {
+            if (fxmlController instanceof FXLoginView fxController) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify login");
+                fxController.setStage(stage);
+
+                fxController.setController(controller);
+
+                return fxController;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not FXLoginView. Found: " + controllerClass
                 );
             }
 
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify login");
-            fxController.setStage(stage);
-
-            
-            fxController.setController(controller);
-
-            return fxController;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load LoginPage.fxml", e);
-            throw new IllegalStateException("Cannot create LoginView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load LoginPage.fxml", ex);
+            throw new IllegalStateException("Cannot create LoginView: FXML file not found or invalid", ex);
         }
     }
 
@@ -66,28 +65,26 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof FXRegistrationView)) {
+            if (fxmlController instanceof FXRegistrationView fxController) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify - Registrazione");
+                fxController.setStage(stage);
+
+                fxController.setController(controller);
+
+                return fxController;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not FXRegistrationView. Found: " + controllerClass
                 );
             }
 
-            FXRegistrationView fxController = (FXRegistrationView) fxmlController;
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify - Registrazione");
-            fxController.setStage(stage);
-
-            
-            fxController.setController(controller);
-
-            return fxController;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load RegistrationDialog.fxml", e);
-            throw new IllegalStateException("Cannot create RegistrationView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load RegistrationDialog.fxml", ex);
+            throw new IllegalStateException("Cannot create RegistrationView: FXML file not found or invalid", ex);
         }
     }
 
@@ -98,28 +95,26 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof FXCollectorHPView)) {
+            if (fxmlController instanceof FXCollectorHPView fxController) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify - Collezionista Home");
+                fxController.setStage(stage);
+
+                fxController.setController(controller);
+
+                return fxController;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not FXCollectorHPView. Found: " + controllerClass
                 );
             }
 
-            FXCollectorHPView fxController = (FXCollectorHPView) fxmlController;
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify - Collezionista Home");
-            fxController.setStage(stage);
-
-            
-            fxController.setController(controller);
-
-            return fxController;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load CollectorHomePage.fxml", e);
-            throw new IllegalStateException("Cannot create CollectorHomePageView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load CollectorHomePage.fxml", ex);
+            throw new IllegalStateException("Cannot create CollectorHomePageView: FXML file not found or invalid", ex);
         }
     }
 
@@ -130,28 +125,26 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof FXStoreHPView)) {
+            if (fxmlController instanceof FXStoreHPView fxController) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify - Store Home");
+                fxController.setStage(stage);
+
+                fxController.setController(controller);
+
+                return fxController;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not FXStoreHPView. Found: " + controllerClass
                 );
             }
 
-            FXStoreHPView fxController = (FXStoreHPView) fxmlController;
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify - Store Home");
-            fxController.setStage(stage);
-
-            
-            fxController.setController(controller);
-
-            return fxController;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load StoreHomePage.fxml", e);
-            throw new IllegalStateException("Cannot create StoreHomePageView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load StoreHomePage.fxml", ex);
+            throw new IllegalStateException("Cannot create StoreHomePageView: FXML file not found or invalid", ex);
         }
     }
 
@@ -162,28 +155,27 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof FXCollectionView)) {
+            if (fxmlController instanceof FXCollectionView fxController) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify - My Collection");
+                fxController.setStage(stage);
+
+                // Set controller
+                fxController.setController(controller);
+
+                return fxController;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not FXCollectionView. Found: " + controllerClass
                 );
             }
 
-            FXCollectionView fxController = (FXCollectionView) fxmlController;
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify - My Collection");
-            fxController.setStage(stage);
-
-            // Set controller
-            fxController.setController(controller);
-
-            return fxController;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load CollectionPage.fxml", e);
-            throw new IllegalStateException("Cannot create CollectionView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load CollectionPage.fxml", ex);
+            throw new IllegalStateException("Cannot create CollectionView: FXML file not found or invalid", ex);
         }
     }
 
@@ -194,34 +186,33 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof ILiveTradeView)) {
+            if (fxmlController instanceof ILiveTradeView tradeView) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify - Trade");
+
+                // Wire known concrete implementation
+                if (tradeView instanceof FXLiveTradeView fxLegacy) {
+                    fxLegacy.setStage(stage);
+                    fxLegacy.setController(controller);
+                }
+
+                // Notify view of username via controller.setView when appropriate
+                // controller.setView will set username on the view
+                controller.setView(tradeView);
+
+                return tradeView;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not a LiveTrade view. Found: " + controllerClass
                 );
             }
 
-            ILiveTradeView tradeView = (ILiveTradeView) fxmlController;
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify - Trade");
-
-            // Wire known concrete implementation
-            if (tradeView instanceof FXLiveTradeView fxLegacy) {
-                fxLegacy.setStage(stage);
-                fxLegacy.setController(controller);
-            }
-
-            // Notify view of username via controller.setView when appropriate
-            // controller.setView will set username on the view
-            controller.setView(tradeView);
-
-            return tradeView;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load LiveTradePage.fxml", e);
-            throw new IllegalStateException("Cannot create TradeView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load LiveTradePage.fxml", ex);
+            throw new IllegalStateException("Cannot create TradeView: FXML file not found or invalid", ex);
         }
     }
 
@@ -232,30 +223,29 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof IManageTradeView)) {
+            if (fxmlController instanceof IManageTradeView manageView) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify - Manage Trades");
+
+                if (manageView instanceof FXManageTradeView fxManage) {
+                    fxManage.setStage(stage);
+                    // wire manage controller into the view
+                    manageView.setManageController(controller);
+                }
+
+                return manageView;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not a ManageTrade view. Found: " + controllerClass
                 );
             }
 
-            IManageTradeView manageView = (IManageTradeView) fxmlController;
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify - Manage Trades");
-
-            if (manageView instanceof FXManageTradeView fxManage) {
-                fxManage.setStage(stage);
-                // wire manage controller into the view
-                manageView.setManageController(controller);
-            }
-
-            return manageView;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load ManageTradesPage.fxml", e);
-            throw new IllegalStateException("Cannot create ManageTradeView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load ManageTradesPage.fxml", ex);
+            throw new IllegalStateException("Cannot create ManageTradeView: FXML file not found or invalid", ex);
         }
     }
 
@@ -266,28 +256,27 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (!(fxmlController instanceof INegotiationView)) {
+            if (fxmlController instanceof INegotiationView fxController) {
+                Scene scene = new Scene(root);
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.setTitle("Cardify - Trade Negotiation");
+                fxController.setStage(stage);
+
+                // Set controller
+                fxController.setController(controller);
+
+                return fxController;
+            } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(
                     "FXML controller is not a Negotiation view. Found: " + controllerClass
                 );
             }
 
-            INegotiationView fxController = (INegotiationView) fxmlController;
-            Scene scene = new Scene(root);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setTitle("Cardify - Trade Negotiation");
-            fxController.setStage(stage);
-
-            // Set controller
-            fxController.setController(controller);
-
-            return fxController;
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to load TradeNegotiationPage.fxml", e);
-            throw new IllegalStateException("Cannot create NegotiationView: FXML file not found or invalid", e);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Failed to load TradeNegotiationPage.fxml", ex);
+            throw new IllegalStateException("Cannot create NegotiationView: FXML file not found or invalid", ex);
         }
     }
 

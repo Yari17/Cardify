@@ -10,8 +10,8 @@ public class Main {
             ApplicationController applicationController = new ApplicationController();
 
             applicationController.start();
-        } catch (Exception e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, "Error starting the application: {0}", e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Error starting the application: {0}", ex.getMessage());
         }
     }
 }

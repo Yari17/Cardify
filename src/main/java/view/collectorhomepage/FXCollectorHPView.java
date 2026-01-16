@@ -221,8 +221,8 @@ public class FXCollectorHPView implements ICollectorHPView {
             String username = (controller != null) ? controller.getUsername() : "<no-controller>";
             LOGGER.log(java.util.logging.Level.INFO, "Opening card dialog - id: {0}, owner: {1}, tradable: {2}, currentUser: {3}",
                     new Object[] { card != null ? card.getId() : "<null>", owner, tradable, username });
-        } catch (Exception e) {
-            LOGGER.log(java.util.logging.Level.FINE, "Failed to log dialog diagnostics: {0}", e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.log(java.util.logging.Level.FINE, "Failed to log dialog diagnostics: {0}", ex.getMessage());
         }
 
         content.getChildren().addAll(
@@ -247,8 +247,8 @@ public class FXCollectorHPView implements ICollectorHPView {
             negotiateButton.setOnAction(evt -> {
                 try {
                     controller.openNegotiation(card);
-                } catch (Exception e) {
-                    LOGGER.warning("Failed to open negotiation: " + e.getMessage());
+                } catch (Exception ex) {
+                    LOGGER.warning("Failed to open negotiation: " + ex.getMessage());
                 }
             });
             content.getChildren().add(negotiateButton);

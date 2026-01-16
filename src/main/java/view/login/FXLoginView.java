@@ -40,8 +40,8 @@ public class FXLoginView implements ILoginView {
             } else {
                 LOGGER.warning("Application controller not set on FXLoginView");
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Unhandled exception in login handler", e);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Unhandled exception in login handler", ex);
         }
     }
 
@@ -54,8 +54,8 @@ public class FXLoginView implements ILoginView {
             } else {
                 LOGGER.warning("Application controller not set on FXLoginView");
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Unhandled exception opening registration dialog", e);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Unhandled exception opening registration dialog", ex);
         }
     }
 

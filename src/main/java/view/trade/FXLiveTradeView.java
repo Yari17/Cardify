@@ -92,7 +92,7 @@ public class FXLiveTradeView implements ILiveTradeView {
                         icon = new ImageView(img);
                         icon.getStyleClass().add("trade-direction-icon");
                       }
-                } catch (Exception err) {LOGGER.log(Level.WARNING, err.getMessage(), err);}
+                } catch (Exception ex) {LOGGER.log(Level.WARNING, ex.getMessage(), ex);}
                 if (icon != null) root.getChildren().add(icon);
 
                 // Title + meta
@@ -156,7 +156,7 @@ public class FXLiveTradeView implements ILiveTradeView {
                     if (item.getTradeDate() != null) {
                         isToday = item.getTradeDate().toLocalDate().equals(java.time.LocalDate.now());
                     }
-                } catch (Exception err) {LOGGER.log(Level.WARNING, err.getMessage(), err);}
+                } catch (Exception ex) {LOGGER.log(Level.WARNING, ex.getMessage(), ex);}
 
                 if (isToday) {
                     Button tradeBtn = new Button("Trade");
@@ -237,8 +237,8 @@ public class FXLiveTradeView implements ILiveTradeView {
                 // LiveTradeController delegates to ApplicationController to navigate to Manage Trades
                 controller.navigateToManage();
             }
-        } catch (Exception e) {
-            LOGGER.fine(() -> "Failed to navigate to manage trades: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Failed to navigate to manage trades: " + ex.getMessage());
         }
     }
 
@@ -323,8 +323,8 @@ public class FXLiveTradeView implements ILiveTradeView {
             try {
                 java.net.URL res = getClass().getResource("/styles/theme.css");
                 if (res != null) scene.getStylesheets().add(res.toExternalForm());
-            } catch (Exception e) {
-                LOGGER.fine(() -> "Unable to apply theme stylesheet: " + e.getMessage());
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Unable to apply theme stylesheet: " + ex.getMessage());
             }
             dialog.setScene(scene);
             dialog.showAndWait();
@@ -347,15 +347,15 @@ public class FXLiveTradeView implements ILiveTradeView {
                 Label msg = new Label(code > 0 ? "Presenza confermata. Codice: " + code : "Errore durante la conferma");
                 msg.setStyle("-fx-text-fill: white;");
                 Button ok = new Button("OK");
-                ok.setOnAction(e -> dlg.close());
+                ok.setOnAction(ex -> dlg.close());
                 box.getChildren().addAll(msg, ok);
                 box.setStyle("-fx-background-color: #1E2530;");
                 Scene s = new Scene(box, 360, 120);
                 try {
                     java.net.URL res = getClass().getResource("/styles/theme.css");
                     if (res != null) s.getStylesheets().add(res.toExternalForm());
-                } catch (Exception e) {
-                    LOGGER.fine(() -> "Unable to apply theme stylesheet: " + e.getMessage());
+                } catch (Exception ex) {
+                    LOGGER.fine(() -> "Unable to apply theme stylesheet: " + ex.getMessage());
                 }
                 dlg.setScene(s);
                 dlg.showAndWait();
@@ -375,15 +375,15 @@ public class FXLiveTradeView implements ILiveTradeView {
             box.setPadding(new Insets(12));
             Label msg = new Label("Inspect cards in store (UI pending)");
             msg.setStyle("-fx-text-fill: white;");
-            Button ok = new Button("OK"); ok.setOnAction(e -> dlg.close());
+            Button ok = new Button("OK"); ok.setOnAction(ex -> dlg.close());
             box.getChildren().addAll(msg, ok);
             box.setStyle("-fx-background-color: #1E2530;");
             Scene s = new Scene(box, 360, 120);
             try {
                 java.net.URL res = getClass().getResource("/styles/theme.css");
                 if (res != null) s.getStylesheets().add(res.toExternalForm());
-            } catch (Exception e) {
-                LOGGER.fine(() -> "Unable to apply theme stylesheet: " + e.getMessage());
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Unable to apply theme stylesheet: " + ex.getMessage());
             }
             dlg.setScene(s);
             dlg.showAndWait();
@@ -398,7 +398,7 @@ public class FXLiveTradeView implements ILiveTradeView {
             VBox box = new VBox(10); box.setPadding(new Insets(12));
             Label msg = new Label("Ispezione completata da: " + (username != null ? username : "?")); msg.setStyle("-fx-text-fill: white;");
             Button ok = new Button("OK"); ok.setOnAction(e -> dlg.close()); box.getChildren().addAll(msg, ok); box.setStyle("-fx-background-color: #1E2530;");
-            Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource("/styles/theme.css"); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception e) { LOGGER.fine(() -> "Unable to apply theme stylesheet: " + e.getMessage()); }
+            Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource("/styles/theme.css"); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception ex) { LOGGER.fine(() -> "Unable to apply theme stylesheet: " + ex.getMessage()); }
             dlg.setScene(s); dlg.showAndWait();
         });
     }
@@ -411,7 +411,7 @@ public class FXLiveTradeView implements ILiveTradeView {
             VBox box = new VBox(10); box.setPadding(new Insets(12));
             Label msg = new Label("Trade " + (tradeId != null ? tradeId : "<id>") + " completato"); msg.setStyle("-fx-text-fill: white;");
             Button ok = new Button("OK"); ok.setOnAction(e -> dlg.close()); box.getChildren().addAll(msg, ok); box.setStyle("-fx-background-color: #1E2530;");
-            Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource("/styles/theme.css"); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception e) { LOGGER.fine(() -> "Unable to apply theme stylesheet: " + e.getMessage()); }
+            Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource("/styles/theme.css"); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception ex) { LOGGER.fine(() -> "Unable to apply theme stylesheet: " + ex.getMessage()); }
             dlg.setScene(s); dlg.showAndWait();
         });
     }

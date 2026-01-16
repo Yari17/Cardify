@@ -91,8 +91,8 @@ public class CollectionController {
             }
 
             LOGGER.info(() -> "Loaded collection with " + userBinders.size() + " sets for user: " + username);
-        } catch (Exception e) {
-            LOGGER.severe("Error loading collection: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error loading collection: " + ex.getMessage());
             if (view != null) {
                 view.showError("Errore nel caricamento della collezione");
             }
@@ -109,8 +109,8 @@ public class CollectionController {
                 LOGGER.warning("No provider available for game: " + AppConfig.POKEMON_GAME);
                 return Map.of();
             }
-        } catch (Exception e) {
-            LOGGER.severe("Error fetching available sets: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error fetching available sets: " + ex.getMessage());
             return Map.of();
         }
     }
@@ -130,8 +130,8 @@ public class CollectionController {
             if (view != null) {
                 view.showSuccess("Set \"" + setName + "\" aggiunto alla collezione!");
             }
-        } catch (Exception e) {
-            LOGGER.severe("Error creating set: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error creating set: " + ex.getMessage());
             if (view != null) {
                 view.showError("Errore nell'aggiunta del set");
             }
@@ -159,8 +159,8 @@ public class CollectionController {
             if (view != null) {
                 view.showSuccess("Set \"" + binder.getSetName() + "\" eliminato dalla collezione!");
             }
-        } catch (Exception e) {
-            LOGGER.severe("Error deleting set: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error deleting set: " + ex.getMessage());
             if (view != null) {
                 view.showError("Errore nell'eliminazione del set");
             }
@@ -209,8 +209,8 @@ public class CollectionController {
                 // Update only the specific card in the UI
                 view.updateCardInSet(setId, card.getId());
             }
-        } catch (Exception e) {
-            LOGGER.severe("Error adding card: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error adding card: " + ex.getMessage());
             if (view != null) {
                 view.showError("Errore nell'aggiunta della carta");
             }
@@ -256,8 +256,8 @@ public class CollectionController {
                     view.updateCardInSet(setId, card.getId());
                 }
             }
-        } catch (Exception e) {
-            LOGGER.severe("Error removing card: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error removing card: " + ex.getMessage());
             if (view != null) {
                 view.showError("Errore nella rimozione della carta");
             }
@@ -296,8 +296,8 @@ public class CollectionController {
 
                 LOGGER.info(() -> "Set card " + cardId + " as " + (tradable ? "tradable" : "not tradable"));
             }
-        } catch (Exception e) {
-            LOGGER.severe("Error toggling tradable: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error toggling tradable: " + ex.getMessage());
         }
     }
 
@@ -334,8 +334,8 @@ public class CollectionController {
 
             // Reload the collection to refresh the UI with saved data
             loadUserCollection();
-        } catch (Exception e) {
-            LOGGER.severe("Error saving changes: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.severe("Error saving changes: " + ex.getMessage());
             if (view != null) {
                 view.showError("Errore nel salvataggio delle modifiche");
             }
@@ -395,8 +395,8 @@ public class CollectionController {
         try {
             List<Card> res = provider.searchSet(setId);
             return res != null ? res : java.util.Collections.emptyList();
-        } catch (Exception e) {
-            LOGGER.fine(() -> "Provider.searchSet failed for " + setId + ": " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Provider.searchSet failed for " + setId + ": " + ex.getMessage());
             return java.util.Collections.emptyList();
         }
     }

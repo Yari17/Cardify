@@ -197,7 +197,7 @@ public class FXManageTradeView implements IManageTradeView {
                     iv.getStyleClass().add("trade-direction-icon");
                     return iv;
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
                 // ignore icon load failures
             }
             return null;
@@ -396,8 +396,8 @@ public class FXManageTradeView implements IManageTradeView {
                             Image img = new Image(c.getImageUrl(), 120, 80, true, true);
                             if (!img.isError()) iv.setImage(img);
                         }
-                    } catch (Exception e) {
-                        LOGGER.fine(() -> "Failed to load card image in proposal dialog: " + e.getMessage());
+                    } catch (Exception ex) {
+                        LOGGER.fine(() -> "Failed to load card image in proposal dialog: " + ex.getMessage());
                     }
 
                     Label name = new Label(c.getName() != null ? c.getName() : c.getId());
@@ -427,8 +427,8 @@ public class FXManageTradeView implements IManageTradeView {
                             Image img = new Image(c.getImageUrl(), 120, 80, true, true);
                             if (!img.isError()) iv.setImage(img);
                         }
-                    } catch (Exception e) {
-                        LOGGER.fine(() -> "Failed to load card image in proposal dialog: " + e.getMessage());
+                    } catch (Exception ex) {
+                        LOGGER.fine(() -> "Failed to load card image in proposal dialog: " + ex.getMessage());
                     }
 
                     Label name = new Label(c.getName() != null ? c.getName() : c.getId());
@@ -467,8 +467,8 @@ public class FXManageTradeView implements IManageTradeView {
             try {
                 java.net.URL res = getClass().getResource("/styles/theme.css");
                 if (res != null) scene.getStylesheets().add(res.toExternalForm());
-            } catch (Exception e) {
-                LOGGER.fine(() -> "Unable to apply theme stylesheet in proposal dialog: " + e.getMessage());
+            } catch (Exception ignored) {
+                LOGGER.fine(() -> "Unable to apply theme stylesheet in proposal dialog: " + ignored.getMessage());
             }
 
             dialog.setScene(scene);
@@ -488,7 +488,7 @@ public class FXManageTradeView implements IManageTradeView {
 
     @FXML
     private void onLiveTradeClicked() {
-        if (manageController != null) manageController.navigateToLiveTrades();
+                if (manageController != null) manageController.navigateToLiveTrades();
     }
 
     @FXML

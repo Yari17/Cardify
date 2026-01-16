@@ -173,8 +173,8 @@ public class ApplicationController {
             controller.setView(tradeView);
             // Present the trade view to the user (ensure navbar and logout are visible)
             displayView(tradeView);
-        } catch (Exception e) {
-            throw new NavigationException("Failed to navigate to trade transaction", e);
+        } catch (Exception ex) {
+            throw new NavigationException("Failed to navigate to trade transaction", ex);
         }
     }
 
@@ -187,8 +187,8 @@ public class ApplicationController {
             // Ask controller to load scheduled trades and present them in the live trade view
             controller.loadScheduledTrades();
             displayView(tradeView);
-        } catch (Exception e) {
-            throw new NavigationException("Failed to navigate to Live Trades", e);
+        } catch (Exception ex) {
+            throw new NavigationException("Failed to navigate to Live Trades", ex);
         }
     }
 
@@ -221,8 +221,8 @@ public class ApplicationController {
 
             // Start the negotiation controller with assembled data
             controller.start(inventory, requested);
-        } catch (Exception e) {
-            LOGGER.log(java.util.logging.Level.WARNING, "Could not assemble negotiation data: {0}", e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Could not assemble negotiation data: {0}", ex.getMessage());
         }
 
         // Show the negotiation UI. Let the view implementation decide how to present itself
@@ -265,9 +265,9 @@ public class ApplicationController {
         viewStack.addLast(newView);
         try {
             newView.display();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             String viewName = newView.getClass().getSimpleName();
-            throw new NavigationException("Failed to display view: " + viewName, e);
+            throw new NavigationException("Failed to display view: " + viewName, ex);
         }
     }
 
@@ -282,9 +282,9 @@ public class ApplicationController {
         if (view != null) {
             try {
                 view.close();
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 String viewName = view.getClass().getSimpleName();
-                throw new NavigationException("Failed to close view: " + viewName, e);
+                throw new NavigationException("Failed to close view: " + viewName, ex);
             }
         }
     }

@@ -279,37 +279,6 @@
     "lastModified": "2026-01-13T01:28"
   },
   {
-    "id": 11,
-    "owner": "elena_sanna",
-    "setId": "pl4",
-    "setName": "Platinum Legends",
-    "cards": [
-      {
-        "id": "pl4-31",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "pl4-32",
-        "gameType": "POKEMON",
-        "quantity": 2,
-        "isTradable": true,
-        "status": ""
-      },
-      {
-        "id": "pl4-33",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": false,
-        "status": ""
-      }
-    ],
-    "createdAt": "2026-01-13T01:29",
-    "lastModified": "2026-01-13T01:29"
-  },
-  {
     "id": 13,
     "owner": "user3",
     "setId": "swsh10.5",

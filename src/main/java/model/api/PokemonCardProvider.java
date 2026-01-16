@@ -110,9 +110,8 @@ public class PokemonCardProvider implements ICardProvider {
                 LOGGER.warning("fetchSets() returned null!");
             }
             return setMap;
-        } catch (Exception e) {
-            LOGGER.severe("Exception in getAllSets: " + e.getClass().getName() + " - " + e.getMessage());
-            LOGGER.log(java.util.logging.Level.FINER, "Exception in getAllSets", e);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Exception in getAllSets", ex);
             return new HashMap<>();
         }
     }
@@ -137,11 +136,10 @@ public class PokemonCardProvider implements ICardProvider {
 
             LOGGER.log(Level.INFO, "Successfully loaded details for card: {0}", cardId);
             return (T) pokemonCard;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error loading card details for ID {0}: {1} - {2}",
-                    new Object[]{cardId, e.getClass().getName(), e.getMessage()});
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error loading card details for ID " + cardId, ex);
             // log stack trace at finer level
-            LOGGER.log(java.util.logging.Level.FINER, "Exception", e);
+            LOGGER.log(java.util.logging.Level.FINER, "Exception", ex);
             return null;
         }
     }

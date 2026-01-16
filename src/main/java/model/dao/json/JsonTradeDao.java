@@ -120,6 +120,16 @@ public class JsonTradeDao implements ITradeDao {
     }
 
     @Override
+    public List<TradeTransaction> getStoreTradeScheduledTransactions(String userId, String tradeId) {
+        return List.of();
+    }
+
+    @Override
+    public List<TradeTransaction> getUserTradeTransactions(String userId, String tradeId) {
+        return List.of();
+    }
+
+    @Override
     public Optional<TradeTransaction> get(long id) {
         TradeTransaction t = tradesById.get((int) id);
         return Optional.ofNullable(t);

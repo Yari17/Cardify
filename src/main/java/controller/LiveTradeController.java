@@ -73,8 +73,8 @@ public class LiveTradeController {
                 beans.add(b);
             }
             if (view != null) view.displayScheduledTrades(beans);
-        } catch (Exception e) {
-            LOGGER.fine(() -> "loadScheduledTrades failed: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "loadScheduledTrades failed: " + ex.getMessage());
         }
     }
 
@@ -150,8 +150,8 @@ public class LiveTradeController {
             tradeDao.save(tx);
 
             return tx.confirmPresence(username);
-        } catch (Exception e) {
-            LOGGER.warning(() -> "confirmPresence failed: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "confirmPresence failed: " + ex.getMessage());
             return -1;
         }
     }
@@ -160,8 +160,8 @@ public class LiveTradeController {
     public void startTrade(String proposalId) {
         try {
             navigationController.navigateToTrade(username, proposalId);
-        } catch (Exception e) {
-            LOGGER.warning(() -> "startTrade navigation failed: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "startTrade navigation failed: " + ex.getMessage());
         }
     }
 

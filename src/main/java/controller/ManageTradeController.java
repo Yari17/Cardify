@@ -57,9 +57,9 @@ public class ManageTradeController {
                 if (p == null) continue;
                 processProposal(p, pending, concluded, now);
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Error loading user trade transactions: {0}", e.getMessage());
-            LOGGER.log(Level.FINE, "Stacktrace", e);
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Error loading user trade transactions: {0}", ex.getMessage());
+            LOGGER.log(Level.FINE, "Stacktrace", ex);
         }
 
         // Wire controller and display pending + concluded
@@ -94,8 +94,8 @@ public class ManageTradeController {
 
             LOGGER.log(Level.INFO, "Proposal {0}: {1}", new Object[]{newStatus.name().toLowerCase(), proposalId});
             return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to update proposal {0} to {1}: {2}", new Object[]{proposalId, newStatus, e.getMessage()});
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Failed to update proposal {0} to {1}: {2}", new Object[]{proposalId, newStatus, ex.getMessage()});
             return false;
         }
     }
@@ -110,8 +110,8 @@ public class ManageTradeController {
             if (p.getMeetingDate() != null && !p.getMeetingDate().isEmpty()) {
                 tradeDate = java.time.LocalDate.parse(p.getMeetingDate()).atStartOfDay();
             }
-        } catch (Exception e) {
-            LOGGER.fine(() -> "Could not parse meeting date for proposal " + p.getProposalId() + ": " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Could not parse meeting date for proposal " + p.getProposalId() + ": " + ex.getMessage());
         }
 
         List<Card> offered = new ArrayList<>();
@@ -137,8 +137,8 @@ public class ManageTradeController {
             // Delegate to ApplicationController's navigation to trade so LiveTradeController handles the use-case
             navigationController.navigateToTrade(username, proposalId);
             return true;
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed to start trade flow for {0}: {1}", new Object[]{proposalId, e.getMessage()});
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Failed to start trade flow for {0}: {1}", new Object[]{proposalId, ex.getMessage()});
             return false;
         }
     }
@@ -154,8 +154,8 @@ public class ManageTradeController {
         if (proposalDao == null) return;
         try {
             proposalDao.update(p);
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Unable to persist proposal status change for {0}: {1}", new Object[]{p.getProposalId(), e.getMessage()});
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Unable to persist proposal status change for {0}: {1}", new Object[]{p.getProposalId(), ex.getMessage()});
         }
     }
 
@@ -232,8 +232,8 @@ public class ManageTradeController {
         if (view != null) view.close();
         try {
             navigationController.navigateToLiveTrades(username);
-        } catch (exception.NavigationException e) {
-            LOGGER.log(java.util.logging.Level.WARNING, "Failed to navigate to Live Trades: {0}", e.getMessage());
+        } catch (exception.NavigationException ex) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Failed to navigate to Live Trades: {0}", ex.getMessage());
             if (view != null) view.showError("Impossibile aprire la sezione Trade");
         }
     }

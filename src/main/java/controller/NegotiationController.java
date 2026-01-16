@@ -80,8 +80,8 @@ public class NegotiationController {
                 if (view != null) view.showConfirmationResult(true, "Proposta inviata");
                 return;
             }
-        } catch (Exception e) {
-            LOGGER.warning("Failed to persist proposal: " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.warning("Failed to persist proposal: " + ex.getMessage());
         }
         if (view != null) view.showConfirmationResult(false, "Impossibile salvare la proposta");
     }

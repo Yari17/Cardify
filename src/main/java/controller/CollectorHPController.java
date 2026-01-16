@@ -88,9 +88,9 @@ public class CollectorHPController {
             if (view != null) {
                 view.displayCards(cardBeans);
             }
-        } catch (Exception e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, "Error loading popular cards: {0}", e.getMessage());
-            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, e);
+        } catch (Exception ex) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Error loading popular cards: {0}", ex.getMessage());
+            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, ex);
         }
     }
 
@@ -138,10 +138,10 @@ public class CollectorHPController {
             if (view != null) {
                 view.displayCards(cardBeans);
             }
-        } catch (Exception e) {
+        } catch (Exception ex) {
             LOGGER.log(java.util.logging.Level.SEVERE, "Error loading cards from set {0}: {1}",
-                    new Object[]{setId, e.getMessage()});
-            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, e);
+                    new Object[]{setId, ex.getMessage()});
+            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, ex);
         }
     }
 
@@ -153,8 +153,8 @@ public class CollectorHPController {
     private List<Card> searchProviderCardsByName(String name) {
         try {
             return cardProvider.searchCardsByName(name);
-        } catch (Exception e) {
-            LOGGER.log(java.util.logging.Level.WARNING, "Provider search failed for name: {0} -> {1}", new Object[]{name, e.getMessage()});
+        } catch (Exception ex) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Provider search failed for name: {0} -> {1}", new Object[]{name, ex.getMessage()});
             return Collections.emptyList();
         }
     }
@@ -196,10 +196,10 @@ public class CollectorHPController {
             List<CardBean> cardBeans = buildCardBeansFromMatches(matches, idToOwner);
             LOGGER.log(java.util.logging.Level.INFO, "Filtered and loaded {0} cards to display for search", cardBeans.size());
             return cardBeans;
-        } catch (Exception e) {
+        } catch (Exception ex) {
             LOGGER.log(java.util.logging.Level.SEVERE, "Error searching cards by name ''{0}'': {1}",
-                    new Object[]{name, e.getMessage()});
-            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, e);
+                    new Object[]{name, ex.getMessage()});
+            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, ex);
             return java.util.Collections.emptyList();
         }
     }
@@ -238,9 +238,9 @@ public class CollectorHPController {
             } else {
                 LOGGER.warning("Received empty or null map from ICardProvider");
             }
-        } catch (Exception e) {
-            LOGGER.log(java.util.logging.Level.SEVERE, "Error loading available sets: {0}", e.getMessage());
-            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, e);
+        } catch (Exception ex) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Error loading available sets: {0}", ex.getMessage());
+            LOGGER.log(java.util.logging.Level.SEVERE, EXCEPTION_DETAILS, ex);
         }
     }
 
@@ -275,8 +275,8 @@ public class CollectorHPController {
         }
         try {
             navigationController.navigateToLiveTrades(username);
-         } catch (exception.NavigationException e) {
-             LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + e.getMessage());
+         } catch (exception.NavigationException ex) {
+             LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + ex.getMessage());
              // UI feedback omitted here to keep controller decoupled from specific view capabilities the ApplicationController or destination view may show errors as needed.
          }
     }
@@ -288,8 +288,8 @@ public class CollectorHPController {
         }
         try {
             navigationController.navigateToManageTrade(username);
-        } catch (exception.NavigationException e) {
-            LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + e.getMessage());
+        } catch (exception.NavigationException ex) {
+            LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + ex.getMessage());
         }
     }
 
@@ -399,8 +399,8 @@ public class CollectorHPController {
                 localCardCache.put(id, detailed);
                 return detailed.toBean();
             }
-        } catch (Exception e) {
-            LOGGER.fine(() -> "Provider failed to fetch details for " + id + ": " + e.getMessage());
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Provider failed to fetch details for " + id + ": " + ex.getMessage());
         }
 
         // Fallbacks

@@ -52,8 +52,8 @@ public class FXRegistrationView implements IRegistrationView {
             } else {
                 LOGGER.warning("Application controller not set on FXRegistrationView");
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Unhandled exception in registration handler", e);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Unhandled exception in registration handler", ex);
         }
     }
 

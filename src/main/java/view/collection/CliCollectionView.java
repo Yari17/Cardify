@@ -175,9 +175,9 @@ public class CliCollectionView implements ICollectionView {
                 case "1" -> manageSets();
                 case "2" -> addNewSet();
                 case "3" -> {
-                    if (saveButtonVisible && controller != null) {
-                        controller.saveChanges();
-                    }
+                    // Guard style: do nothing if save not visible or controller missing
+                    if (!saveButtonVisible || controller == null) break;
+                    controller.saveChanges();
                 }
                 case "0" -> {
                     if (controller != null) {
@@ -261,12 +261,12 @@ public class CliCollectionView implements ICollectionView {
                         case "2" -> removeCardFromSet(setId, allCards);
                         case "3" -> manageCardDetails(setId, allCards, ownedCardsMap);
                         case "4" -> {
-                            if (confirmDeleteSet(binder.getSetName())) {
-                                if (controller != null) {
-                                    controller.deleteBinder(setId);
-                                }
-                                return;
+                            // Use guard to reduce nesting
+                            if (!confirmDeleteSet(binder.getSetName())) break;
+                            if (controller != null) {
+                                controller.deleteBinder(setId);
                             }
+                            return;
                         }
                         case "0" -> {
                             displayCollection(currentBinders, localSetCards);
@@ -278,10 +278,9 @@ public class CliCollectionView implements ICollectionView {
                     // If controller requested a refresh, restart the loop to reflect latest state
                     if (this.refreshRequested) {
                         this.refreshRequested = false;
-                        continue;
                     }
 
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     showError("Errore nel caricamento delle carte del set.");
                     return;
                 }
@@ -374,7 +373,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             showError(INVALID_NUMBER);
         }
     }
@@ -420,7 +419,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             showError(INVALID_NUMBER);
         }
     }
@@ -456,7 +455,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             showError(INVALID_NUMBER);
         }
     }
@@ -563,7 +562,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException ignored) {
             showError(INVALID_NUMBER);
         }
     }
