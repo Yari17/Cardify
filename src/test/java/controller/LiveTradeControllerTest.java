@@ -3,6 +3,7 @@ package controller;
 import model.dao.ITradeDao;
 import model.dao.factory.DaoFactory;
 import model.domain.TradeTransaction;
+import model.domain.Binder;
 import model.domain.enumerations.TradeStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,8 +139,8 @@ class LiveTradeControllerTest {
         doNothing().when(binderDao).createBinder(anyString(), anyString(), anyString());
         doNothing().when(binderDao).save(any());
         // Simula che dopo la creazione il binder esista
-        when(binderDao.getUserBinders(eq("user2"))).thenReturn(List.of(new Binder("user2", "SET1", "Set Uno")));
-        when(binderDao.getUserBinders(eq("user1"))).thenReturn(List.of(new Binder("user1", "SET2", "Set Due")));
+        when(binderDao.getUserBinders("user2")).thenReturn(List.of(new Binder("user2", "SET1", "Set Uno")));
+        when(binderDao.getUserBinders("user1")).thenReturn(List.of(new Binder("user1", "SET2", "Set Due")));
         // Esegui lo scambio
         controller.performCardExchange(tx);
         // Verifica che i binders siano aggiornati
