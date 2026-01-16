@@ -48,7 +48,7 @@ public class FXNegotiationView implements INegotiationView {
     private Consumer<CardBean> onPropose;
     private Consumer<CardBean> onUnpropose;
     private Consumer<ProposalBean> onConfirm;
-
+    @Override
     public void setStage(Stage stage) { this.stage = stage; }
 
     @FXML

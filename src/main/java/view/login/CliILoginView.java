@@ -90,6 +90,6 @@ public class CliILoginView implements ILoginView {
 
     @Override
     public void showError(String errorMessage) {
-
+        System.out.println("[ERROR] " + errorMessage);
     }
 }

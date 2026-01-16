@@ -125,7 +125,12 @@ public class FXRegistrationView implements IRegistrationView {
 
     @Override
     public void showError(String errorMessage) {
-
+        if (messageLabel != null) {
+            messageLabel.setStyle("-fx-text-fill: red;");
+            messageLabel.setText(errorMessage);
+        } else {
+            LOGGER.fine("messageLabel is null while trying to show error");
+        }
     }
 
 

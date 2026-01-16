@@ -81,7 +81,7 @@ public class CollectorHPController {
             List<CardBean> cardBeans = buildCardBeansFromBinderMap(binderMap, ownerMap);
 
             // Shuffle popular cards to present them in random order
-            java.util.Collections.shuffle(cardBeans, new java.util.Random());
+            Collections.shuffle(cardBeans, new java.util.Random());
 
             LOGGER.log(java.util.logging.Level.INFO, "(Popular) Loaded {0} cards to display", cardBeans.size());
 

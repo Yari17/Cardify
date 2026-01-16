@@ -14,7 +14,7 @@ public class DemoTradeDao implements ITradeDao {
 
     @Override
     public void updateTransactionStatus(int id, String status) {
-
+        //TODO implementare update dello status
     }
 
     @Override
@@ -39,17 +39,17 @@ public class DemoTradeDao implements ITradeDao {
 
     @Override
     public void save(TradeTransaction tradeTransaction) {
-
+        //TODO implementare salvataggio
     }
 
     @Override
     public void update(TradeTransaction tradeTransaction, String[] params) {
-
+        //TODO implementare update
     }
 
     @Override
     public void delete(TradeTransaction tradeTransaction) {
-
+        //TODO implementare delete
     }
 
 

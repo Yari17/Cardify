@@ -18,7 +18,7 @@ public class FXStoreHPView implements IStoreHPView {
 
     @FXML
     private void initialize() {
-        
+        //TODO any initialization if needed
     }
 
     @Override
@@ -47,7 +47,7 @@ public class FXStoreHPView implements IStoreHPView {
 
     @Override
     public void showError(String errorMessage) {
-
+        LOGGER.severe("Error: " + errorMessage);
     }
 
     @Override

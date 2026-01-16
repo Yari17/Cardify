@@ -36,55 +36,66 @@ public class CliCollectorHPView implements ICollectorHPView {
             return;
         }
 
+        runMainLoop();
+    }
+
+    // Extracted main loop to reduce cognitive complexity of display()
+    private void runMainLoop() {
         boolean running = true;
         while (running) {
             printMainMenu();
-
             String choice = inputManager.readString();
+            // Delegate handling to a separate method to reduce cognitive complexity in display()
+            running = handleMainSelection(choice);
+        }
+    }
 
-            switch (choice) {
-                case "1":
-                    showPopularCardsMenu();
-                    break;
-                case "2":
-                    searchByNameMenu();
-                    break;
-                case "3":
-                    searchBySetMenu();
-                    break;
-                case "4":
-                    // Instead of a placeholder print, delegate navigation to the controller
-                    if (controller != null) {
-                        controller.navigateToCollection();
-                        // stop the CLI loop so the current view exits and navigation can take over
-                        return; // return immediately; ApplicationController will display the new view
-                    } else {
-                        System.out.println("Controller non disponibile.");
-                    }
-                    break;
-                case "5":
-                    System.out.println("Effettua scambio selezionato.");
-                    break;
-                case "6":
-                    if (controller != null) {
-                        showWelcomeMessage(controller.getUsername());
-                    }
-                    break;
-                case "7":
-                    if (controller != null) {
-                        controller.onLogoutRequested();
-                    }
-                    running = false;
-                    break;
-                case "0":
-                    if (controller != null) {
-                        controller.onExitRequested();
-                    }
-                    running = false;
-                    break;
-                default:
-                    System.out.println("Opzione non valida. Riprova.");
-            }
+    /**
+     * Handle the main-menu selection. Returns true if the CLI should continue running,
+     * false to stop/exit this view.
+     */
+    private boolean handleMainSelection(String choice) {
+        switch (choice) {
+            case "1":
+                showPopularCardsMenu();
+                return true;
+            case "2":
+                searchByNameMenu();
+                return true;
+            case "3":
+                searchBySetMenu();
+                return true;
+            case "4":
+                // Delegate navigation to the controller and exit CLI loop so the
+                // ApplicationController can display the target view.
+                if (controller != null) {
+                    controller.navigateToCollection();
+                    return false; // stop CLI loop
+                } else {
+                    System.out.println("Controller non disponibile.");
+                    return true;
+                }
+            case "5":
+                System.out.println("Effettua scambio selezionato.");
+                return true;
+            case "6":
+                if (controller != null) {
+                    showWelcomeMessage(controller.getUsername());
+                }
+                return true;
+            case "7":
+                if (controller != null) {
+                    controller.onLogoutRequested();
+                }
+                return false;
+            case "0":
+                if (controller != null) {
+                    controller.onExitRequested();
+                }
+                return false;
+            default:
+                System.out.println("Opzione non valida. Riprova.");
+                return true;
         }
     }
 
@@ -428,11 +439,11 @@ public class CliCollectorHPView implements ICollectorHPView {
 
     @Override
     public void showSuccess(String message) {
-
+        // For CLI, simply print the success message
     }
 
     @Override
     public void showError(String message) {
-
+        // For CLI, simply print the error message
     }
 }

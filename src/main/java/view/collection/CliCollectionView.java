@@ -29,15 +29,13 @@ public class CliCollectionView implements ICollectionView {
     private final InputManager inputManager;
     private CollectionController controller;
     private Map<String, Binder> currentBinders;
-    // CLI must not hold DAO references
-    // convert incoming map to local Map<String, List<Card>> via unchecked cast
-    //noinspection unchecked
+
     private Map<String, List<Card>> localSetCards;
-    // Added missing state fields
+
     private boolean saveButtonVisible;
     private String username;
 
-    // NEW: track the set currently being managed and a refresh flag
+
     private String managingSetId = null;
     private volatile boolean refreshRequested = false;
 
@@ -280,7 +278,7 @@ public class CliCollectionView implements ICollectionView {
                         this.refreshRequested = false;
                     }
 
-                } catch (Exception ex) {
+                } catch (Exception _) {
                     showError("Errore nel caricamento delle carte del set.");
                     return;
                 }
@@ -373,7 +371,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             showError(INVALID_NUMBER);
         }
     }
@@ -419,7 +417,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             showError(INVALID_NUMBER);
         }
     }
@@ -455,7 +453,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             showError(INVALID_NUMBER);
         }
     }
@@ -562,7 +560,7 @@ public class CliCollectionView implements ICollectionView {
             } else {
                 showError(INVALID_CHOICE);
             }
-        } catch (NumberFormatException ignored) {
+        } catch (NumberFormatException _) {
             showError(INVALID_NUMBER);
         }
     }

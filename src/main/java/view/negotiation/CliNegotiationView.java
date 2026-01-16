@@ -4,6 +4,7 @@ import controller.NegotiationController;
 import model.bean.CardBean;
 import model.bean.ProposalBean;
 import config.InputManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,11 @@ public class CliNegotiationView implements INegotiationView {
     private Consumer<CardBean> onUnpropose;
     private Consumer<ProposalBean> onConfirm;
 
+    // Reused format and message constants to avoid duplication
+    private static final String ITEM_LINE_FMT = " %d) %s x%d%n";
+    private static final String INVALID_INDEX_MSG = "Invalid index";
+
+    @SuppressWarnings("unused")
     public CliNegotiationView() {
         this.inputManager = new config.InputManager();
     }
@@ -95,15 +101,15 @@ public class CliNegotiationView implements INegotiationView {
             System.out.println("=== TRADE NEGOTIATION ===");
             System.out.println("Requested items:");
             for (int i = 0; i < requested.size(); i++) {
-                System.out.printf(" %d) %s x%d\n", i + 1, requested.get(i).getName(), requested.get(i).getQuantity());
+                System.out.printf(ITEM_LINE_FMT, i + 1, requested.get(i).getName(), requested.get(i).getQuantity());
             }
             System.out.println("Your inventory:");
             for (int i = 0; i < inventory.size(); i++) {
-                System.out.printf(" %d) %s x%d\n", i + 1, inventory.get(i).getName(), inventory.get(i).getQuantity());
+                System.out.printf(ITEM_LINE_FMT, i + 1, inventory.get(i).getName(), inventory.get(i).getQuantity());
             }
             System.out.println("Proposed items:");
             for (int i = 0; i < proposed.size(); i++) {
-                System.out.printf(" %d) %s x%d\n", i + 1, proposed.get(i).getName(), proposed.get(i).getQuantity());
+                System.out.printf(ITEM_LINE_FMT, i + 1, proposed.get(i).getName(), proposed.get(i).getQuantity());
             }
 
             System.out.println("Options: 1=propose 2=unpropose 3=confirm 0=back");
@@ -128,8 +134,7 @@ public class CliNegotiationView implements INegotiationView {
                 proposed.add(card);
                 if (onPropose != null) onPropose.accept(card);
             }
-        } catch (NumberFormatException ignored) {}
-    }
+        } catch (NumberFormatException _) {System.out.println(INVALID_INDEX_MSG);}    }
 
     private void handleUnpropose() {
         System.out.print("Select proposed index to remove: ");
@@ -140,14 +145,13 @@ public class CliNegotiationView implements INegotiationView {
                 CardBean card = proposed.remove(idx);
                 if (onUnpropose != null) onUnpropose.accept(card);
             }
-        } catch (NumberFormatException ignored) {}
-    }
+        } catch (NumberFormatException _) {System.out.println(INVALID_INDEX_MSG);}    }
 
     private void handleConfirm() {
         // Ask for meeting place and date in CLI
         System.out.println("Available stores:");
         for (int i = 0; i < availableStores.size(); i++) {
-            System.out.printf(" %d) %s\n", i + 1, availableStores.get(i));
+            System.out.printf(ITEM_LINE_FMT, i + 1, availableStores.get(i), 1);
         }
         System.out.print("Select store index: ");
         String s = inputManager.readString().trim();
@@ -155,7 +159,7 @@ public class CliNegotiationView implements INegotiationView {
         try {
             int idx = Integer.parseInt(s) - 1;
             if (idx >= 0 && idx < availableStores.size()) chosenStore = availableStores.get(idx);
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException _) {System.out.println(INVALID_INDEX_MSG);}
         if (chosenStore == null) {
             System.out.println("Invalid store selection");
             return;
@@ -168,11 +172,17 @@ public class CliNegotiationView implements INegotiationView {
                 System.out.println("Date must be after today");
                 return;
             }
-        } catch (Exception ex) {
+        } catch (Exception _) {
             System.out.println("Invalid date format");
             return;
         }
 
+        ProposalBean bean = getProposalBean(chosenStore, dateIn);
+        if (onConfirm != null) onConfirm.accept(bean);
+    }
+
+    @NotNull
+    private ProposalBean getProposalBean(String chosenStore, String dateIn) {
         ProposalBean bean = new ProposalBean();
         bean.setOffered(new ArrayList<>(proposed));
         // ensure requested copies are quantity 1
@@ -187,15 +197,16 @@ public class CliNegotiationView implements INegotiationView {
         bean.setToUser(controller != null ? controller.getTargetOwnerUsername() : null);
         bean.setMeetingPlace(chosenStore);
         bean.setMeetingDate(dateIn);
-        if (onConfirm != null) onConfirm.accept(bean);
+        return bean;
     }
 
     @Override
     public void close() {
+        // nothing to close for CLI
     }
 
     @Override
     public void showError(String errorMessage) {
-
+        System.out.println("[ERROR] " + errorMessage);
     }
 }

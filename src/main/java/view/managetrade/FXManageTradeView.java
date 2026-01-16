@@ -197,7 +197,7 @@ public class FXManageTradeView implements IManageTradeView {
                     iv.getStyleClass().add("trade-direction-icon");
                     return iv;
                 }
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 // ignore icon load failures
             }
             return null;
@@ -249,7 +249,7 @@ public class FXManageTradeView implements IManageTradeView {
 
     @Override
     public void showError(String errorMessage) {
-
+        LOGGER.severe("Error: " + errorMessage);
     }
 
 

@@ -144,10 +144,10 @@ public class FXLiveTradeView implements ILiveTradeView {
 
                 Button tradeNowBtn = new Button("Trade Now");
                 tradeNowBtn.getStyleClass().add("button-accent");
-                tradeNowBtn.setOnAction(evt -> {
+                tradeNowBtn.setOnAction(evt ->
                     // Show details dialog (reuse displayTrade)
-                    displayTrade(item);
-                });
+                    displayTrade(item)
+                );
                 actions.getChildren().add(tradeNowBtn);
 
                 // Show 'Trade' only on trade day

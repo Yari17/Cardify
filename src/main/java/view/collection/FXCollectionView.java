@@ -1,5 +1,6 @@
 package view.collection;
 
+import controller.CollectionController;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,7 +10,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import controller.CollectionController;
 import model.bean.CardBean;
 import model.domain.Binder;
 import model.domain.Card;
@@ -21,10 +21,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 //Controller grafico del caso d'uso Gestisci Collezione
 public class FXCollectionView implements ICollectionView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectionView.class.getName());
     private static final String CARD_HOVER_STYLE = "card-hover";
+    // centralized constant for repeated style class
+    private static final String BUTTON_ACCENT = "button-accent";
 
     @FXML
     private Label usernameLabel;
@@ -108,7 +111,7 @@ public class FXCollectionView implements ICollectionView {
             setsContainer.getChildren().add(emptyState);
         }
 
-        LOGGER.log(Level.INFO,"Displayed collection with {0} sets", bindersBySet.size());
+        LOGGER.log(Level.INFO, "Displayed collection with {0} sets", bindersBySet.size());
     }
 
     /**
@@ -116,7 +119,7 @@ public class FXCollectionView implements ICollectionView {
      */
     private Button createAddSetButton() {
         Button button = new Button("+ Aggiungi Nuovo Set");
-        button.getStyleClass().add("button-accent");
+        button.getStyleClass().add(BUTTON_ACCENT);
         button.setStyle("-fx-font-size: 16px; -fx-padding: 15 30;");
         button.setOnAction(e -> showAddSetDialog());
 
@@ -158,7 +161,7 @@ public class FXCollectionView implements ICollectionView {
         if (totalCards == 0) {
             Label noCardsNote = new Label("Nessuna carta disponibile per questo set (dati non caricati)");
             noCardsNote.setStyle("-fx-text-fill: #cfcfcf; -fx-font-size: 12px;");
-            VBox.setMargin(noCardsNote, new Insets(6,0,0,0));
+            VBox.setMargin(noCardsNote, new Insets(6, 0, 0, 0));
             // We'll add this below next to the header (after header is assembled)
             header.getChildren().add(noCardsNote);
         }
@@ -187,9 +190,10 @@ public class FXCollectionView implements ICollectionView {
 
         // Load first page of cards
         try {
+            assert allCards != null;
             loadCardsPage(setId, allCards, binder, cardsGrid, paginationControls);
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Error loading cards for set: " + setId, ex);
+        } catch (Exception _) {
+            LOGGER.warning("Error loading cards for set: " + setId);
         }
 
         setSection.getChildren().addAll(header, cardsGrid, paginationControls);
@@ -201,7 +205,7 @@ public class FXCollectionView implements ICollectionView {
      * Load a specific page of cards for a set
      */
     private void loadCardsPage(String setId, List<Card> allCards, Binder binder, FlowPane cardsGrid,
-            HBox paginationControls) {
+                               HBox paginationControls) {
         int currentPage = setCurrentPages.getOrDefault(setId, 0);
         int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
 
@@ -215,7 +219,7 @@ public class FXCollectionView implements ICollectionView {
         int displayEnd = endIndex;
         LOGGER.log(java.util.logging.Level.INFO,
                 "Loading page {0}/{1} for set {2} (cards {3}-{4} of {5})",
-                new Object[] { currentPage + 1, totalPages, setId, displayStart, displayEnd, allCards.size() });
+                new Object[]{currentPage + 1, totalPages, setId, displayStart, displayEnd, allCards.size()});
 
         List<Card> pageCards = allCards.subList(startIndex, endIndex);
 
@@ -250,7 +254,7 @@ public class FXCollectionView implements ICollectionView {
         Button prevButton = new Button();
         prevButton.setText("Previous");
         prevButton.setUserData("prevButton");
-        prevButton.getStyleClass().add("button-accent");
+        prevButton.getStyleClass().add(BUTTON_ACCENT);
 
         FontIcon prevIcon = new FontIcon("fas-arrow-left");
         prevIcon.setIconSize(14);
@@ -264,7 +268,7 @@ public class FXCollectionView implements ICollectionView {
         Button nextButton = new Button();
         nextButton.setText("Next");
         nextButton.setUserData("nextButton");
-        nextButton.getStyleClass().add("button-accent");
+        nextButton.getStyleClass().add(BUTTON_ACCENT);
 
         FontIcon nextIcon = new FontIcon("fas-arrow-right");
         nextIcon.setIconSize(14);
@@ -324,8 +328,8 @@ public class FXCollectionView implements ICollectionView {
             return null;
 
         for (javafx.scene.Node node : setSection.getChildren()) {
-            if (node instanceof FlowPane && ("cardsGrid_" + setId).equals(node.getUserData())) {
-                return (FlowPane) node;
+            if (node instanceof FlowPane flow && ("cardsGrid_" + setId).equals(flow.getUserData())) {
+                return flow;
             }
         }
         return null;
@@ -440,7 +444,11 @@ public class FXCollectionView implements ICollectionView {
         plusIcon.setIconSize(28);
         plusIcon.setIconColor(javafx.scene.paint.Color.web("#29B6F6"));
         addButton.setGraphic(plusIcon);
-        addButton.getStyleClass().add("card-add-button");
+        // do not add the 'card-add-button' class which may define a rectangular background
+        // Make the button visually just the icon: remove default rectangular background
+        addButton.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;");
+        // ensure clicks only register on the visible icon, avoiding the larger rectangular hitbox
+        addButton.setPickOnBounds(false);
 
         addButton.setOnAction(_ -> {
             if (controller != null) {
@@ -476,9 +484,11 @@ public class FXCollectionView implements ICollectionView {
         confirmDialog.setTitle("Conferma Eliminazione");
         confirmDialog.setHeaderText("Eliminare il set \"" + setName + "\"?");
         confirmDialog.setContentText(
-                "Questa azione eliminerà il set e tutte le carte associate.\n" +
-                        "L'operazione non può essere annullata.\n\n" +
-                        "Sei sicuro di voler continuare?");
+                """
+                        Questa azione eliminerà il set e tutte le carte associate.
+                        L'operazione non può essere annullata.
+
+                        Sei sicuro di voler continuare?""");
 
         ButtonType buttonTypeYes = new ButtonType("Sì, Elimina", ButtonBar.ButtonData.OK_DONE);
         ButtonType buttonTypeNo = new ButtonType("Annulla", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -491,10 +501,8 @@ public class FXCollectionView implements ICollectionView {
         dialogPane.getStyleClass().add("dialog-pane");
 
         Optional<ButtonType> result = confirmDialog.showAndWait();
-        if (result.isPresent() && result.get() == buttonTypeYes) {
-            if (controller != null) {
-                controller.deleteBinder(setId);
-            }
+        if (result.isPresent() && result.get() == buttonTypeYes && controller != null) {
+            controller.deleteBinder(setId);
         }
     }
 
@@ -582,7 +590,7 @@ public class FXCollectionView implements ICollectionView {
         subtitleLabel.setStyle("-fx-font-size: 16px;");
 
         Button addButton = new Button("Aggiungi Set");
-        addButton.getStyleClass().add("button-accent");
+        addButton.getStyleClass().add(BUTTON_ACCENT);
         addButton.setStyle("-fx-font-size: 18px; -fx-padding: 15 40;");
         addButton.setOnAction(_ -> showAddSetDialog());
 
@@ -633,15 +641,11 @@ public class FXCollectionView implements ICollectionView {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             String selectedSetName = setComboBox.getValue();
             if (selectedSetName != null) {
-                String setId = availableSets.entrySet().stream()
+                availableSets.entrySet().stream()
                         .filter(entry -> entry.getValue().equals(selectedSetName))
                         .map(Map.Entry::getKey)
-                        .findFirst()
-                        .orElse(null);
+                        .findFirst().ifPresent(setId -> controller.createBinder(setId, selectedSetName));
 
-                if (setId != null && controller != null) {
-                    controller.createBinder(setId, selectedSetName);
-                }
             }
         }
     }
@@ -810,23 +814,20 @@ public class FXCollectionView implements ICollectionView {
 
     @FXML
     private void onNavButtonHoverEnter(MouseEvent event) {
-        if (event.getSource() instanceof VBox container) {
-            if (!container.getStyle().contains("dropshadow")) {
-                container.setStyle(
-                        "-fx-background-color: rgba(41, 182, 246, 0.2); " +
-                                "-fx-background-radius: 8; " +
-                                "-fx-scale-x: 1.1; " +
-                                "-fx-scale-y: 1.1;");
-            }
+        if (event.getSource() instanceof VBox container && !container.getStyle().contains("dropshadow")) {
+            container.setStyle(
+                    "-fx-background-color: rgba(41, 182, 246, 0.2); " +
+                            "-fx-background-radius: 8; " +
+                            "-fx-scale-x: 1.1; " +
+                            "-fx-scale-y: 1.1;");
+
         }
     }
 
     @FXML
     private void onNavButtonHoverExit(MouseEvent event) {
-        if (event.getSource() instanceof VBox container) {
-            if (!container.getStyle().contains("dropshadow")) {
-                container.setStyle("");
-            }
+        if (event.getSource() instanceof VBox container && !container.getStyle().contains("dropshadow")) {
+            container.setStyle("");
         }
     }
 }

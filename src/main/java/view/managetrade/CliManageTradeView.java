@@ -21,7 +21,7 @@ public class CliManageTradeView implements IManageTradeView{
 
     @Override
     public void showError(String errorMessage) {
-
+        System.out.println("[ERROR] " + errorMessage);
     }
 
     @Override

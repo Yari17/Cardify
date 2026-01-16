@@ -63,11 +63,11 @@ public class CliRegistrationView implements IRegistrationView {
 
     @Override
     public void close() {
-
+        System.out.println("Chiusura della vista di registrazione.");
     }
 
     @Override
     public void showError(String errorMessage) {
-
+        System.out.println("ERROR: " + errorMessage);
     }
 }

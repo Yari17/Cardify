@@ -103,4 +103,8 @@ public class Binder {
     private void updateLastModified() {
         this.lastModified = LocalDateTime.now();
     }
+
+    public LocalDateTime getLastModified() {
+        return lastModified;
+    }
 }

@@ -73,7 +73,7 @@ public class CliStoreHPView implements IStoreHPView {
 
     @Override
     public void showError(String errorMessage) {
-
+        System.out.println("[ERROR] " + errorMessage);
     }
 
     @Override

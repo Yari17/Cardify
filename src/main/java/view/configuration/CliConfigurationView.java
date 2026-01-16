@@ -90,5 +90,6 @@ public class CliConfigurationView implements IConfigurationView {
 
     @Override
     public void close() {
+        System.out.println("Chiusura della vista di configurazione.");
     }
 }
