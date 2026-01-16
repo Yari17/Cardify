@@ -44,3 +44,4 @@ jobs:
           mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
           -Dsonar.organization=yari17
           -Dsonar.projectKey=Yari17_Cardify
+          -Dsonar.inclusions=**/*.java
