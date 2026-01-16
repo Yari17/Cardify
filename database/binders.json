@@ -383,10 +383,19 @@
         "quantity": 1,
         "isTradable": true,
         "status": ""
+      },
+      {
+        "id": "base5-80",
+        "name": "Rainbow Energy",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/80/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-14T14:37:39.995239",
-    "lastModified": "2026-01-14T18:45:11.488861"
+    "lastModified": "2026-01-16T13:59:22.060045"
   },
   {
     "id": 17,

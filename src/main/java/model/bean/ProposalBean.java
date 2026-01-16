@@ -12,6 +12,7 @@ public class ProposalBean {
     private List<CardBean> requested = new ArrayList<>();
     private String meetingPlace; // store username or id
     private String meetingDate; // date as string, expected format YYYY-MM-DD
+    private String meetingTime; // time as string, expected format HH:mm (optional)
     private String status; // ProposalStatus name: PENDING, ACCEPTED, REJECTED, EXPIRED
     private LocalDateTime lastUpdated;
 
@@ -35,6 +36,9 @@ public class ProposalBean {
 
     public String getMeetingDate() { return meetingDate; }
     public void setMeetingDate(String meetingDate) { this.meetingDate = meetingDate; }
+
+    public String getMeetingTime() { return meetingTime; }
+    public void setMeetingTime(String meetingTime) { this.meetingTime = meetingTime; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

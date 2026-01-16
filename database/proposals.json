@@ -21,7 +21,7 @@
         "quantity": 1
       }
     ],
-    "lastUpdated": "2026-01-15T15:44:10.721501",
+    "lastUpdated": "2026-01-16T17:33:51.419112",
     "status": "EXPIRED",
     "meetingPlace": "Nexus Comics",
     "meetingDate": "2026-01-15"
@@ -48,7 +48,7 @@
         "quantity": 1
       }
     ],
-    "lastUpdated": "2026-01-15T16:33:02.267255",
+    "lastUpdated": "2026-01-16T17:33:51.423561",
     "status": "EXPIRED",
     "meetingPlace": "Store1",
     "meetingDate": "2026-01-15"
@@ -140,5 +140,33 @@
     "status": "ACCEPTED",
     "meetingPlace": "La Tana del Goblin",
     "meetingDate": "2026-01-16"
+  },
+  {
+    "proposalId": "6",
+    "proposerId": "user1",
+    "receiverId": "user3",
+    "cardsOffered": [
+      {
+        "id": "base5-5",
+        "name": "Dark Dragonite",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/5/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "swsh10.5-008",
+        "name": "Charmander",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/008/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-16T17:38:42.509291",
+    "status": "PENDING",
+    "meetingPlace": "Nexus Comics",
+    "meetingDate": "2026-01-17",
+    "meetingTime": "18:30"
   }
 ]

@@ -8,7 +8,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="view.managetrade.FXManageTradeView"
+            fx:controller="view.javafx.FXManageTradeView"
             prefHeight="800.0" prefWidth="1400.0"
             stylesheets="@../styles/theme.css, @../styles/navbar.css"
             styleClass="bg-main">

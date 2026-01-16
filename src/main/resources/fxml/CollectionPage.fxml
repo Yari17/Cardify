@@ -8,7 +8,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="view.collection.FXCollectionView"
+            fx:controller="view.javafx.FXCollectionView"
             prefHeight="800.0" prefWidth="1400.0"
             stylesheets="@../styles/theme.css, @../styles/navbar.css, @../styles/collection.css"
             styleClass="bg-main">
@@ -31,7 +31,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Homepage" styleClass="nav-label"/>
+                <Label fx:id="homeLabel" text="Homepage" styleClass="nav-label"/>
             </VBox>
 
             <!-- Collection Button (disabled when on collection page) -->
@@ -45,7 +45,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Collection" styleClass="nav-label-disabled"/>
+                <Label fx:id="collectionLabel" text="Collection" styleClass="nav-label-disabled"/>
             </VBox>
 
             <!-- Live Trade Button -->
@@ -61,7 +61,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Trade" styleClass="nav-label"/>
+                <Label fx:id="liveTradeLabel" text="Trade" styleClass="nav-label"/>
             </VBox>
 
             <!-- Trade Button -->
@@ -77,7 +77,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Manage Trades" styleClass="nav-label"/>
+                <Label fx:id="manageTradesLabel" text="Manage Trades" styleClass="nav-label"/>
             </VBox>
 
             <!-- Logout Button -->
@@ -93,7 +93,7 @@
                         </ImageView>
                     </graphic>
                 </Button>
-                <Label text="Logout" styleClass="nav-label"/>
+                <Label fx:id="logoutLabel" text="Logout" styleClass="nav-label"/>
             </VBox>
 
             <!-- Spacer -->

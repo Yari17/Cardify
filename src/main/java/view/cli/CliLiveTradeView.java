@@ -1,9 +1,9 @@
-package view.trade;
+package view.cli;
 
 import controller.LiveTradeController;
 import config.InputManager;
 import model.bean.TradeTransactionBean;
-import view.managetrade.CliManageTradeView;
+import view.ILiveTradeView;
 
 
 public class CliLiveTradeView implements ILiveTradeView {
@@ -73,6 +73,15 @@ public class CliLiveTradeView implements ILiveTradeView {
     }
 
     @Override
+    public void refresh() {
+
+        // For CLI, refreshing a trade view will attempt to reload trades via controller if available
+        if (controller != null) {
+            controller.loadTrades();
+        }
+    }
+
+    @Override
     public void showError(String errorMessage) {
         System.out.println("ERROR: " + errorMessage);
 
@@ -109,7 +118,6 @@ public class CliLiveTradeView implements ILiveTradeView {
         manageView.setUsername(username);
     }
 
-    @Override
     public void onConfirmPresence(String id) {
         if (id == null) {
             System.out.println("Proposal id mancante");
@@ -138,12 +146,10 @@ public class CliLiveTradeView implements ILiveTradeView {
         onIspectionComplete("store");
     }
 
-    @Override
     public void onIspectionComplete(String username) {
         System.out.println("Ispezione completata da: " + (username != null ? username : "<unknown>"));
     }
 
-    @Override
     public void onTradeComplete(String id) {
         System.out.println("Lo scambio " + (id != null ? id : "<id>") + " è stato completato.");
     }

@@ -1,4 +1,4 @@
-package view.negotiation;
+package view.javafx;
 
 import controller.NegotiationController;
 import javafx.fxml.FXML;
@@ -13,6 +13,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.bean.CardBean;
 import model.bean.ProposalBean;
+import view.INegotiationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,8 @@ public class FXNegotiationView implements INegotiationView {
     private javafx.scene.control.ComboBox<String> storeComboBox;
     @FXML
     private javafx.scene.control.TextField meetingDateField; // format YYYY-MM-DD
+    @FXML
+    private javafx.scene.control.TextField meetingTimeField; // format HH:mm (optional)
     @FXML
     private Button addButton;
     @FXML
@@ -115,13 +118,13 @@ public class FXNegotiationView implements INegotiationView {
     }
 
     @Override
-    public void setOnCardProposed(Consumer<CardBean> onPropose) { this.onPropose = onPropose; }
+    public void registerOnCardProposed(Consumer<CardBean> onPropose) { this.onPropose = onPropose; }
 
     @Override
-    public void setOnCardUnproposed(Consumer<CardBean> onUnpropose) { this.onUnpropose = onUnpropose; }
+    public void registerOnCardUnproposed(Consumer<CardBean> onUnpropose) { this.onUnpropose = onUnpropose; }
 
     @Override
-    public void setOnConfirmRequested(Consumer<ProposalBean> onConfirm) { this.onConfirm = onConfirm; }
+    public void registerOnConfirmRequested(Consumer<ProposalBean> onConfirm) { this.onConfirm = onConfirm; }
 
     @Override
     public void setAvailableStores(List<String> storeUsernames) {
@@ -170,6 +173,45 @@ public class FXNegotiationView implements INegotiationView {
     @Override
     public void setController(NegotiationController controller) {
         this.controller = controller;
+    }
+
+    @Override
+    public void refresh() {
+        javafx.application.Platform.runLater(() -> {
+            try {
+                if (inventoryList != null) inventoryList.refresh();
+                if (requestedList != null) requestedList.refresh();
+                if (proposedList != null) proposedList.refresh();
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "NegotiationView refresh failed: " + ex.getMessage());
+            }
+        });
+    }
+
+    // METODI GET: lettura degli input correnti dalla UI per il controller
+    @Override
+    public List<CardBean> getProposedCards() {
+        return new ArrayList<>(proposedList.getItems());
+    }
+
+    @Override
+    public List<CardBean> getRequestedCards() {
+        return new ArrayList<>(requestedList.getItems());
+    }
+
+    @Override
+    public String getSelectedStore() {
+        return storeComboBox != null ? storeComboBox.getValue() : null;
+    }
+
+    @Override
+    public String getMeetingDateInput() {
+        return meetingDateField != null ? meetingDateField.getText() : null;
+    }
+
+    @Override
+    public String getMeetingTimeInput() {
+        return meetingTimeField != null ? meetingTimeField.getText() : null;
     }
 
     private void handleAdd() {
@@ -237,7 +279,7 @@ public class FXNegotiationView implements INegotiationView {
             try {
                 java.time.LocalDate d = java.time.LocalDate.parse(meetingDate.trim());
                 if (!d.isAfter(java.time.LocalDate.now())) dateOk = false;
-            } catch (Exception ignored) { dateOk = false; }
+            } catch (Exception _) { dateOk = false; }
         }
 
         if (meetingPlace == null || meetingPlace.trim().isEmpty()) {
@@ -280,6 +322,24 @@ public class FXNegotiationView implements INegotiationView {
         bean.setToUser(controller != null ? controller.getTargetOwnerUsername() : null);
         bean.setMeetingPlace(meetingPlace);
         bean.setMeetingDate(meetingDate.trim());
+        // read optional time if present and validate basic HH:mm format
+        String meetingTime = meetingTimeField != null ? meetingTimeField.getText() : null;
+        if (meetingTime != null) meetingTime = meetingTime.trim();
+        if (meetingTime != null && !meetingTime.isEmpty()) {
+            // basic validation HH:mm
+            try {
+                java.time.LocalTime.parse(meetingTime);
+                bean.setMeetingTime(meetingTime);
+            } catch (Exception ex) {
+                if (stage != null) {
+                    javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+                    a.setTitle("Errore orario");
+                    a.setHeaderText("Inserisci un orario valido nel formato HH:mm");
+                    a.showAndWait();
+                }
+                return;
+            }
+        }
         if (onConfirm != null) onConfirm.accept(bean);
     }
 

@@ -33,18 +33,6 @@
     -fx-opacity: 0.6;
 }
 
-/* Remove hover effects from containers with disabled buttons */
-.nav-button-container:has(.button-transparent:disabled) {
-    -fx-cursor: default;
-    -fx-padding: 8;
-}
-
-.nav-button-container:has(.button-transparent:disabled):hover {
-    -fx-background-color: transparent;
-    -fx-scale-x: 1.0;
-    -fx-scale-y: 1.0;
-}
-
 /* Disabled label style */
 .nav-button-container .nav-label-disabled {
     -fx-text-fill: #9CA3AF;
@@ -80,6 +68,21 @@
 
 .profile-container:hover {
     -fx-effect: dropshadow(gaussian, rgba(76, 175, 80, 0.6), 8, 0, 0, 0);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+/* Selected navigation label */
+.nav-label.nav-selected {
+    -fx-text-fill: #29B6F6; /* accent color */
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(41,182,246,0.25), 6, 0, 0, 1);
+}
+
+/* Selected nav container for slight background highlight (if needed) */
+.nav-button-container.nav-selected {
+    -fx-background-color: rgba(41, 182, 246, 0.12);
+    -fx-background-radius: 8;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }

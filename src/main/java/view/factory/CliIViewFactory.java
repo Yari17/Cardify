@@ -2,21 +2,22 @@ package view.factory;
 
 import controller.*;
 import config.InputManager;
-import view.collection.CliCollectionView;
-import view.collection.ICollectionView;
-import view.collectorhomepage.CliCollectorHPView;
-import view.collectorhomepage.ICollectorHPView;
-import view.login.CliILoginView;
-import view.login.ILoginView;
-import view.managetrade.IManageTradeView;
-import view.registration.CliRegistrationView;
-import view.registration.IRegistrationView;
-import view.storehomepage.CliStoreHPView;
-import view.storehomepage.IStoreHPView;
-import view.trade.CliLiveTradeView;
-import view.trade.ILiveTradeView;
-import view.negotiation.CliNegotiationView;
-import view.negotiation.INegotiationView;
+import view.cli.CliCollectionView;
+import view.ICollectionView;
+import view.cli.CliCollectorHPView;
+import view.ICollectorHPView;
+import view.cli.CliILoginView;
+import view.ILoginView;
+import view.cli.CliManageTradeView;
+import view.IManageTradeView;
+import view.cli.CliRegistrationView;
+import view.IRegistrationView;
+import view.cli.CliStoreHPView;
+import view.IStoreHPView;
+import view.cli.CliLiveTradeView;
+import view.ILiveTradeView;
+import view.cli.CliNegotiationView;
+import view.INegotiationView;
 
 public class CliIViewFactory implements IViewFactory {
 
@@ -77,6 +78,14 @@ public class CliIViewFactory implements IViewFactory {
 
     @Override
     public IManageTradeView createManageTradeView(ManageTradeController controller) {
-        return null;
+        CliManageTradeView view = new CliManageTradeView();
+        view.setManageController(controller);
+        // register callbacks
+        view.registerOnAccept(controller::acceptProposal);
+        view.registerOnDecline(controller::declineProposal);
+        view.registerOnCancel(controller::declineProposal);
+        view.registerOnTradeClick(controller::initiateTrade);
+        view.registerOnTradeNowClick(controller::initiateTrade);
+        return view;
     }
 }

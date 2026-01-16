@@ -1,9 +1,9 @@
-
-package view.registration;
+package view.cli;
 
 import controller.RegistrationController;
 import model.bean.UserBean;
 import config.InputManager;
+import view.IRegistrationView;
 
 @SuppressWarnings("java:S106")
 public class CliRegistrationView implements IRegistrationView {
@@ -69,5 +69,15 @@ public class CliRegistrationView implements IRegistrationView {
     @Override
     public void showError(String errorMessage) {
         System.out.println("ERROR: " + errorMessage);
+    }
+
+    @Override
+    public void refresh() {
+        // CLI: refresh is a no-op for interactive views; caller may invoke display().
+    }
+
+    @Override
+    public void setStage(javafx.stage.Stage stage) {
+        // CLI does not use JavaFX stages, method present for interface compatibility.
     }
 }

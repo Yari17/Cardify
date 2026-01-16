@@ -1,7 +1,9 @@
-package view.storehomepage;
+package view.cli;
 
 import controller.StoreHPController;
 import config.InputManager;
+import javafx.stage.Stage;
+import view.IStoreHPView;
 
 @SuppressWarnings("java:S106")
 public class CliStoreHPView implements IStoreHPView {
@@ -53,7 +55,7 @@ public class CliStoreHPView implements IStoreHPView {
                     System.out.println("Registra Ritiro selezionato.");
                     break;
                 case "5":
-                    controller.onLogoutRequested();
+                    if (controller != null) controller.onLogoutRequested();
                     running = false;
                     break;
                 case "0":
@@ -68,7 +70,12 @@ public class CliStoreHPView implements IStoreHPView {
 
     @Override
     public void close() {
-        controller.onExitRequested();
+        if (controller != null) controller.onExitRequested();
+    }
+
+    @Override
+    public void refresh() {
+        // CLI: refresh is a no-op here; display() drives the interactive loop.
     }
 
     @Override
@@ -81,5 +88,10 @@ public class CliStoreHPView implements IStoreHPView {
         System.out.println("\n╔════════════════════════════════════╗");
         System.out.println("║   Benvenuto STORE " + username + "!      ║");
         System.out.println("╚════════════════════════════════════╝");
+    }
+
+    @Override
+    public void setStage(Stage stage) {
+        // CLI does not use a JavaFX Stage; method implemented for compatibility with IView.
     }
 }

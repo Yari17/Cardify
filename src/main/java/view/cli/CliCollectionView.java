@@ -1,10 +1,11 @@
-package view.collection;
+package view.cli;
 
 import controller.CollectionController;
 import model.bean.CardBean;
 import model.domain.Binder;
 import model.domain.Card;
 import config.InputManager;
+import view.ICollectionView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -112,6 +113,16 @@ public class CliCollectionView implements ICollectionView {
     @Override
     public void close() {
         // CLI non ha risorse da chiudere
+    }
+
+    @Override
+    public void refresh() {
+        // CLI: refresh is a no-op; callers may invoke displayCollection/display() to re-render.
+    }
+
+    @Override
+    public void setStage(javafx.stage.Stage stage) {
+        // CLI does not use JavaFX Stage; method present for interface compatibility.
     }
 
     // ==================== PRIVATE METHODS ====================

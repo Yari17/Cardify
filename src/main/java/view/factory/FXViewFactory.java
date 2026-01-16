@@ -5,21 +5,21 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import view.collection.FXCollectionView;
-import view.collection.ICollectionView;
-import view.collectorhomepage.FXCollectorHPView;
-import view.collectorhomepage.ICollectorHPView;
-import view.login.FXLoginView;
-import view.login.ILoginView;
-import view.managetrade.FXManageTradeView;
-import view.managetrade.IManageTradeView;
-import view.negotiation.INegotiationView;
-import view.registration.FXRegistrationView;
-import view.registration.IRegistrationView;
-import view.storehomepage.FXStoreHPView;
-import view.storehomepage.IStoreHPView;
-import view.trade.FXLiveTradeView;
-import view.trade.ILiveTradeView;
+import view.javafx.FXCollectionView;
+import view.ICollectionView;
+import view.javafx.FXCollectorHPView;
+import view.ICollectorHPView;
+import view.javafx.FXLoginView;
+import view.ILoginView;
+import view.javafx.FXManageTradeView;
+import view.IManageTradeView;
+import view.INegotiationView;
+import view.javafx.FXRegistrationView;
+import view.IRegistrationView;
+import view.javafx.FXStoreHPView;
+import view.IStoreHPView;
+import view.javafx.FXLiveTradeView;
+import view.ILiveTradeView;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -231,8 +231,14 @@ public class FXViewFactory implements IViewFactory {
 
                 if (manageView instanceof FXManageTradeView fxManage) {
                     fxManage.setStage(stage);
-                    // wire manage controller into the view
-                    manageView.setManageController(controller);
+                    // Ensure FX view has a reference to its controller so navigation handlers work
+                    fxManage.setManageController(controller);
+                    // register controller callbacks to decouple implementation
+                    manageView.registerOnAccept(controller::acceptProposal);
+                    manageView.registerOnDecline(controller::declineProposal);
+                    manageView.registerOnCancel(controller::declineProposal);
+                    manageView.registerOnTradeClick(controller::initiateTrade);
+                    manageView.registerOnTradeNowClick(controller::initiateTrade);
                 }
 
                 return manageView;

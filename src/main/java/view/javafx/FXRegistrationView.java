@@ -1,71 +1,74 @@
-package view.login;
+package view.javafx;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import config.AppConfig;
-import controller.LoginController;
+import controller.RegistrationController;
 import model.bean.UserBean;
+import view.IRegistrationView;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class FXLoginView implements ILoginView {
-    private static final Logger LOGGER = Logger.getLogger(FXLoginView.class.getName());
+public class FXRegistrationView implements IRegistrationView {
+    private static final Logger LOGGER = Logger.getLogger(FXRegistrationView.class.getName());
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    @FXML private ComboBox<String> userTypeComboBox;
     @FXML private Label messageLabel;
     @FXML private Label persistenceLabel;
 
     
-    private LoginController loginController;
+    private RegistrationController appController;
 
     
     private Stage stage;
+
     @FXML
     private void initialize() {
         
         if (persistenceLabel != null) {
             persistenceLabel.setText(AppConfig.getPersistenceLabel());
         }
-    }
 
-    @FXML
-    private void onLoginClicked() {
-        try {
-            if (loginController != null) {
-                
-                loginController.onLoginRequested();
-            } else {
-                LOGGER.warning("Application controller not set on FXLoginView");
-            }
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Unhandled exception in login handler", ex);
+        
+        if (userTypeComboBox != null) {
+            userTypeComboBox.getItems().addAll(
+                UserBean.USER_TYPE_COLLECTOR,
+                UserBean.USER_TYPE_STORE
+            );
+            
+            userTypeComboBox.getSelectionModel().selectFirst();
         }
     }
 
     @FXML
     private void onRegisterClicked() {
         try {
-            if (loginController != null) {
+            if (appController != null) {
                 
-                loginController.onRegisterRequested();
+                appController.onRegisterRequested();
             } else {
-                LOGGER.warning("Application controller not set on FXLoginView");
+                LOGGER.warning("Application controller not set on FXRegistrationView");
             }
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Unhandled exception opening registration dialog", ex);
+            LOGGER.log(Level.SEVERE, "Unhandled exception in registration handler", ex);
         }
     }
 
     
 
     @Override
-    public UserBean getUserCredentials() {
+    public UserBean getUserData() {
         String username = usernameField != null ? usernameField.getText() : "";
         String password = passwordField != null ? passwordField.getText() : "";
-        return new UserBean(username, password);
+        String userType = userTypeComboBox != null && userTypeComboBox.getValue() != null
+            ? userTypeComboBox.getValue()
+            : UserBean.USER_TYPE_COLLECTOR;
+
+        return new UserBean(username, password, userType);
     }
 
     @Override
@@ -89,8 +92,8 @@ public class FXLoginView implements ILoginView {
     }
 
     @Override
-    public void setController(LoginController controller) {
-        this.loginController = controller;
+    public void setController(RegistrationController controller) {
+        this.appController = controller;
     }
 
     @Override
@@ -135,4 +138,18 @@ public class FXLoginView implements ILoginView {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-}
+    @Override
+    public void refresh() {
+        // Default FX refresh: ensure UI updates happen on FX thread.
+        javafx.application.Platform.runLater(() -> {
+            try {
+                if (messageLabel != null) {
+                    // reapply current text to force UI bindings/refresh if any
+                    messageLabel.setText(messageLabel.getText());
+                }
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "RegistrationView refresh failed: " + ex.getMessage());
+            }
+        });
+    }
+ }

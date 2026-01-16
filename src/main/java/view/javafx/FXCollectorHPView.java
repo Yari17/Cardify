@@ -1,4 +1,4 @@
-package view.collectorhomepage;
+package view.javafx;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.bean.CardBean;
+import view.ICollectorHPView;
 
 public class FXCollectorHPView implements ICollectorHPView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectorHPView.class.getName());
@@ -50,42 +51,33 @@ public class FXCollectorHPView implements ICollectorHPView {
     @FXML
     private ComboBox<String> gameComboBox;
 
-    @SuppressWarnings("unused") // Will be used when expansion filtering is implemented
-    @FXML
+    @FXML // Will be used when expansion filtering is implemented
     private ComboBox<String> expansionComboBox;
 
     @FXML
     private ComboBox<String> languageComboBox;
 
-    @SuppressWarnings("unused") // Will be used when ITCGCard condition filtering is implemented
-    @FXML
+    @FXML // Will be used when ITCGCard condition filtering is implemented
     private CheckBox mintCheckBox;
 
-    @SuppressWarnings("unused")
     @FXML
     private CheckBox nearMintCheckBox;
 
-    @SuppressWarnings("unused")
     @FXML
     private CheckBox excellentCheckBox;
 
-    @SuppressWarnings("unused")
     @FXML
     private CheckBox goodCheckBox;
 
-    @SuppressWarnings("unused")
     @FXML
     private CheckBox playedCheckBox;
 
-    @SuppressWarnings("unused") // Will be used when price filtering is implemented
-    @FXML
+    @FXML // Will be used when price filtering is implemented
     private Slider priceSlider;
 
-    @SuppressWarnings("unused") // Will be used to display cards
-    @FXML
+    @FXML // Will be used to display cards
     private FlowPane cardsFlowPane;
 
-    @SuppressWarnings("unused")
     @FXML
     private Button applyFiltersButton;
 
@@ -911,7 +903,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             }
         }
     }
-
+    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -959,6 +951,19 @@ public class FXCollectorHPView implements ICollectorHPView {
             dlg.getDialogPane().setContent(content);
             dlg.getDialogPane().getButtonTypes().add(javafx.scene.control.ButtonType.CLOSE);
             dlg.show();
+        });
+    }
+
+    @Override
+    public void refresh() {
+        javafx.application.Platform.runLater(() -> {
+            try {
+                // Refresh UX elements if present
+                if (usernameLabel != null) usernameLabel.setText(usernameLabel.getText());
+                // Could refresh lists or other components here
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "CollectorHPView refresh failed: " + ex.getMessage());
+            }
         });
     }
 }

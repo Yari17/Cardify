@@ -4,10 +4,10 @@ import model.bean.CardBean;
 import model.bean.ProposalBean;
 import model.domain.Card;
 import model.domain.Proposal;
-import model.domain.TradeTransaction;
 import model.domain.enumerations.ProposalStatus;
-import model.domain.enumerations.TradeStatus;
-import view.managetrade.IManageTradeView;
+import view.cli.CliManageTradeView;
+import view.javafx.FXManageTradeView;
+import view.IManageTradeView;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -62,8 +62,7 @@ public class ManageTradeController {
             LOGGER.log(Level.FINE, "Stacktrace", ex);
         }
 
-        // Wire controller and display pending + concluded
-        view.setManageController(this);
+        // Display pending + concluded; controller registration performed in setView
         view.displayTrades(pending, concluded);
     }
 
@@ -84,7 +83,10 @@ public class ManageTradeController {
             var opt = proposalDao.getById(proposalId);
             if (opt.isEmpty()) return false;
             Proposal p = opt.get();
-            p.setStatus(newStatus);
+            // Delegate state transition to domain object
+            if (newStatus == ProposalStatus.ACCEPTED) p.accept();
+            else if (newStatus == ProposalStatus.REJECTED) p.decline();
+            else p.setStatus(newStatus);
             proposalDao.update(p);
 
             // If the proposal became ACCEPTED, create and persist a TradeTransaction
@@ -98,30 +100,6 @@ public class ManageTradeController {
             LOGGER.log(Level.WARNING, "Failed to update proposal {0} to {1}: {2}", new Object[]{proposalId, newStatus, ex.getMessage()});
             return false;
         }
-    }
-
-    // Map a domain.Proposal to a domain.TradeTransaction
-    private model.domain.TradeTransaction mapProposalToTradeTransaction(Proposal p) {
-        if (p == null) return null;
-        int txId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-        java.time.LocalDateTime creation = java.time.LocalDateTime.now();
-        java.time.LocalDateTime tradeDate = creation;
-        try {
-            if (p.getMeetingDate() != null && !p.getMeetingDate().isEmpty()) {
-                tradeDate = java.time.LocalDate.parse(p.getMeetingDate()).atStartOfDay();
-            }
-        } catch (Exception ex) {
-            LOGGER.fine(() -> "Could not parse meeting date for proposal " + p.getProposalId() + ": " + ex.getMessage());
-        }
-
-        List<Card> offered = new ArrayList<>();
-        if (p.getCardsOffered() != null) offered.addAll(p.getCardsOffered());
-        List<Card> requested = new ArrayList<>();
-        if (p.getCardsRequested() != null) requested.addAll(p.getCardsRequested());
-
-        return new TradeTransaction(txId,
-                TradeStatus.WAITING_FOR_ARRIVAL,
-                p.getProposerId(), p.getReceiverId(), p.getMeetingPlace(), creation, tradeDate, offered, requested);
     }
 
     // Return proposal domain object for detailed view
@@ -166,6 +144,7 @@ public class ManageTradeController {
         b.setToUser(p.getReceiverId());
         b.setMeetingPlace(p.getMeetingPlace());
         b.setMeetingDate(p.getMeetingDate());
+        b.setMeetingTime(p.getMeetingTime());
         b.setStatus(p.getStatus() != null ? p.getStatus().name() : null);
         b.setLastUpdated(p.getLastUpdated());
         b.setOffered(mapCardsToBeans(p.getCardsOffered()));
@@ -198,8 +177,25 @@ public class ManageTradeController {
     public void setView(IManageTradeView view) {
         this.view = view;
         if (this.view != null) {
-            this.view.setManageController(this);
-            this.view.setUsername(this.username);
+            // Prefer callback registration to decouple view from controller implementation
+            try {
+                this.view.registerOnAccept(this::acceptProposal);
+                this.view.registerOnDecline(this::declineProposal);
+                this.view.registerOnCancel(this::declineProposal);
+                this.view.registerOnTradeClick(this::initiateTrade);
+                this.view.registerOnTradeNowClick(this::initiateTrade);
+            } catch (AbstractMethodError | Exception _) {
+                // fallback for older concrete view implementations that still declare setManageController
+                try {
+                    if (this.view instanceof FXManageTradeView fx) fx.setManageController(this);
+                    else if (this.view instanceof CliManageTradeView cli) cli.setManageController(this);
+                } catch (Exception _) {
+                    LOGGER.fine("View does not support setManageController");
+                }
+            }
+            try { this.view.setUsername(this.username); } catch (Exception _) {
+                LOGGER.fine("View does not support setUsername");
+            }
         }
     }
 
@@ -263,9 +259,9 @@ public class ManageTradeController {
         try {
             model.dao.ITradeDao tradeDao = navigationController != null ? navigationController.getDaoFactory().createTradeDao() : null;
             if (tradeDao != null) {
-                model.domain.TradeTransaction tx = mapProposalToTradeTransaction(p);
+                model.domain.TradeTransaction tx = p.toTradeTransaction();
                 if (tx == null) {
-                    LOGGER.fine(() -> "mapProposalToTradeTransaction returned null for proposal " + proposalId);
+                    LOGGER.fine(() -> "toTradeTransaction returned null for proposal " + proposalId);
                     return;
                 }
                 tradeDao.save(tx);

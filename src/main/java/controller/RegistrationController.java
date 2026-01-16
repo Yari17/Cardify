@@ -2,7 +2,7 @@ package controller;
 
 import model.bean.UserBean;
 import model.dao.IUserDao;
-import view.registration.IRegistrationView;
+import view.IRegistrationView;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -1,8 +1,8 @@
 package controller;
 
 import config.InputManager;
-import view.configuration.CliConfigurationView;
-import view.configuration.IConfigurationView;
+import view.cli.CliConfigurationView;
+import view.IConfigurationView;
 
 public class ConfigurationManager {
     private final IConfigurationView view;

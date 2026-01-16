@@ -1,10 +1,11 @@
-package view.negotiation;
+package view.cli;
 
 import controller.NegotiationController;
 import model.bean.CardBean;
 import model.bean.ProposalBean;
 import config.InputManager;
 import org.jetbrains.annotations.NotNull;
+import view.INegotiationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,10 @@ public class CliNegotiationView implements INegotiationView {
     private List<CardBean> proposed = new ArrayList<>();
     private List<String> availableStores = new ArrayList<>();
     private String meetingDateHint;
+    // store last CLI inputs so controller can read them via getters
+    private String lastSelectedStore;
+    private String lastMeetingDateInput;
+    private String lastMeetingTimeInput;
 
     private Consumer<CardBean> onPropose;
     private Consumer<CardBean> onUnpropose;
@@ -28,7 +33,6 @@ public class CliNegotiationView implements INegotiationView {
     private static final String ITEM_LINE_FMT = " %d) %s x%d%n";
     private static final String INVALID_INDEX_MSG = "Invalid index";
 
-    @SuppressWarnings("unused")
     public CliNegotiationView() {
         this.inputManager = new config.InputManager();
     }
@@ -60,17 +64,17 @@ public class CliNegotiationView implements INegotiationView {
     }
 
     @Override
-    public void setOnCardProposed(Consumer<CardBean> onPropose) {
+    public void registerOnCardProposed(Consumer<CardBean> onPropose) {
         this.onPropose = onPropose;
     }
 
     @Override
-    public void setOnCardUnproposed(Consumer<CardBean> onUnpropose) {
+    public void registerOnCardUnproposed(Consumer<CardBean> onUnpropose) {
         this.onUnpropose = onUnpropose;
     }
 
     @Override
-    public void setOnConfirmRequested(Consumer<ProposalBean> onConfirm) {
+    public void registerOnConfirmRequested(Consumer<ProposalBean> onConfirm) {
         this.onConfirm = onConfirm;
     }
 
@@ -177,12 +181,22 @@ public class CliNegotiationView implements INegotiationView {
             return;
         }
 
-        ProposalBean bean = getProposalBean(chosenStore, dateIn);
+        // Prompt optional time HH:mm
+        System.out.print("Enter meeting time (HH:mm) [optional, press ENTER to skip]: ");
+        String timeIn = inputManager.readString().trim();
+        if (timeIn.isEmpty()) timeIn = null;
+
+        // store last inputs for getters
+        this.lastSelectedStore = chosenStore;
+        this.lastMeetingDateInput = dateIn;
+        this.lastMeetingTimeInput = timeIn;
+
+        ProposalBean bean = getProposalBean(chosenStore, dateIn, timeIn);
         if (onConfirm != null) onConfirm.accept(bean);
     }
 
     @NotNull
-    private ProposalBean getProposalBean(String chosenStore, String dateIn) {
+    private ProposalBean getProposalBean(String chosenStore, String dateIn, String timeIn) {
         ProposalBean bean = new ProposalBean();
         bean.setOffered(new ArrayList<>(proposed));
         // ensure requested copies are quantity 1
@@ -197,6 +211,15 @@ public class CliNegotiationView implements INegotiationView {
         bean.setToUser(controller != null ? controller.getTargetOwnerUsername() : null);
         bean.setMeetingPlace(chosenStore);
         bean.setMeetingDate(dateIn);
+        if (timeIn != null && !timeIn.isEmpty()) {
+            try {
+                java.time.LocalTime.parse(timeIn);
+                bean.setMeetingTime(timeIn);
+            } catch (Exception _) {
+                System.out.println("Invalid time format, ignoring time");
+                bean.setMeetingTime(null);
+            }
+        }
         return bean;
     }
 
@@ -209,4 +232,40 @@ public class CliNegotiationView implements INegotiationView {
     public void showError(String errorMessage) {
         System.out.println("[ERROR] " + errorMessage);
     }
+
+    @Override
+    public void refresh() {
+        // CLI: refresh does not automatically start the interactive loop; caller may call display().
+    }
+
+    @Override
+    public void setStage(javafx.stage.Stage stage) {
+        // CLI does not use JavaFX stages; present for interface compatibility.
+    }
+
+    // GETTERS for controller to read current inputs
+    @Override
+    public List<CardBean> getProposedCards() {
+        return new ArrayList<>(proposed);
+    }
+
+    @Override
+    public List<CardBean> getRequestedCards() {
+        List<CardBean> copies = new ArrayList<>();
+        for (CardBean cb : requested) {
+            CardBean copy = new CardBean(cb);
+            copy.setQuantity(1);
+            copies.add(copy);
+        }
+        return copies;
+    }
+
+    @Override
+    public String getSelectedStore() { return lastSelectedStore; }
+
+    @Override
+    public String getMeetingDateInput() { return lastMeetingDateInput; }
+
+    @Override
+    public String getMeetingTimeInput() { return lastMeetingTimeInput; }
 }

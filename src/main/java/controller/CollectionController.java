@@ -7,7 +7,7 @@ import model.bean.CardBean;
 import model.dao.IBinderDao;
 import model.domain.Binder;
 import model.domain.Card;
-import view.collection.ICollectionView;
+import view.ICollectionView;
 
 import java.util.HashMap;
 import java.util.List;

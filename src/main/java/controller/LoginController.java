@@ -3,7 +3,7 @@ package controller;
 import model.bean.UserBean;
 import model.dao.IUserDao;
 import model.domain.User;
-import view.login.ILoginView;
+import view.ILoginView;
 
 import java.util.Optional;
 

@@ -1,8 +1,8 @@
-package view.configuration;
+package view;
 
 import controller.ConfigurationManager;
 
-public interface IConfigurationView {
+public interface IConfigurationView extends IView {
     void display();
     String getInterfaceChoice();
     String getPersistenceChoice();

@@ -1,9 +1,10 @@
-package view.storehomepage;
+package view.javafx;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import controller.StoreHPController;
+import view.IStoreHPView;
 
 import java.util.logging.Logger;
 
@@ -57,6 +58,16 @@ public class FXStoreHPView implements IStoreHPView {
         }
     }
 
+    @Override
+    public void refresh() {
+        javafx.application.Platform.runLater(() -> {
+            if (welcomeLabel != null) {
+                // re-apply current text to force UI update
+                welcomeLabel.setText(welcomeLabel.getText());
+            }
+        });
+    }
+
     @FXML
     private void onLogoutClicked() {
         if (controller != null) {
@@ -71,6 +82,7 @@ public class FXStoreHPView implements IStoreHPView {
         }
     }
 
+    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }

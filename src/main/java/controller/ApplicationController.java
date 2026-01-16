@@ -8,17 +8,13 @@ import model.dao.IUserDao;
 import model.dao.factory.DaoFactory;
 import config.InputManager;
 import model.domain.enumerations.PersistenceType;
-import view.IView;
-import view.collection.ICollectionView;
-import view.collectorhomepage.ICollectorHPView;
+import view.*;
 import view.factory.CliIViewFactory;
 import view.factory.FXViewFactory;
 import view.factory.IViewFactory;
-import view.login.ILoginView;
-import view.managetrade.IManageTradeView;
-import view.registration.IRegistrationView;
-import view.storehomepage.IStoreHPView;
-import view.trade.ILiveTradeView;
+import view.IRegistrationView;
+import view.IStoreHPView;
+import view.ILiveTradeView;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -150,7 +146,7 @@ public class ApplicationController {
             // If already displaying ManageTrades, do nothing
             if (!viewStack.isEmpty()) {
                 IView top = viewStack.getLast();
-                if (top instanceof view.managetrade.IManageTradeView) {
+                if (top instanceof IManageTradeView) {
                     LOGGER.fine("Already on Manage Trades view; skipping navigation");
                     return;
                 }
@@ -197,7 +193,7 @@ public class ApplicationController {
         // Create a NegotiationController with basic context (proposer and target owner)
         String targetOwner = targetCard != null ? targetCard.getOwner() : null;
         NegotiationController controller = new NegotiationController(proposerUsername, targetOwner, this);
-        view.negotiation.INegotiationView negotiationView = viewFactory.createNegotiationView(controller);
+        INegotiationView negotiationView = viewFactory.createNegotiationView(controller);
         controller.setView(negotiationView);
 
         // Build simple inventory/requested lists from the binder DAO

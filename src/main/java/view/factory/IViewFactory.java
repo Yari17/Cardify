@@ -1,14 +1,14 @@
 package view.factory;
 
 import controller.*;
-import view.collection.ICollectionView;
-import view.collectorhomepage.ICollectorHPView;
-import view.login.ILoginView;
-import view.managetrade.IManageTradeView;
-import view.registration.IRegistrationView;
-import view.storehomepage.IStoreHPView;
-import view.trade.ILiveTradeView;
-import view.negotiation.INegotiationView;
+import view.ICollectionView;
+import view.ICollectorHPView;
+import view.ILoginView;
+import view.IManageTradeView;
+import view.IRegistrationView;
+import view.IStoreHPView;
+import view.ILiveTradeView;
+import view.INegotiationView;
 
 public interface IViewFactory {
     ILoginView createLoginView(LoginController controller);

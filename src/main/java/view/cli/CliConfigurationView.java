@@ -1,7 +1,8 @@
-package view.configuration;
+package view.cli;
 
 import controller.ConfigurationManager;
 import config.InputManager;
+import view.IConfigurationView;
 
 @SuppressWarnings("java:S106")
 public class CliConfigurationView implements IConfigurationView {
@@ -91,5 +92,20 @@ public class CliConfigurationView implements IConfigurationView {
     @Override
     public void close() {
         System.out.println("Chiusura della vista di configurazione.");
+    }
+
+    @Override
+    public void refresh() {
+        // CLI view: refresh is no-op; display() can be invoked to re-open configuration.
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+        System.out.println("ERROR: " + errorMessage);
+    }
+
+    @Override
+    public void setStage(javafx.stage.Stage stage) {
+        // CLI does not use JavaFX stage; provided for interface compatibility.
     }
 }

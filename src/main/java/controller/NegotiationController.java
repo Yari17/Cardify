@@ -3,7 +3,7 @@ package controller;
 import model.bean.CardBean;
 import model.bean.ProposalBean;
 import model.dao.IUserDao;
-import view.negotiation.INegotiationView;
+import view.INegotiationView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -37,9 +37,9 @@ public class NegotiationController {
             view.showProposed(java.util.Collections.emptyList());
 
             // register callbacks if view wants to use them
-            view.setOnCardProposed(this::onCardProposed);
-            view.setOnCardUnproposed(this::onCardUnproposed);
-            view.setOnConfirmRequested(this::onConfirmRequested);
+            view.registerOnCardProposed(this::onCardProposed);
+            view.registerOnCardUnproposed(this::onCardUnproposed);
+            view.registerOnConfirmRequested(this::onConfirmRequested);
 
             // Load available stores from user DAO
             try {
@@ -113,6 +113,7 @@ public class NegotiationController {
         // Include meeting details
         p.setMeetingPlace(bean.getMeetingPlace());
         p.setMeetingDate(bean.getMeetingDate());
+        p.setMeetingTime(bean.getMeetingTime());
         p.setStatus(model.domain.enumerations.ProposalStatus.PENDING);
         p.setLastUpdated(java.time.LocalDateTime.now());
         return p;

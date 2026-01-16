@@ -7,7 +7,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.TextField?>
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.negotiation.FXNegotiationView" prefWidth="820" prefHeight="620">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.javafx.FXNegotiationView" prefWidth="820" prefHeight="620">
     <top>
         <Label text="Proposta di Scambio" style="-fx-font-size:20px; -fx-font-weight:bold; -fx-padding:10;" BorderPane.alignment="CENTER" />
     </top>
@@ -34,6 +34,8 @@
                     <ComboBox fx:id="storeComboBox" prefWidth="220" />
                     <Label text="Data (YYYY-MM-DD):" />
                     <TextField fx:id="meetingDateField" promptText="YYYY-MM-DD" prefWidth="140" />
+                    <Label text="Orario (HH:mm):" />
+                    <TextField fx:id="meetingTimeField" promptText="HH:mm" prefWidth="100" />
                 </HBox>
                 <HBox spacing="8" style="-fx-padding:6; -fx-alignment:center-right;">
                     <Button fx:id="addButton" text="Aggiungi" />

@@ -1,8 +1,7 @@
-package view.registration;
+package view;
 
 import controller.RegistrationController;
 import model.bean.UserBean;
-import view.IView;
 
 public interface IRegistrationView extends IView {
     UserBean getUserData();

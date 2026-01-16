@@ -1,9 +1,13 @@
 package model.domain;
 
 import model.domain.enumerations.ProposalStatus;
+import model.domain.enumerations.TradeStatus;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 public class Proposal {
     private String proposalId;
@@ -15,6 +19,7 @@ public class Proposal {
     private ProposalStatus status;
     private String meetingPlace;
     private String meetingDate; // YYYY-MM-DD
+    private String meetingTime; // HH:mm (optional)
 
     public String getProposalId() { return proposalId; }
     public void setProposalId(String proposalId) { this.proposalId = proposalId; }
@@ -43,8 +48,81 @@ public class Proposal {
     public String getMeetingDate() { return meetingDate; }
     public void setMeetingDate(String meetingDate) { this.meetingDate = meetingDate; }
 
+    public String getMeetingTime() { return meetingTime; }
+    public void setMeetingTime(String meetingTime) { this.meetingTime = meetingTime; }
+
     @Override
     public String toString() {
         return "Proposal{" + "proposalId='" + proposalId + '\'' + ", proposerId='" + proposerId + '\'' + ", receiverId='" + receiverId + '\'' + ", offered=" + cardsOffered + ", requested=" + cardsRequested + ", status=" + status + '}';
     }
+
+    // -------------------- Domain behavior (Information Expert) --------------------
+
+    /**
+     * Mark this proposal as accepted and update timestamp.
+     * Business rules about transition can be enforced here.
+     */
+    public void accept() {
+        this.status = ProposalStatus.ACCEPTED;
+        this.lastUpdated = LocalDateTime.now();
+    }
+
+    /**
+     * Mark this proposal as declined/rejected and update timestamp.
+     */
+    public void decline() {
+        this.status = ProposalStatus.REJECTED;
+        this.lastUpdated = LocalDateTime.now();
+    }
+
+    /**
+     * Returns true if this proposal is expired according to lastUpdated + 1 day rule.
+     */
+    public boolean isExpired(LocalDateTime now) {
+        if (this.lastUpdated == null || now == null) return false;
+        return this.lastUpdated.plusDays(1).isBefore(now);
+    }
+
+    /**
+     * Try to parse meetingDate and meetingTime into a LocalDateTime.
+     * Returns empty Optional if parsing fails or no date specified.
+     */
+    public Optional<LocalDateTime> getMeetingLocalDateTime() {
+        if (this.meetingDate == null || this.meetingDate.isEmpty()) return Optional.empty();
+        try {
+            java.time.LocalDate date = java.time.LocalDate.parse(this.meetingDate);
+            if (this.meetingTime != null && !this.meetingTime.isEmpty()) {
+                try {
+                    LocalTime time = LocalTime.parse(this.meetingTime);
+                    return Optional.of(LocalDateTime.of(date, time));
+                } catch (DateTimeParseException ex) {
+                    // ignore and fallback to start of day
+                }
+            }
+            return Optional.of(date.atStartOfDay());
+        } catch (DateTimeParseException ex) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Build a TradeTransaction representing the scheduled trade for this proposal.
+     * Returns null if insufficient data.
+     */
+    public TradeTransaction toTradeTransaction() {
+        // lazy-import to avoid circular references in some build setups
+        TradeStatus defaultStatus = TradeStatus.WAITING_FOR_ARRIVAL;
+        int txId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+        LocalDateTime creation = LocalDateTime.now();
+        LocalDateTime tradeDate = creation;
+
+        Optional<LocalDateTime> maybe = getMeetingLocalDateTime();
+        if (maybe.isPresent()) tradeDate = maybe.get();
+
+        List<Card> offered = this.cardsOffered != null ? new java.util.ArrayList<>(this.cardsOffered) : java.util.Collections.emptyList();
+        List<Card> requested = this.cardsRequested != null ? new java.util.ArrayList<>(this.cardsRequested) : java.util.Collections.emptyList();
+
+        return new TradeTransaction(txId, defaultStatus, this.proposerId, this.receiverId, this.meetingPlace, creation, tradeDate, offered, requested);
+    }
+
 }

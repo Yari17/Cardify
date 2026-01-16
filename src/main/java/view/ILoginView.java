@@ -1,8 +1,7 @@
-package view.login;
+package view;
 
 import controller.LoginController;
 import model.bean.UserBean;
-import view.IView;
 
 public interface ILoginView extends IView {
     UserBean getUserCredentials();

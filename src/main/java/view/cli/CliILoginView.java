@@ -1,8 +1,10 @@
-package view.login;
+package view.cli;
 
 import controller.LoginController;
 import model.bean.UserBean;
 import config.InputManager;
+import javafx.stage.Stage;
+import view.ILoginView;
 
 
 public class CliILoginView implements ILoginView {
@@ -91,5 +93,18 @@ public class CliILoginView implements ILoginView {
     @Override
     public void showError(String errorMessage) {
         System.out.println("[ERROR] " + errorMessage);
+    }
+
+    // Implementazione minima di refresh per la vista CLI: non avvia loop, è no-op
+    @Override
+    public void refresh() {
+        // Per la CLI il refresh non forza il display interattivo; il chiamante può
+        // richiamare display() se desidera re-renderizzare il menu.
+    }
+
+    // Implementazione di setStage per rispettare il contratto IView; per la CLI è no-op
+    @Override
+    public void setStage(Stage stage) {
+        // CLI non usa Stage; metodo fornito per compatibilità.
     }
 }

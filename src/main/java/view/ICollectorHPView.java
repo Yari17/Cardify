@@ -1,8 +1,7 @@
-package view.collectorhomepage;
+package view;
 
 import controller.CollectorHPController;
 import model.bean.CardBean;
-import view.IView;
 
 import java.util.List;
 import java.util.Map;

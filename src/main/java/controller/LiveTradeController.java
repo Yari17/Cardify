@@ -3,7 +3,7 @@ package controller;
 
 import model.bean.UserBean;
 import model.domain.Card;
-import view.trade.ILiveTradeView;
+import view.ILiveTradeView;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -121,7 +121,15 @@ public class LiveTradeController {
             java.time.LocalDateTime creation = java.time.LocalDateTime.now();
             java.time.LocalDateTime tradeDate;
             if (p.getMeetingDate() != null && !p.getMeetingDate().isEmpty()) {
-                tradeDate = java.time.LocalDate.parse(p.getMeetingDate()).atStartOfDay();
+                if (p.getMeetingTime() != null && !p.getMeetingTime().isEmpty()) {
+                    try {
+                        tradeDate = java.time.LocalDateTime.of(java.time.LocalDate.parse(p.getMeetingDate()), java.time.LocalTime.parse(p.getMeetingTime()));
+                    } catch (Exception _) {
+                        tradeDate = java.time.LocalDate.parse(p.getMeetingDate()).atStartOfDay();
+                    }
+                } else {
+                    tradeDate = java.time.LocalDate.parse(p.getMeetingDate()).atStartOfDay();
+                }
             } else {
                 tradeDate = creation;
             }

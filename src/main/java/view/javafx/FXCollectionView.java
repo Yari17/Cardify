@@ -1,4 +1,4 @@
-package view.collection;
+package view.javafx;
 
 import controller.CollectionController;
 import javafx.fxml.FXML;
@@ -14,6 +14,7 @@ import model.bean.CardBean;
 import model.domain.Binder;
 import model.domain.Card;
 import org.kordamp.ikonli.javafx.FontIcon;
+import view.ICollectionView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,9 @@ public class FXCollectionView implements ICollectionView {
     private static final String CARD_HOVER_STYLE = "card-hover";
     // centralized constant for repeated style class
     private static final String BUTTON_ACCENT = "button-accent";
+    // navigation constants
+    private static final String NAV_SELECTED = "nav-selected";
+    private static final String NAV_COLLECTION = "collection";
 
     @FXML
     private Label usernameLabel;
@@ -41,6 +45,39 @@ public class FXCollectionView implements ICollectionView {
     @FXML
     private Button saveButton;
 
+    @FXML
+    private Button homeButton;
+
+    @FXML
+    private Label homeLabel;
+
+    @FXML
+    private Button collectionButton;
+
+    @FXML
+    private Label collectionLabel;
+
+    @FXML
+    private Button liveTradeButton;
+
+    @FXML
+    private Label liveTradeLabel;
+
+    @FXML
+    private Button tradeButton;
+
+    @FXML
+    private Label manageTradesLabel;
+
+    @FXML
+    private Button logoutButton;
+
+    @FXML
+    private Label logoutLabel;
+
+    @FXML
+    private VBox logoutButtonContainer;
+
     private CollectionController controller;
     private Stage stage;
     // GUI must not hold DAO references. Controller supplies setCardsMap via displayCollection.
@@ -50,13 +87,12 @@ public class FXCollectionView implements ICollectionView {
     private Map<String, Binder> currentBinders;
 
     // Pagination fields - track current page for each set
-    private Map<String, Integer> setCurrentPages;
+    private final Map<String, Integer> setCurrentPages = new HashMap<>();
     private static final int CARDS_PER_PAGE = 20;
 
     public FXCollectionView() {
         // FXML fields will be injected by FXMLLoader
         this.currentBinders = new HashMap<>();
-        this.setCurrentPages = new HashMap<>();
     }
 
     public void setController(CollectionController controller) {
@@ -121,7 +157,7 @@ public class FXCollectionView implements ICollectionView {
         Button button = new Button("+ Aggiungi Nuovo Set");
         button.getStyleClass().add(BUTTON_ACCENT);
         button.setStyle("-fx-font-size: 16px; -fx-padding: 15 30;");
-        button.setOnAction(e -> showAddSetDialog());
+        button.setOnAction(ev -> { showAddSetDialog(); ev.consume(); });
 
         VBox.setMargin(button, new Insets(0, 0, 20, 0));
 
@@ -216,10 +252,9 @@ public class FXCollectionView implements ICollectionView {
         int endIndex = Math.min(startIndex + CARDS_PER_PAGE, allCards.size());
 
         int displayStart = allCards.isEmpty() ? 0 : (startIndex + 1);
-        int displayEnd = endIndex;
         LOGGER.log(java.util.logging.Level.INFO,
                 "Loading page {0}/{1} for set {2} (cards {3}-{4} of {5})",
-                new Object[]{currentPage + 1, totalPages, setId, displayStart, displayEnd, allCards.size()});
+                new Object[]{currentPage + 1, totalPages, setId, displayStart, endIndex, allCards.size()});
 
         List<Card> pageCards = allCards.subList(startIndex, endIndex);
 
@@ -276,7 +311,7 @@ public class FXCollectionView implements ICollectionView {
         nextButton.setGraphic(nextIcon);
 
         // Set button actions
-        prevButton.setOnAction(e -> {
+        prevButton.setOnAction(ev -> {
             int currentPage = setCurrentPages.getOrDefault(setId, 0);
             if (currentPage > 0) {
                 setCurrentPages.put(setId, currentPage - 1);
@@ -285,9 +320,10 @@ public class FXCollectionView implements ICollectionView {
                     loadCardsPage(setId, allCards, binder, grid, controls);
                 }
             }
+            ev.consume();
         });
 
-        nextButton.setOnAction(e -> {
+        nextButton.setOnAction(ev -> {
             int currentPage = setCurrentPages.getOrDefault(setId, 0);
             int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
             if (currentPage < totalPages - 1) {
@@ -297,6 +333,7 @@ public class FXCollectionView implements ICollectionView {
                     loadCardsPage(setId, allCards, binder, grid, controls);
                 }
             }
+            ev.consume();
         });
 
         controls.getChildren().addAll(prevButton, pageLabel, nextButton);
@@ -381,10 +418,13 @@ public class FXCollectionView implements ICollectionView {
         // Se l'immagine non è caricata, mostra placeholder
         if (!imageLoaded) {
             try {
-                Image placeholderImage = new Image(getClass().getResourceAsStream("/icons/nocardimage.svg"));
-                cardImage.setImage(placeholderImage);
-                cardImage.setFitWidth(80);
-                cardImage.setFitHeight(120);
+                java.net.URL res = getClass().getResource("/icons/nocardimage.svg");
+                if (res != null) {
+                    Image placeholderImage = new Image(res.toExternalForm());
+                    cardImage.setImage(placeholderImage);
+                    cardImage.setFitWidth(80);
+                    cardImage.setFitHeight(120);
+                }
             } catch (Exception ex) {
                 LOGGER.warning("Failed to load placeholder image: " + ex.getMessage());
             }
@@ -471,7 +511,7 @@ public class FXCollectionView implements ICollectionView {
         deleteButton.getStyleClass().add("button-danger");
         deleteButton.setStyle("-fx-background-color: transparent; -fx-padding: 8; -fx-cursor: hand;");
 
-        deleteButton.setOnAction(_ -> showDeleteConfirmationDialog(setId, setName));
+        deleteButton.setOnAction(ev -> { showDeleteConfirmationDialog(setId, setName); ev.consume(); });
 
         return deleteButton;
     }
@@ -495,9 +535,10 @@ public class FXCollectionView implements ICollectionView {
 
         confirmDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
 
-        // Stile per il dialog
+        // Stile per il dialog (guard resource)
         DialogPane dialogPane = confirmDialog.getDialogPane();
-        dialogPane.getStylesheets().add(getClass().getResource("/styles/theme.css").toExternalForm());
+        java.net.URL themeRes = getClass().getResource("/styles/theme.css");
+        if (themeRes != null) dialogPane.getStylesheets().add(themeRes.toExternalForm());
         dialogPane.getStyleClass().add("dialog-pane");
 
         Optional<ButtonType> result = confirmDialog.showAndWait();
@@ -526,10 +567,11 @@ public class FXCollectionView implements ICollectionView {
         minusIcon.setIconColor(javafx.scene.paint.Color.web("#EF5350"));
         minusButton.setGraphic(minusIcon);
         minusButton.getStyleClass().add("card-control-button");
-        minusButton.setOnAction(_ -> {
+        minusButton.setOnAction(ev -> {
             if (controller != null) {
                 controller.removeCardFromSet(setId, card);
             }
+            ev.consume();
         });
 
         // Label quantità (usa la quantità reale da CardBean)
@@ -547,10 +589,11 @@ public class FXCollectionView implements ICollectionView {
         plusIcon.setIconColor(javafx.scene.paint.Color.web("#66BB6A"));
         plusButton.setGraphic(plusIcon);
         plusButton.getStyleClass().add("card-control-button");
-        plusButton.setOnAction(_ -> {
+        plusButton.setOnAction(ev -> {
             if (controller != null) {
                 controller.addCardToSet(setId, card);
             }
+            ev.consume();
         });
 
         topRow.getChildren().addAll(minusButton, quantityLabel, plusButton);
@@ -562,10 +605,11 @@ public class FXCollectionView implements ICollectionView {
         if (ownedCard != null) {
             tradableCheckbox.setSelected(ownedCard.isTradable());
         }
-        tradableCheckbox.setOnAction(_ -> {
+        tradableCheckbox.setOnAction(ev -> {
             if (controller != null) {
                 controller.toggleCardTradable(setId, card.getId(), tradableCheckbox.isSelected());
             }
+            ev.consume();
         });
 
         controls.getChildren().addAll(topRow, tradableCheckbox);
@@ -592,7 +636,7 @@ public class FXCollectionView implements ICollectionView {
         Button addButton = new Button("Aggiungi Set");
         addButton.getStyleClass().add(BUTTON_ACCENT);
         addButton.setStyle("-fx-font-size: 18px; -fx-padding: 15 40;");
-        addButton.setOnAction(_ -> showAddSetDialog());
+        addButton.setOnAction(ev -> { showAddSetDialog(); ev.consume(); });
 
         emptyState.getChildren().addAll(titleLabel, subtitleLabel, addButton);
 
@@ -678,9 +722,7 @@ public class FXCollectionView implements ICollectionView {
     /**
      * Aggiorna una singola carta nel set senza refreshare tutta la collezione
      */
-    /**
-     * Aggiorna una singola carta nel set senza refreshare tutta la collezione
-     */
+    /* Aggiorna una singola carta nel set senza refreshare tutta la collezione */
     public void updateCardInSet(String setId, String cardId) {
         if (setsContainer == null || currentBinders == null) {
             return;
@@ -770,17 +812,49 @@ public class FXCollectionView implements ICollectionView {
         } else {
             LOGGER.warning("Stage not set, cannot display");
         }
+        // When showing collection page, mark the collection nav item as selected and others unselected
+        markNavSelected(NAV_COLLECTION);
     }
 
     @Override
     public void close() {
         if (stage != null) {
             stage.close();
+        } else {
+            LOGGER.warning("Stage not set, cannot close");
         }
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
+    private void markNavSelected(String selected) {
+        // remove selected style from all
+        removeNavSelectedFrom(homeLabel);
+        removeNavSelectedFrom(collectionLabel);
+        removeNavSelectedFrom(liveTradeLabel);
+        removeNavSelectedFrom(manageTradesLabel);
+        removeNavSelectedFrom(logoutLabel);
+
+        switch (selected) {
+            case "home" -> addNavSelectedTo(homeLabel);
+            case NAV_COLLECTION -> addNavSelectedTo(collectionLabel);
+            case "live" -> addNavSelectedTo(liveTradeLabel);
+            case "manage" -> addNavSelectedTo(manageTradesLabel);
+            case "logout" -> addNavSelectedTo(logoutLabel);
+            default -> {
+                // unknown selection: no-op
+            }
+        }
+    }
+
+    private void addNavSelectedTo(Label l) {
+        if (l != null && !l.getStyleClass().contains(NAV_SELECTED)) {
+            l.getStyleClass().add(NAV_SELECTED);
+        }
+    }
+
+    private void removeNavSelectedFrom(Label l) {
+        if (l != null) {
+            l.getStyleClass().removeIf(s -> s.equals(NAV_SELECTED));
+        }
     }
 
     @FXML
@@ -789,11 +863,18 @@ public class FXCollectionView implements ICollectionView {
         if (controller != null) {
             controller.navigateToHome();
         }
+        markNavSelected("home");
     }
 
     @FXML
     private void onCollectionClicked() {
         LOGGER.info("Already in Collection page");
+        markNavSelected(NAV_COLLECTION);
+    }
+
+    @SuppressWarnings("unused")
+    private void unusedSuppressOnCollection() {
+        // helper to suppress 'unused' false positive for FXML binding in some static analyzers
     }
 
     @FXML
@@ -801,6 +882,16 @@ public class FXCollectionView implements ICollectionView {
         LOGGER.info("Trade clicked - navigating to trade page");
         if (controller != null) {
             controller.navigateToTrade();
+        }
+        // 'trade' action may map to live or manage depending on which button fired
+        // to keep behavior consistent, detect which button was used via focused property
+        if (liveTradeButton != null && liveTradeButton.isFocused()) {
+            markNavSelected("live");
+        } else if (tradeButton != null && tradeButton.isFocused()) {
+            markNavSelected("manage");
+        } else {
+            // default to live
+            markNavSelected("live");
         }
     }
 
@@ -810,6 +901,7 @@ public class FXCollectionView implements ICollectionView {
         if (controller != null) {
             controller.onLogoutRequested();
         }
+        markNavSelected("logout");
     }
 
     @FXML
@@ -830,5 +922,26 @@ public class FXCollectionView implements ICollectionView {
             container.setStyle("");
         }
     }
-}
+    @Override
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 
+    @Override
+    public void refresh() {
+        javafx.application.Platform.runLater(() -> {
+            try {
+                // Instead of referencing non-existing controls (cardsList/setsListView),
+                // re-render the collection using the cached data already stored in this view.
+                Map<String, Binder> binders = (this.currentBinders != null) ? this.currentBinders : java.util.Collections.emptyMap();
+                Map<String, List<Card>> cards = (this.setCardsMap != null) ? this.setCardsMap : java.util.Collections.emptyMap();
+
+                // displayCollection expects Map<String, Binder>, Map<String, List<model.domain.Card>>
+                displayCollection(binders, cards);
+
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Refresh failed: " + ex.getMessage());
+            }
+        });
+    }
+}

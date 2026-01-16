@@ -1,8 +1,9 @@
-package view.collectorhomepage;
+package view.cli;
 
 import controller.CollectorHPController;
 import model.bean.CardBean;
 import config.InputManager;
+import view.ICollectorHPView;
 
 import java.util.List;
 import java.util.Map;
@@ -102,6 +103,17 @@ public class CliCollectorHPView implements ICollectorHPView {
     @Override
     public void close() {
         // Intentionally empty for CLI: no resources to release here.
+    }
+
+    @Override
+    public void refresh() {
+        // CLI view: refresh does not automatically re-render the interactive loop.
+        // Consumers can call display() to re-open the interactive menu.
+    }
+
+    @Override
+    public void setStage(javafx.stage.Stage stage) {
+        // CLI does not use JavaFX stages; provided for interface compatibility.
     }
 
     @Override

@@ -1,7 +1,7 @@
-package view.collection;
+package view;
 
+import controller.CollectionController;
 import model.domain.Binder;
-import view.IView;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +12,9 @@ import java.util.Map;
  * decoupled from the specific presentation layer (CLI, JavaFX, etc.).
  */
 public interface ICollectionView extends IView {
+
+    // Allow the runtime wiring of the controller to the view implementation
+    void setController(CollectionController controller);
 
     /**
      * Sets the welcome message for the user.

@@ -2,7 +2,7 @@ package controller;
 
 import model.bean.CardBean;
 import model.domain.Card;
-import view.collectorhomepage.ICollectorHPView;
+import view.ICollectorHPView;
 
 import java.util.*;
 import java.util.logging.Logger;

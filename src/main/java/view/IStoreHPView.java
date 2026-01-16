@@ -1,7 +1,6 @@
-package view.storehomepage;
+package view;
 
 import controller.StoreHPController;
-import view.IView;
 
 public interface IStoreHPView extends IView {
     void setController(StoreHPController controller);
