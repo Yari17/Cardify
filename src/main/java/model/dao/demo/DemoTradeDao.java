@@ -34,6 +34,11 @@ public class DemoTradeDao implements ITradeDao {
     }
 
     @Override
+    public List<TradeTransaction> getUserCompletedTrades(String userId) {
+        return List.of();
+    }
+
+    @Override
     public Optional<TradeTransaction> get(long id) {
         return Optional.empty();
     }
@@ -61,6 +66,11 @@ public class DemoTradeDao implements ITradeDao {
     @Override
     public TradeTransaction getTradeTransactionBySessionCodes(int proposerCode, int receiverCode) {
         return null;
+    }
+
+    @Override
+    public List<TradeTransaction> getStoreTradeInProgressTransactions(String storeId) {
+        return List.of();
     }
 
 }

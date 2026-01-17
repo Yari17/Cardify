@@ -47,4 +47,9 @@ public class CliStoreTradeView implements IStoreTradeView {
 
     @Override
     public void showMessage(String message) { System.out.println(message); }
+
+    @Override
+    public void displayInProgressTrades(List<TradeTransactionBean> inProgress) {
+
+    }
 }

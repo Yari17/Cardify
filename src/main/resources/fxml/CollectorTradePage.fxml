@@ -105,9 +105,10 @@
             </padding>
             <Label text="Scambi Programmati" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #00BFFF;"/>
             <Separator/>
-            <!-- RIMOSSI: HBox con tradeStatusLabel e refreshTradeButton -->
-            <Separator/>
             <ListView fx:id="scheduledTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #00BFFF; -fx-border-width: 2;"/>
+            <Separator/>
+            <Label text="Scambi Conclusi" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #32CD32;"/>
+            <ListView fx:id="completedTradesList" VBox.vgrow="ALWAYS" styleClass="list-view-dark" style="-fx-background-radius: 10; -fx-border-radius: 10; -fx-border-color: #32CD32; -fx-border-width: 2;"/>
         </VBox>
     </center>
 

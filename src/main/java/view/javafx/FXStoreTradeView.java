@@ -38,6 +38,9 @@ public class FXStoreTradeView implements IStoreTradeView {
     private ListView<TradeTransactionBean> scheduledList;
 
     @FXML
+    private ListView<TradeTransactionBean> inProgressList;
+
+    @FXML
     private Button refreshButton;
 
     @FXML
@@ -45,6 +48,10 @@ public class FXStoreTradeView implements IStoreTradeView {
 
     @FXML
     private Label messageLabel;
+
+    private static final String INSPECTION_PASSED = "INSPECTION_PASSED";
+    private static final String CANCELLED = "CANCELLED";
+    private static final String INSPECTION_CANCELLED_MSG = "Lo scambio è stato annullato durante l'ispezione";
 
     public FXStoreTradeView() {
         // default constructor for FXMLLoader
@@ -61,7 +68,8 @@ public class FXStoreTradeView implements IStoreTradeView {
         if (refreshButton != null) {
             refreshButton.setOnAction(e -> {
                 if (controller != null) {
-                    controller.loadScheduledTrades();
+                    controller.loadStoreScheduledTrades();
+                    controller.loadStoreInProgressTrades();
                 }
             });
         }
@@ -101,6 +109,37 @@ public class FXStoreTradeView implements IStoreTradeView {
                 }
             });
         }
+        if (inProgressList != null) {
+            inProgressList.setOnMouseClicked(evt -> {
+                if (evt.getClickCount() == 2) {
+                    TradeTransactionBean sel = inProgressList.getSelectionModel().getSelectedItem();
+                    if (sel != null) displayTrade(sel); // Usa la stessa UI dettagliata
+                }
+            });
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            inProgressList.setCellFactory(lv -> new ListCell<>() {
+                @Override
+                protected void updateItem(TradeTransactionBean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+                    String p = item.getProposerId() != null ? item.getProposerId() : "?";
+                    String r = item.getReceiverId() != null ? item.getReceiverId() : "?";
+                    String dt = "TBD";
+                    LocalDateTime ld = item.getTradeDate();
+                    if (ld != null) dt = ld.format(fmt);
+                    setText("Scambio tra " + p + " e " + r + " — " + dt);
+                }
+            });
+        }
+        // Carica entrambe le liste all'avvio (non solo su refresh)
+        if (controller != null) {
+            controller.loadStoreScheduledTrades();
+            controller.loadStoreInProgressTrades();
+        }
     }
 
     @Override
@@ -136,6 +175,24 @@ public class FXStoreTradeView implements IStoreTradeView {
         });
     }
 
+    public void displayInProgressTrades(java.util.List<TradeTransactionBean> inProgress) {
+        Platform.runLater(() -> {
+            if (inProgressList == null) return;
+            inProgressList.getItems().clear();
+            if (inProgress != null && !inProgress.isEmpty()) {
+                inProgressList.setItems(FXCollections.observableArrayList(inProgress));
+                inProgressList.setVisible(true);
+                inProgressList.setManaged(true);
+                inProgressList.requestLayout();
+                inProgressList.refresh();
+            } else {
+                inProgressList.setItems(FXCollections.observableArrayList());
+                inProgressList.setVisible(true);
+                inProgressList.setManaged(true);
+            }
+        });
+    }
+
     // Diagnostic helper called by the view factory to check whether FXML fields were injected
     public boolean isInitialized() {
         return scheduledList != null && refreshButton != null && backButton != null;
@@ -151,32 +208,25 @@ public class FXStoreTradeView implements IStoreTradeView {
                 dialog.initModality(Modality.APPLICATION_MODAL);
                 dialog.setTitle("Gestisci scambio - Store");
 
-                Label header = new Label("Dettaglio scambio selezionato:");
+                Button backBtn = new Button("Torna indietro");
+                backBtn.setOnAction(e -> dialog.close());
+
+                Label statusLabel = new Label();
+                statusLabel.setWrapText(true);
+                updateStatusLabel(statusLabel, transaction.getStatus());
+
                 TextArea details = new TextArea();
                 details.setEditable(false);
                 details.setWrapText(true);
+                details.setText(buildDetailsText(transaction));
 
-                Label info = new Label();
+                Label info = new Label(buildInfoText(transaction));
                 info.setWrapText(true);
 
-                // Build two session code inputs with labels showing proposer/receiver names
-                Label proposerLabel = new Label("Inserisci session code di " + transaction.getProposerId());
-                TextField proposerField = new TextField();
-                proposerField.setPromptText("Codice proposer");
-
-                Label receiverLabel = new Label("Inserisci session code di " + transaction.getReceiverId());
-                TextField receiverField = new TextField();
-                receiverField.setPromptText("Codice receiver");
-
-                // Inspection controls container must be declared before handlers that reference it
                 VBox inspectionBox = new VBox(8);
                 inspectionBox.setVisible(false);
                 inspectionBox.setManaged(false);
 
-                // We'll keep track of the currently fetched transaction id so the conclude button lambdas can use it
-                final int[] currentFoundTransactionId = new int[1];
-
-                // Conclude button declared early so lambdas below can reference it
                 Button concludeBtn = new Button("Concludi scambio");
                 concludeBtn.setVisible(false);
                 concludeBtn.setManaged(false);
@@ -184,13 +234,14 @@ public class FXStoreTradeView implements IStoreTradeView {
                     Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di concludere lo scambio e procedere allo scambio delle carte?", ButtonType.YES, ButtonType.NO);
                     Optional<ButtonType> rr = a.showAndWait();
                     if (rr.isPresent() && rr.get() == ButtonType.YES) {
-                        boolean res = controller.concludeTrade(currentFoundTransactionId[0]);
+                        boolean res = controller.concludeTrade(transaction.getTransactionId());
                         if (res) {
                             showMessage("Scambio concluso con successo");
-                            model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(currentFoundTransactionId[0]);
+                            model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
                             if (updated != null) {
                                 info.setText(buildInfoText(updated));
                                 details.setText(buildDetailsText(updated));
+                                updateStatusLabel(statusLabel, updated.getStatus());
                             }
                             concludeBtn.setDisable(true);
                         } else {
@@ -199,55 +250,149 @@ public class FXStoreTradeView implements IStoreTradeView {
                     }
                 });
 
-                Button searchBtn = new Button("Ottieni informazioni scambio");
-                searchBtn.setOnAction(e -> {
+                Button refreshBtn = new Button("Refresh");
+                refreshBtn.setOnAction(e -> {
                     if (controller == null) { showError("Controller non disponibile"); return; }
-                    String ptxt = proposerField.getText().trim();
-                    String rtxt = receiverField.getText().trim();
-                    int pcode, rcode;
-                    try {
-                        pcode = Integer.parseInt(ptxt);
-                        rcode = Integer.parseInt(rtxt);
-                    } catch (NumberFormatException ex) {
-                        showError("Entrambi i session code devono essere numeri interi");
-                        return;
+                    model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                    if (updated != null) {
+                        info.setText(buildInfoText(updated));
+                        details.setText(buildDetailsText(updated));
+                        updateStatusLabel(statusLabel, updated.getStatus());
+                    } else {
+                        showError("Impossibile aggiornare lo scambio");
                     }
+                });
 
-                    // Fetch trade by session codes (store-scoped)
-                    model.bean.TradeTransactionBean found = controller.fetchTradeBySessionCodes(pcode, rcode);
-                    if (found == null) {
-                        showError("Nessuno scambio trovato per questa coppia di codici");
-                        return;
-                    }
-
-                    // Display info and details
-                    info.setText(buildInfoText(found));
-                    details.setText(buildDetailsText(found));
-
-                    // remember current transaction id for conclude action
-                    currentFoundTransactionId[0] = found.getTransactionId();
-
-                    // Show inspection controls
+                // Se lo scambio è in inspection passed, mostra solo conclude e refresh
+                if (INSPECTION_PASSED.equals(transaction.getStatus())) {
+                    concludeBtn.setVisible(true);
+                    concludeBtn.setManaged(true);
+                    inspectionBox.getChildren().clear();
+                    inspectionBox.getChildren().addAll(concludeBtn, refreshBtn);
                     inspectionBox.setVisible(true);
                     inspectionBox.setManaged(true);
-
-                    // Create inspection buttons (proposer/receiver) and problem buttons
+                } else if ("INSPECTION_PHASE".equals(transaction.getStatus())) {
+                    // Mostra i bottoni di ispezione e conclude solo se inspection passed
+                    inspectionBox.setVisible(true);
+                    inspectionBox.setManaged(true);
                     Button proposerConfirm = new Button("Proponente: Conferma ispezione");
                     Button receiverConfirm = new Button("Ricevente: Conferma ispezione");
                     Button proposerProblem = new Button("Proponente: Segnala problema");
                     Button receiverProblem = new Button("Ricevente: Segnala problema");
-
-                    // Disable buttons if inspection already recorded
-                    if (Boolean.TRUE.equals(found.getProposerInspectionOk())) proposerConfirm.setDisable(true);
-                    if (Boolean.TRUE.equals(found.getReceiverInspectionOk())) receiverConfirm.setDisable(true);
-                    if (Boolean.FALSE.equals(found.getProposerInspectionOk())) { proposerProblem.setDisable(true); proposerConfirm.setDisable(true); }
-                    if (Boolean.FALSE.equals(found.getReceiverInspectionOk())) { receiverProblem.setDisable(true); receiverConfirm.setDisable(true); }
-
-                    // Handlers with confirmation alerts
+                    if (Boolean.TRUE.equals(transaction.getProposerInspectionOk())) proposerConfirm.setDisable(true);
+                    if (Boolean.TRUE.equals(transaction.getReceiverInspectionOk())) receiverConfirm.setDisable(true);
+                    if (Boolean.FALSE.equals(transaction.getProposerInspectionOk())) { proposerProblem.setDisable(true); proposerConfirm.setDisable(true); }
+                    if (Boolean.FALSE.equals(transaction.getReceiverInspectionOk())) { receiverProblem.setDisable(true); receiverConfirm.setDisable(true); }
                     proposerConfirm.setOnAction(ev -> {
-                        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi che le carte del proponente sono originali e in buone condizioni?", ButtonType.YES, ButtonType.NO);
+                        boolean ok = controller.recordInspectionResult(transaction.getTransactionId(), transaction.getProposerId(), true);
+                        if (ok) {
+                            proposerConfirm.setDisable(true);
+                            proposerProblem.setDisable(true);
+                        }
+                        model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                        if (updated != null) {
+                            info.setText(buildInfoText(updated));
+                            details.setText(buildDetailsText(updated));
+                            updateStatusLabel(statusLabel, updated.getStatus());
+                            if (INSPECTION_PASSED.equals(updated.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
+                            if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
+                        }
+                    });
+                    receiverConfirm.setOnAction(ev -> {
+                        boolean ok = controller.recordInspectionResult(transaction.getTransactionId(), transaction.getReceiverId(), true);
+                        if (ok) {
+                            receiverConfirm.setDisable(true);
+                            receiverProblem.setDisable(true);
+                        }
+                        model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                        if (updated != null) {
+                            info.setText(buildInfoText(updated));
+                            details.setText(buildDetailsText(updated));
+                            updateStatusLabel(statusLabel, updated.getStatus());
+                            if (INSPECTION_PASSED.equals(updated.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
+                            if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
+                        }
+                    });
+                    proposerProblem.setOnAction(ev -> {
+                        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del proponente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
                         Optional<ButtonType> res = a.showAndWait();
                         if (res.isPresent() && res.get() == ButtonType.YES) {
+                            boolean ok = controller.recordInspectionResult(transaction.getTransactionId(), transaction.getProposerId(), false);
+                            if (ok) {
+                                proposerProblem.setDisable(true);
+                                proposerConfirm.setDisable(true);
+                                model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                                if (updated != null) {
+                                    info.setText(buildInfoText(updated));
+                                    details.setText(buildDetailsText(updated));
+                                    updateStatusLabel(statusLabel, updated.getStatus());
+                                    if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
+                                }
+                            }
+                        }
+                    });
+                    receiverProblem.setOnAction(ev -> {
+                        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del ricevente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
+                        Optional<ButtonType> res = a.showAndWait();
+                        if (res.isPresent() && res.get() == ButtonType.YES) {
+                            boolean ok = controller.recordInspectionResult(transaction.getTransactionId(), transaction.getReceiverId(), false);
+                            if (ok) {
+                                receiverProblem.setDisable(true);
+                                receiverConfirm.setDisable(true);
+                                model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                                if (updated != null) {
+                                    info.setText(buildInfoText(updated));
+                                    details.setText(buildDetailsText(updated));
+                                    updateStatusLabel(statusLabel, updated.getStatus());
+                                    if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
+                                }
+                            }
+                        }
+                    });
+                    inspectionBox.getChildren().clear();
+                    inspectionBox.getChildren().addAll(proposerConfirm, proposerProblem, receiverConfirm, receiverProblem, concludeBtn, refreshBtn);
+                } else {
+                    // Programmato: mostra UI con session code e searchBtn come prima
+                    Label proposerLabel = new Label("Inserisci session code di " + transaction.getProposerId());
+                    TextField proposerField = new TextField();
+                    proposerField.setPromptText("Codice proposer");
+                    Label receiverLabel = new Label("Inserisci session code di " + transaction.getReceiverId());
+                    TextField receiverField = new TextField();
+                    receiverField.setPromptText("Codice receiver");
+                    Button searchBtn = new Button("Ottieni informazioni scambio");
+                    searchBtn.setOnAction(e -> {
+                        if (controller == null) { showError("Controller non disponibile"); return; }
+                        String ptxt = proposerField.getText().trim();
+                        String rtxt = receiverField.getText().trim();
+                        int pcode;
+                        int rcode;
+                        try {
+                            pcode = Integer.parseInt(ptxt);
+                            rcode = Integer.parseInt(rtxt);
+                        } catch (NumberFormatException _) {
+                            showError("Entrambi i session code devono essere numeri interi");
+                            return;
+                        }
+                        model.bean.TradeTransactionBean found = controller.fetchTradeBySessionCodes(pcode, rcode);
+                        if (found == null) {
+                            showError("Nessuno scambio trovato per questa coppia di codici");
+                            return;
+                        }
+                        info.setText(buildInfoText(found));
+                        details.setText(buildDetailsText(found));
+                        updateStatusLabel(statusLabel, found.getStatus());
+                        inspectionBox.setVisible(true);
+                        inspectionBox.setManaged(true);
+                        // Mostra i controlli di ispezione/conclusione come sopra
+                        Button proposerConfirm = new Button("Proponente: Conferma ispezione");
+                        Button receiverConfirm = new Button("Ricevente: Conferma ispezione");
+                        Button proposerProblem = new Button("Proponente: Segnala problema");
+                        Button receiverProblem = new Button("Ricevente: Segnala problema");
+                        if (Boolean.TRUE.equals(found.getProposerInspectionOk())) proposerConfirm.setDisable(true);
+                        if (Boolean.TRUE.equals(found.getReceiverInspectionOk())) receiverConfirm.setDisable(true);
+                        if (Boolean.FALSE.equals(found.getProposerInspectionOk())) { proposerProblem.setDisable(true); proposerConfirm.setDisable(true); }
+                        if (Boolean.FALSE.equals(found.getReceiverInspectionOk())) { receiverProblem.setDisable(true); receiverConfirm.setDisable(true); }
+                        proposerConfirm.setOnAction(ev -> {
                             boolean ok = controller.recordInspectionResult(found.getTransactionId(), found.getProposerId(), true);
                             if (ok) {
                                 proposerConfirm.setDisable(true);
@@ -257,17 +402,12 @@ public class FXStoreTradeView implements IStoreTradeView {
                             if (updated != null) {
                                 info.setText(buildInfoText(updated));
                                 details.setText(buildDetailsText(updated));
-                                // If inspection passed, show conclude button
-                                if ("INSPECTION_PASSED".equals(updated.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
-                                if ("CANCELLED".equals(updated.getStatus())) showMessage("Lo scambio è stato annullato durante l'ispezione");
+                                updateStatusLabel(statusLabel, updated.getStatus());
+                                if (INSPECTION_PASSED.equals(updated.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
+                                if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
                             }
-                        }
-                    });
-
-                    receiverConfirm.setOnAction(ev -> {
-                        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi che le carte del ricevente sono originali e in buone condizioni?", ButtonType.YES, ButtonType.NO);
-                        Optional<ButtonType> res = a.showAndWait();
-                        if (res.isPresent() && res.get() == ButtonType.YES) {
+                        });
+                        receiverConfirm.setOnAction(ev -> {
                             boolean ok = controller.recordInspectionResult(found.getTransactionId(), found.getReceiverId(), true);
                             if (ok) {
                                 receiverConfirm.setDisable(true);
@@ -277,79 +417,66 @@ public class FXStoreTradeView implements IStoreTradeView {
                             if (updated != null) {
                                 info.setText(buildInfoText(updated));
                                 details.setText(buildDetailsText(updated));
-                                if ("INSPECTION_PASSED".equals(updated.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
-                                if ("CANCELLED".equals(updated.getStatus())) showMessage("Lo scambio è stato annullato durante l'ispezione");
+                                updateStatusLabel(statusLabel, updated.getStatus());
+                                if (INSPECTION_PASSED.equals(updated.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
+                                if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
                             }
-                        }
-                    });
-
-                    proposerProblem.setOnAction(ev -> {
-                        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del proponente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
-                        Optional<ButtonType> res = a.showAndWait();
-                        if (res.isPresent() && res.get() == ButtonType.YES) {
-                            boolean ok = controller.recordInspectionResult(found.getTransactionId(), found.getProposerId(), false);
-                            if (ok) {
-                                proposerProblem.setDisable(true);
-                                proposerConfirm.setDisable(true);
-                                // After cancellation refresh and disable all
-                                model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(found.getTransactionId());
-                                if (updated != null) {
-                                    info.setText(buildInfoText(updated));
-                                    details.setText(buildDetailsText(updated));
-                                    if ("CANCELLED".equals(updated.getStatus())) showMessage("Lo scambio è stato annullato durante l'ispezione");
+                        });
+                        proposerProblem.setOnAction(ev -> {
+                            Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del proponente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
+                            Optional<ButtonType> res = a.showAndWait();
+                            if (res.isPresent() && res.get() == ButtonType.YES) {
+                                boolean ok = controller.recordInspectionResult(found.getTransactionId(), found.getProposerId(), false);
+                                if (ok) {
+                                    proposerProblem.setDisable(true);
+                                    proposerConfirm.setDisable(true);
+                                    model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(found.getTransactionId());
+                                    if (updated != null) {
+                                        info.setText(buildInfoText(updated));
+                                        details.setText(buildDetailsText(updated));
+                                        updateStatusLabel(statusLabel, updated.getStatus());
+                                        if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
+                                    }
                                 }
                             }
-                        }
-                    });
-
-                    receiverProblem.setOnAction(ev -> {
-                        Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del ricevente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
-                        Optional<ButtonType> res = a.showAndWait();
-                        if (res.isPresent() && res.get() == ButtonType.YES) {
-                            boolean ok = controller.recordInspectionResult(found.getTransactionId(), found.getReceiverId(), false);
-                            if (ok) {
-                                receiverProblem.setDisable(true);
-                                receiverConfirm.setDisable(true);
-                                model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(found.getTransactionId());
-                                if (updated != null) {
-                                    info.setText(buildInfoText(updated));
-                                    details.setText(buildDetailsText(updated));
-                                    if ("CANCELLED".equals(updated.getStatus())) showMessage("Lo scambio è stato annullato durante l'ispezione");
+                        });
+                        receiverProblem.setOnAction(ev -> {
+                            Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del ricevente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
+                            Optional<ButtonType> res = a.showAndWait();
+                            if (res.isPresent() && res.get() == ButtonType.YES) {
+                                boolean ok = controller.recordInspectionResult(found.getTransactionId(), found.getReceiverId(), false);
+                                if (ok) {
+                                    receiverProblem.setDisable(true);
+                                    receiverConfirm.setDisable(true);
+                                    model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(found.getTransactionId());
+                                    if (updated != null) {
+                                        info.setText(buildInfoText(updated));
+                                        details.setText(buildDetailsText(updated));
+                                        updateStatusLabel(statusLabel, updated.getStatus());
+                                        if (CANCELLED.equals(updated.getStatus())) showMessage(INSPECTION_CANCELLED_MSG);
+                                    }
                                 }
                             }
+                        });
+                        if (INSPECTION_PASSED.equals(found.getStatus())) {
+                            concludeBtn.setVisible(true); concludeBtn.setManaged(true);
+                        } else {
+                            concludeBtn.setVisible(false); concludeBtn.setManaged(false);
                         }
+                        inspectionBox.getChildren().clear();
+                        inspectionBox.getChildren().addAll(proposerConfirm, proposerProblem, receiverConfirm, receiverProblem, concludeBtn, refreshBtn);
                     });
-
-                    // Show/hide conclude based on status
-                    if ("INSPECTION_PASSED".equals(found.getStatus())) {
-                        concludeBtn.setVisible(true); concludeBtn.setManaged(true);
-                    } else {
-                        concludeBtn.setVisible(false); concludeBtn.setManaged(false);
-                    }
-
-                    // Clear inspectionBox and set buttons
-                    inspectionBox.getChildren().clear();
-                    inspectionBox.getChildren().addAll(proposerConfirm, proposerProblem, receiverConfirm, receiverProblem, concludeBtn);
-                });
-
-                // Refresh button
-                Button refreshBtn = new Button("Refresh");
-                refreshBtn.setOnAction(e -> {
-                    if (controller == null) { showError("Controller non disponibile"); return; }
-                    model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
-                    if (updated != null) {
-                        info.setText(buildInfoText(updated));
-                        details.setText(buildDetailsText(updated));
-                    } else {
-                        showError("Impossibile aggiornare lo scambio");
-                    }
-                });
-
-
-                VBox root = new VBox(10, header, info,
-                        proposerLabel, proposerField,
-                        receiverLabel, receiverField,
-                        new HBox(8, searchBtn, refreshBtn), details, inspectionBox);
+                    VBox root = new VBox(10, backBtn, statusLabel, info,
+                            proposerLabel, proposerField,
+                            receiverLabel, receiverField,
+                            new HBox(8, searchBtn, refreshBtn), details, inspectionBox);
+                    root.setStyle("-fx-padding: 10;");
+                    Scene scene = new Scene(root, 520, 520);
+                    dialog.setScene(scene);
+                    dialog.show();
+                    return;
+                }
+                VBox root = new VBox(10, backBtn, statusLabel, info, details, inspectionBox);
                 root.setStyle("-fx-padding: 10;");
                 Scene scene = new Scene(root, 520, 520);
                 dialog.setScene(scene);
@@ -357,9 +484,62 @@ public class FXStoreTradeView implements IStoreTradeView {
 
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, "Unable to show trade dialog", ex);
-                showError("Errore nell'apertura della finestra di dettaglio");
             }
         });
+    }
+
+    // Mostra direttamente i dettagli dello scambio in corso senza richiedere session code
+    public void displayInProgressTrade(TradeTransactionBean transaction) {
+        Platform.runLater(() -> {
+            try {
+                Stage dialog = new Stage();
+                dialog.initOwner(stage);
+                dialog.initModality(Modality.APPLICATION_MODAL);
+                dialog.setTitle("Dettagli scambio in corso");
+                Label statusLabel = new Label();
+                statusLabel.setWrapText(true);
+                updateStatusLabel(statusLabel, transaction.getStatus());
+                TextArea details = new TextArea();
+                details.setEditable(false);
+                details.setWrapText(true);
+                details.setText(buildDetailsText(transaction));
+                Label info = new Label(buildInfoText(transaction));
+                info.setWrapText(true);
+                Button refreshBtn = new Button("Refresh");
+                refreshBtn.setOnAction(e -> {
+                    if (controller == null) { showError("Controller non disponibile"); return; }
+                    model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                    if (updated != null) {
+                        info.setText(buildInfoText(updated));
+                        details.setText(buildDetailsText(updated));
+                        updateStatusLabel(statusLabel, updated.getStatus());
+                    } else {
+                        showError("Impossibile aggiornare lo scambio");
+                    }
+                });
+                VBox root = new VBox(10, statusLabel, info, details, refreshBtn);
+                root.setStyle("-fx-padding: 10;");
+                Scene scene = new Scene(root, 520, 400);
+                dialog.setScene(scene);
+                dialog.show();
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Unable to show in-progress trade dialog", ex);
+            }
+        });
+    }
+
+    // Metodo di utilità per aggiornare la label di stato in base allo status
+    private void updateStatusLabel(Label statusLabel, String status) {
+        if (status == null) {
+            statusLabel.setText("");
+            return;
+        }
+        switch (status) {
+            case "PARTIALLY_ARRIVED" -> statusLabel.setText("Aspettando il secondo collezionista");
+            case "INSPECTION_PHASE" -> statusLabel.setText("Assicurati che le carte dello scambio siano originali e in buone condizioni");
+            case INSPECTION_PASSED -> statusLabel.setText("L'ispezione è stata completata con successo, procedi con lo scambio");
+            default -> statusLabel.setText("");
+        }
     }
 
     @Override

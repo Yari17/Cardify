@@ -13,6 +13,9 @@ public interface ITradeDao extends IDao<TradeTransaction> {
     List<TradeTransaction> getStoreTradeScheduledTransactions(String userId, String tradeId);//ritorna la lista degli scambi programmati
     List<TradeTransaction> getUserTradeTransactions(String userId, String tradeId);
 
+    // New: ritorna tutti gli scambi conclusi (COMPLETED o CANCELLED) per l'utente
+    List<TradeTransaction> getUserCompletedTrades(String userId);
+
     // Cerca una trade transaction dati proposer/receiver e data (se presente) - utile per mappare Proposal->TradeTransaction
     Optional<TradeTransaction> findByParticipantsAndDate(String proposerId, String receiverId, LocalDateTime tradeDate);
 
@@ -21,4 +24,9 @@ public interface ITradeDao extends IDao<TradeTransaction> {
      * Restituisce la transazione se trovata, altrimenti null.
      */
     TradeTransaction getTradeTransactionBySessionCodes(int proposerCode, int receiverCode);
+
+    /**
+     * Restituisce la lista degli scambi in corso (inspection phase o inspection passed) per lo store.
+     */
+    List<TradeTransaction> getStoreTradeInProgressTransactions(String storeId);
 }

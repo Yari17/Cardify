@@ -2,6 +2,7 @@ package controller;
 
 import exception.NavigationException;
 import javafx.application.Platform;
+import model.api.ICardProvider;
 import model.bean.UserBean;
 import model.dao.IBinderDao;
 import model.dao.IUserDao;
@@ -165,14 +166,17 @@ public class ApplicationController {
         }
     }
 
-    public void navigateToTrade(String username, String proposalId) throws NavigationException {
-        if (username == null || proposalId == null)
-            throw new NavigationException("Invalid parameters for navigateToTrade");
+    public void navigateToTrade(String username) throws NavigationException {
         try {
             LiveTradeController controller = new LiveTradeController(username, this);
             ICollectorTradeView tradeView = viewFactory.createTradeView(controller);
             controller.setView(tradeView);
-            // Present the trade view to the user (ensure navbar and logout are visible)
+            // Carica sia scheduled che completed trades subito dopo il setView
+            LOGGER.info(() -> "navigateToTrade: about to load scheduled and completed trades for user=" + username);
+            controller.loadScheduledTrades();
+            LOGGER.info(() -> "navigateToTrade: scheduled trades loaded, now loading completed trades for user=" + username);
+            controller.loadCollectorCompletedTrades();
+            LOGGER.info(() -> "navigateToTrade: completed trades loaded for user=" + username);
             displayView(tradeView);
         } catch (Exception ex) {
             throw new NavigationException("Failed to navigate to trade transaction", ex);
@@ -186,7 +190,10 @@ public class ApplicationController {
             controller.setView(tradeView);
             // Ask controller to load scheduled trades and present them in the live trade
             // view
+            LOGGER.info(() -> "navigateToLiveTrades: loading scheduled trades for user=" + username);
             controller.loadScheduledTrades();
+            LOGGER.info(() -> "navigateToLiveTrades: loading completed trades for user=" + username);
+            controller.loadCollectorCompletedTrades();
             displayView(tradeView);
         } catch (Exception ex) {
             throw new NavigationException("Failed to navigate to Live Trades", ex);
@@ -207,8 +214,9 @@ public class ApplicationController {
             controller.setStoreView(storeView);
             // Ensure the view is shown first so its FXML controls are initialized
             displayView(storeView);
-            // Load scheduled trades after the view is displayed to guarantee UI is ready
-            controller.loadScheduledTrades();
+            // Load both scheduled and in-progress trades after the view is displayed to guarantee UI is ready
+            controller.loadStoreScheduledTrades();
+            controller.loadStoreInProgressTrades();
         } catch (Exception ex) {
             throw new NavigationException("Failed to navigate to Store Trades", ex);
         }
@@ -315,7 +323,7 @@ public class ApplicationController {
         }
     }
 
-    public model.api.ICardProvider getCardProvider() {
+    public ICardProvider getCardProvider() {
         if (cardProvider == null) {
             cardProvider = new model.api.ApiFactory().getCardProvider(currentGameType);
         }

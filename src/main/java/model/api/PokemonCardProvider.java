@@ -36,7 +36,7 @@ public class PokemonCardProvider implements ICardProvider {
     }
 
     @Override
-    public List<Card> searchSet(String setId) {
+    public List<Card> searchSet(String setId) throws exception.ConnectionException {
         try {
             Set set = api.fetchSet(setId);
             assert set != null;
@@ -58,13 +58,16 @@ public class PokemonCardProvider implements ICardProvider {
         } catch (NullPointerException ex) {
             LOGGER.fine(() -> "NullPointer while processing set data: " + ex.getMessage());
             return new ArrayList<>();
+        } catch (Exception ex) {
+            // Rethrow with context only (avoid logging then rethrow to satisfy static analysis rules)
+            throw new exception.ConnectionException("Failed to fetch set " + setId, ex);
         }
     }
 
     // l'sdk non fornisce un metodo per cercare le carte per nome, quindi devo fare
     // una richiesta http
     @Override
-    public List<Card> searchCardsByName(String cardName) {
+    public List<Card> searchCardsByName(String cardName) throws exception.ConnectionException {
         try {
             // Costruisci l'URL con il parametro di ricerca
             String encodedName = URLEncoder.encode(cardName, StandardCharsets.UTF_8);
@@ -85,18 +88,15 @@ public class PokemonCardProvider implements ICardProvider {
 
             return getCards(jsonArray);
         } catch (InterruptedException ex) {
-            // Re-interrompi il thread per preservare lo stato di interruzione
             Thread.currentThread().interrupt();
-            LOGGER.fine(() -> "HTTP request interrupted: " + ex.getMessage());
-            return new ArrayList<>();
+            throw new exception.ConnectionException("HTTP request interrupted", ex);
         } catch (Exception ex) {
-            LOGGER.fine(() -> "Failed to search cards by name: " + ex.getMessage());
-            return new ArrayList<>();
+            throw new exception.ConnectionException("Failed to search cards by name: " + cardName, ex);
         }
     }
 
     @Override
-    public Map<String, String> getAllSets() {
+    public Map<String, String> getAllSets() throws exception.ConnectionException {
         try {
             LOGGER.info("PokemonAdapter.getAllSets() called - fetching sets from SDK...");
             SetResume[] setArray = api.fetchSets();
@@ -114,15 +114,15 @@ public class PokemonCardProvider implements ICardProvider {
             }
             return setMap;
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Exception in getAllSets", ex);
-            return new HashMap<>();
+            throw new exception.ConnectionException("Failed to fetch sets", ex);
         }
     }
 
 
 
     @Override
-    public <T extends Card> T getCardDetails(String cardId) {
+    @SuppressWarnings("unchecked")
+    public <T extends Card> T getCardDetails(String cardId) throws exception.ConnectionException {
 
         try {
             LOGGER.log(java.util.logging.Level.INFO, "Fetching card details for ID: {0}", cardId);
@@ -140,10 +140,7 @@ public class PokemonCardProvider implements ICardProvider {
             LOGGER.log(Level.INFO, "Successfully loaded details for card: {0}", cardId);
             return (T) pokemonCard;
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Error loading card details for ID " + cardId, ex);
-            // log stack trace at finer level
-            LOGGER.log(java.util.logging.Level.FINER, "Exception", ex);
-            return null;
+            throw new exception.ConnectionException("Failed to load card details for ID " + cardId, ex);
         }
     }
 

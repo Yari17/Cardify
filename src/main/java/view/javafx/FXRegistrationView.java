@@ -134,7 +134,7 @@ public class FXRegistrationView implements IRegistrationView {
         }
     }
 
-
+    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }

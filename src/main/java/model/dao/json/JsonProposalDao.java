@@ -171,4 +171,33 @@ public class JsonProposalDao implements IProposalDao {
         }
         return result;
     }
+
+    @Override
+    public List<Proposal> getPendingProposals(String username) {
+        List<Proposal> result = new ArrayList<>();
+        for (Proposal p : proposalsById.values()) {
+            if (p == null) continue;
+            if (username != null && (username.equals(p.getProposerId()) || username.equals(p.getReceiverId()))) {
+                if (p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING) result.add(p);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public List<Proposal> getCompletedProposals(String username) {
+        List<Proposal> result = new ArrayList<>();
+        for (Proposal p : proposalsById.values()) {
+            if (p == null) continue;
+            if (username != null && (username.equals(p.getProposerId()) || username.equals(p.getReceiverId()))) {
+                model.domain.enumerations.ProposalStatus s = p.getStatus();
+                if (s == model.domain.enumerations.ProposalStatus.ACCEPTED
+                        || s == model.domain.enumerations.ProposalStatus.REJECTED
+                        || s == model.domain.enumerations.ProposalStatus.EXPIRED) {
+                    result.add(p);
+                }
+            }
+        }
+        return result;
+    }
 }

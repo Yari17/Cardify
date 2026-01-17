@@ -5,6 +5,8 @@ import config.InputManager;
 import model.bean.TradeTransactionBean;
 import view.ICollectorTradeView;
 
+import java.util.List;
+
 
 public class CliCollectorTradeView implements ICollectorTradeView {
 
@@ -144,11 +146,38 @@ public class CliCollectorTradeView implements ICollectorTradeView {
             System.out.println("No scheduled trades.");
             return;
         }
+        int count = 0;
         for (int i = 0; i < scheduled.size(); i++) {
             TradeTransactionBean t = scheduled.get(i);
-            System.out.printf("%d) tx-%d: %s vs %s @ %s%n", i + 1,
+            // Mostra solo scambi NON conclusi (né COMPLETED né CANCELLED)
+            if (t.getStatus() != null && (t.getStatus().equalsIgnoreCase("COMPLETED") || t.getStatus().equalsIgnoreCase("CANCELLED"))) {
+                continue;
+            }
+            count++;
+            System.out.printf("%d) tx-%d: %s vs %s @ %s%n", count,
                     t.getTransactionId(),
-                     t.getProposerId(), t.getReceiverId(), t.getStoreId());
+                    t.getProposerId(), t.getReceiverId(), t.getStoreId());
+        }
+        if (count == 0) {
+            System.out.println("No scheduled trades.");
+        }
+    }
+
+    @Override
+    public void displayCompletedTrades(List<TradeTransactionBean> completedTrades) {
+        System.out.printf("%n=== COMPLETED/CANCELLED TRADES ===%n");
+        if (completedTrades == null || completedTrades.isEmpty()) {
+            System.out.println("No completed or cancelled trades.");
+            return;
+        }
+        for (int i = 0; i < completedTrades.size(); i++) {
+            TradeTransactionBean t = completedTrades.get(i);
+            System.out.printf("%d) tx-%d: %s vs %s @ %s [%s]%n", i + 1,
+                    t.getTransactionId(),
+                    t.getProposerId(), t.getReceiverId(), t.getStoreId(),
+                    t.getStatus() != null ? t.getStatus() : "?");
+            // Bottone view simulato: mostra dettagli
+            System.out.println("   [V] Visualizza dettagli scambio");
         }
     }
 

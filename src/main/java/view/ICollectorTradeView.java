@@ -31,4 +31,8 @@ public interface ICollectorTradeView extends IView {
     // Mostra la lista di scambi schedulati per questo utente
     void displayScheduledTrades(List<TradeTransactionBean> scheduled);
 
+    /**
+     * Mostra la lista degli scambi conclusi (COMPLETED o CANCELLED) nella view del collezionista.
+     */
+    void displayCompletedTrades(java.util.List<model.bean.TradeTransactionBean> completedTrades);
 }

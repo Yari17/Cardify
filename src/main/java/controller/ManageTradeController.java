@@ -43,22 +43,18 @@ public class ManageTradeController {
         List<ProposalBean> concluded = new ArrayList<>();
 
         try {
-            // Fetch proposals where user is involved
-            List<Proposal> sentPending = proposalDao != null ? proposalDao.getSentPendingProposal(username) : List.of();
-            List<Proposal> received = proposalDao != null ? proposalDao.getReceivedProposals(username) : List.of();
+            // Fetch proposals by lifecycle categories using DAO convenience methods
+            List<Proposal> pendingProposals = proposalDao != null ? proposalDao.getPendingProposals(username) : List.of();
+            List<Proposal> completedProposals = proposalDao != null ? proposalDao.getCompletedProposals(username) : List.of();
 
-            LocalDateTime now = LocalDateTime.now();
-
-            // Combine sent and received proposals
-            List<model.domain.Proposal> combined = new ArrayList<>();
-            combined.addAll(sentPending);
-            combined.addAll(received);
-
-            // Process combined proposals: separate pending vs concluded (rejected/expired)
-            for (Proposal p : combined) {
-                if (p == null)
-                    continue;
-                processProposal(p, pending, concluded, now);
+            // Map to beans
+            for (Proposal p : pendingProposals) {
+                if (p == null) continue;
+                pending.add(toBean(p));
+            }
+            for (Proposal p : completedProposals) {
+                if (p == null) continue;
+                concluded.add(toBean(p));
             }
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, "Error loading user trade transactions: {0}", ex.getMessage());
@@ -88,13 +84,12 @@ public class ManageTradeController {
             if (opt.isEmpty())
                 return false;
             Proposal p = opt.get();
-            // Delegate state transition to domain object
-            if (newStatus == ProposalStatus.ACCEPTED)
-                p.accept();
-            else if (newStatus == ProposalStatus.REJECTED)
-                p.decline();
-            else
-                p.setStatus(newStatus);
+            // Usa uno switch expression per la transizione di stato
+            switch (newStatus) {
+                case ACCEPTED -> p.accept();
+                case REJECTED -> p.decline();
+                default -> p.setStatus(newStatus);
+            }
             proposalDao.update(p);
 
             // If the proposal became ACCEPTED, create and persist a TradeTransaction
@@ -132,7 +127,8 @@ public class ManageTradeController {
             model.dao.ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
             var txOpt = tradeDao.findByParticipantsAndDate(p.getProposerId(), p.getReceiverId(), meeting);
             if (txOpt.isPresent()) {
-                navigationController.navigateToTrade(username, String.valueOf(txOpt.get().getTransactionId()));
+                // Correggi la chiamata secondo la nuova firma del metodo
+                navigationController.navigateToTrade(username);
             } else {
                 LOGGER.warning(() -> "No TradeTransaction found for proposal: " + proposalId);
                 return false;
@@ -285,10 +281,12 @@ public class ManageTradeController {
 
             if (p.getStatus() == ProposalStatus.PENDING) {
                 pending.add(toBean(p));
-            } else if (p.getStatus() == ProposalStatus.REJECTED || p.getStatus() == ProposalStatus.EXPIRED) {
+            } else if (p.getStatus() == ProposalStatus.REJECTED || p.getStatus() == ProposalStatus.EXPIRED || p.getStatus() == ProposalStatus.ACCEPTED) {
+                // Treat REJECTED, EXPIRED and ACCEPTED as "concluded" proposals for Manage Trades
                 concluded.add(toBean(p));
             }
-            // ACCEPTED proposals are handled as scheduled trades and shown elsewhere
+            // NOTE: ACCEPTED proposals used to be shown only as scheduled trades; they are now
+            // also included in the concluded proposals list per product requirement.
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, "Failed processing proposal {0}: {1}",
                     new Object[] { p.getProposalId(), ex.getMessage() });

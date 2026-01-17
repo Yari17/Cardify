@@ -18,6 +18,11 @@ public interface IStoreTradeView extends IView {
     // Mostra i dettagli di uno scambio selezionato (in una dialog o area dedicata)
     void displayTrade(TradeTransactionBean transaction);
 
+    // Mostra la lista degli scambi in corso (inspection phase o inspection passed)
+    void displayInProgressTrades(List<TradeTransactionBean> inProgress);
+
     // Notifica testuale liberamente utilizzabile dalla controller (es. messaggi del flusso live)
     void showMessage(String message);
+
+
 }

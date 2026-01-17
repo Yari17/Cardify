@@ -104,7 +104,7 @@ public class JsonTradeDao implements ITradeDao {
             t.updateTradeStatus(ts);
             tradesById.put(id, t);
             saveToJson();
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             LOGGER.log(Level.WARNING, "Unknown trade status: {0}", status);
         }
     }
@@ -127,10 +127,11 @@ public class JsonTradeDao implements ITradeDao {
             if (t == null) continue;
             if (!userId.equals(t.getStoreId())) continue;
             model.domain.enumerations.TradeStatus s = t.getTradeStatus();
-            // Include trades where at least one collector has arrived, or the trade is in inspection phase
-            if (s == model.domain.enumerations.TradeStatus.PARTIALLY_ARRIVED
-                    || s == model.domain.enumerations.TradeStatus.BOTH_ARRIVED
-                    || s == model.domain.enumerations.TradeStatus.INSPECTION_PHASE) {
+            // Previously we only returned PARTIALLY_ARRIVED or BOTH_ARRIVED for scheduled trades.
+            // Change: return all non-finalized trades (everything except COMPLETED and CANCELLED).
+            // Also treat null status as non-finalized (include it).
+            if (s == null || (s != model.domain.enumerations.TradeStatus.COMPLETED
+                    && s != model.domain.enumerations.TradeStatus.CANCELLED)) {
                 result.add(t);
             }
         }
@@ -140,6 +141,33 @@ public class JsonTradeDao implements ITradeDao {
     @Override
     public List<TradeTransaction> getUserTradeTransactions(String userId, String tradeId) {
         return List.of();
+    }
+
+    @Override
+    public List<TradeTransaction> getUserCompletedTrades(String userId) {
+        List<TradeTransaction> result = new ArrayList<>();
+        if (userId == null) return result;
+        for (TradeTransaction t : tradesById.values()) {
+            if (t == null) continue;
+            if (!(userId.equals(t.getProposerId()) || userId.equals(t.getReceiverId()))) continue;
+            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+            if (s == model.domain.enumerations.TradeStatus.COMPLETED || s == model.domain.enumerations.TradeStatus.CANCELLED) {
+                result.add(t);
+            }
+        }
+        // Diagnostic logging: which completed trades were found for this user
+        try {
+            if (result.isEmpty()) {
+                LOGGER.info(() -> "JsonTradeDao.getUserCompletedTrades: found 0 completed trades for user=" + userId);
+            } else {
+                StringBuilder ids = new StringBuilder();
+                for (TradeTransaction tt : result) ids.append(tt.getTransactionId()).append(',');
+                LOGGER.info(() -> "JsonTradeDao.getUserCompletedTrades: found " + result.size() + " completed trades for user=" + userId + " ids=" + ids.toString());
+            }
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "JsonTradeDao.getUserCompletedTrades logging failed: " + ex.getMessage());
+        }
+        return result;
     }
 
     @Override
@@ -201,6 +229,22 @@ public class JsonTradeDao implements ITradeDao {
             }
         }
         return null;
+    }
+
+    @Override
+    public List<TradeTransaction> getStoreTradeInProgressTransactions(String storeId) {
+        List<TradeTransaction> result = new ArrayList<>();
+        if (storeId == null) return result;
+        for (TradeTransaction t : tradesById.values()) {
+            if (t == null) continue;
+            if (!storeId.equals(t.getStoreId())) continue;
+            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+            if (s == model.domain.enumerations.TradeStatus.INSPECTION_PHASE
+                    || s == model.domain.enumerations.TradeStatus.INSPECTION_PASSED) {
+                result.add(t);
+            }
+        }
+        return result;
     }
 
 }

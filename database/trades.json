@@ -1,7 +1,7 @@
 [
   {
     "transactionId": 1214693586,
-    "tradeStatus": "INSPECTION_PHASE",
+    "tradeStatus": "COMPLETED",
     "proposerId": "user3",
     "receiverId": "user1",
     "proposerSessionCode": 781346,
@@ -30,6 +30,8 @@
       }
     ],
     "proposerReviewed": false,
-    "receiverReviewed": false
+    "receiverReviewed": false,
+    "proposerInspectionOk": true,
+    "receiverInspectionOk": true
   }
 ]

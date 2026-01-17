@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 public class FXNegotiationView implements INegotiationView {
     // Simple logger for view-level diagnostics
     private static final Logger LOGGER = Logger.getLogger(FXNegotiationView.class.getName());
+    private static final String NOCARDIMAGE_ICONS_PATH = "/icons/nocardimage.svg";
 
     @FXML
     private ListView<CardBean> requestedList;
@@ -347,7 +348,7 @@ public class FXNegotiationView implements INegotiationView {
             try {
                 java.time.LocalTime.parse(meetingTime);
                 bean.setMeetingTime(meetingTime);
-            } catch (Exception ex) {
+            } catch (Exception _) {
                 if (stage != null) {
                     javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
                     a.setTitle("Errore orario");
@@ -391,16 +392,16 @@ public class FXNegotiationView implements INegotiationView {
                         Image img = new Image(item.getImageUrl(), 40, 60, true, true, true);
                         if (!img.isError()) thumb.setImage(img);
                         else {
-                            java.io.InputStream is = getClass().getResourceAsStream("/icons/nocardimage.svg");
+                            java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
                             if (is != null) thumb.setImage(new Image(is));
                         }
                     } else {
-                        java.io.InputStream is = getClass().getResourceAsStream("/icons/nocardimage.svg");
+                        java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
                         if (is != null) thumb.setImage(new Image(is));
                     }
                 } catch (Exception ex) {
                     LOGGER.fine(() -> "Failed to load thumbnail for negotiation cell: " + ex.getMessage());
-                    java.io.InputStream is = getClass().getResourceAsStream("/icons/nocardimage.svg");
+                    java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
                     if (is != null) {
                         try { thumb.setImage(new Image(is)); } catch (Exception innerEx) { LOGGER.fine(() -> "Fallback image failed: " + innerEx.getMessage()); }
                     }

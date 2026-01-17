@@ -366,6 +366,19 @@ public class CollectionController {
         }
     }
 
+    public void navigateToManageTrade() {
+        LOGGER.log(java.util.logging.Level.INFO, "Navigating to Manage Trades for user: {0}", username);
+        if (view != null) {
+            view.close();
+        }
+        try {
+            navigationController.navigateToManageTrade(username);
+        } catch (exception.NavigationException ex) {
+            LOGGER.log(java.util.logging.Level.WARNING, "Failed to navigate to Manage Trades: {0}", ex.getMessage());
+            if (view != null) view.showError("Impossibile aprire la sezione Manage Trades");
+        }
+    }
+
     public void onLogoutRequested() {
         LOGGER.info(() -> "User " + username + " logging out");
         if (view != null) {

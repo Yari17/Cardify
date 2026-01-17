@@ -38,6 +38,7 @@ public class FXCollectorHPView implements ICollectorHPView {
     private static final String NORMAL_STYLE = "-fx-cursor: hand; -fx-padding: 8; -fx-background-color: transparent; -fx-scale-x: 1.0; -fx-scale-y: 1.0;";
     private static final String VARIANT_LABEL_STYLE = "-fx-background-color: #AB47BC; -fx-text-fill: white; -fx-padding: 4 10; -fx-background-radius: 12; -fx-font-size: 11px;";
     private static final String EFFECT_LITERAL = "effect";
+    private static final String EXCEPTION_LITERAL = "Exception";
 
     @FXML
     private Label usernameLabel;
@@ -288,7 +289,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             } catch (Exception ex) {
                 LOGGER.log(java.util.logging.Level.WARNING, "Failed to load card image in dialog: {0} -> {1}",
                         new Object[]{card.getImageUrl(), ex.getMessage()});
-                LOGGER.log(java.util.logging.Level.FINER, "Exception", ex);
+                LOGGER.log(java.util.logging.Level.FINER, EXCEPTION_LITERAL, ex);
             }
         }
 
@@ -312,7 +313,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             imageContainer.getChildren().addAll(cardImageView, noImageLabel);
         } catch (Exception ex) {
             LOGGER.log(java.util.logging.Level.WARNING, "Failed to load placeholder image: {0}", ex.getMessage());
-            LOGGER.log(java.util.logging.Level.FINER, "Exception", ex);
+            LOGGER.log(java.util.logging.Level.FINER, EXCEPTION_LITERAL, ex);
             imageContainer.getChildren().add(cardImageView);
         }
     }
@@ -684,7 +685,7 @@ public class FXCollectorHPView implements ICollectorHPView {
                 }
             } catch (Exception ex) {
                 LOGGER.log(java.util.logging.Level.WARNING, "Failed to load image for card: {0} -> {1}", new Object[]{card.getName(), ex.getMessage()});
-                LOGGER.log(java.util.logging.Level.FINER, "Exception", ex);
+                LOGGER.log(java.util.logging.Level.FINER, EXCEPTION_LITERAL, ex);
             }
         }
 
@@ -697,7 +698,7 @@ public class FXCollectorHPView implements ICollectorHPView {
                 imageView.setFitHeight(180);
             } catch (Exception ex) {
                 LOGGER.log(java.util.logging.Level.WARNING, "Failed to load placeholder image: {0}", ex.getMessage());
-                LOGGER.log(java.util.logging.Level.FINER, "Exception", ex);
+                LOGGER.log(java.util.logging.Level.FINER, EXCEPTION_LITERAL, ex);
             }
         }
 

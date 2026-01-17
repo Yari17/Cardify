@@ -899,20 +899,35 @@ public class FXCollectionView implements ICollectionView {
 
     @FXML
     private void onTradeClicked() {
-        LOGGER.info("Trade clicked - navigating to trade page");
+        LOGGER.info("Trade clicked - navigating to trade/manage page");
         if (controller != null) {
-            controller.navigateToTrade();
-        }
-        // 'trade' action may map to live or manage depending on which button fired
-        // to keep behavior consistent, detect which button was used via focused
-        // property
-        if (liveTradeButton != null && liveTradeButton.isFocused()) {
-            markNavSelected("live");
-        } else if (tradeButton != null && tradeButton.isFocused()) {
-            markNavSelected("manage");
+            // Decide which action the user intended based on which button has focus.
+            // If the live trade button is focused, navigate to live trades; if the manage
+            // trades button is focused, navigate to manage trades.
+            try {
+                if (liveTradeButton != null && liveTradeButton.isFocused()) {
+                    controller.navigateToTrade();
+                    markNavSelected("live");
+                } else if (tradeButton != null && tradeButton.isFocused()) {
+                    controller.navigateToManageTrade();
+                    markNavSelected("manage");
+                } else {
+                    // Fallback: prefer Manage Trades when the dedicated trade button was used
+                    controller.navigateToManageTrade();
+                    markNavSelected("manage");
+                }
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Navigation from Collection onTradeClicked failed: " + ex.getMessage());
+            }
         } else {
-            // default to live
-            markNavSelected("live");
+            // still update nav selection to be safe
+            if (liveTradeButton != null && liveTradeButton.isFocused()) {
+                markNavSelected("live");
+            } else if (tradeButton != null && tradeButton.isFocused()) {
+                markNavSelected("manage");
+            } else {
+                markNavSelected("live");
+            }
         }
     }
 

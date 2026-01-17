@@ -590,5 +590,43 @@
     ],
     "createdAt": "2026-01-16T20:29:35.728634",
     "lastModified": "2026-01-16T20:30:06.846206"
+  },
+  {
+    "id": 23,
+    "owner": "user1",
+    "setId": "A2a",
+    "setName": "Triumphant Light",
+    "cards": [
+      {
+        "id": "A2a-047",
+        "name": "Garchomp ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-17T12:33:18.671928",
+    "lastModified": "2026-01-17T12:33:18.677304"
+  },
+  {
+    "id": 24,
+    "owner": "user3",
+    "setId": "B1",
+    "setName": "Mega Rising",
+    "cards": [
+      {
+        "id": "B1-052",
+        "name": "Mega Gyarados ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/052/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-17T12:33:18.681834",
+    "lastModified": "2026-01-17T12:33:18.684223"
   }
 ]

@@ -95,12 +95,12 @@ public class Proposal {
                 try {
                     LocalTime time = LocalTime.parse(this.meetingTime);
                     return Optional.of(LocalDateTime.of(date, time));
-                } catch (DateTimeParseException ex) {
+                } catch (DateTimeParseException _) {
                     // ignore and fallback to start of day
                 }
             }
             return Optional.of(date.atStartOfDay());
-        } catch (DateTimeParseException ex) {
+        } catch (DateTimeParseException _) {
             return Optional.empty();
         }
     }

@@ -26,5 +26,40 @@
     "meetingPlace": "CiccioGamer89TCG",
     "meetingDate": "2026-01-18",
     "meetingTime": "22:20"
+  },
+  {
+    "proposalId": "2",
+    "proposerId": "user1",
+    "receiverId": "user3",
+    "cardsOffered": [
+      {
+        "id": "base5-80",
+        "name": "Rainbow Energy",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/80/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      },
+      {
+        "id": "B1-052",
+        "name": "Mega Gyarados ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/052/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "swsh10.5-011",
+        "name": "Radiant Charizard",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/011/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-17T15:48:22.833691",
+    "status": "PENDING",
+    "meetingPlace": "Store1",
+    "meetingDate": "2026-01-19",
+    "meetingTime": "13:30"
   }
 ]

@@ -37,6 +37,8 @@ public class FXCollectorTradeView implements ICollectorTradeView {
     private static final int ICON_W = 26;
     private static final int ICON_H = 26;
 
+    private static final String PRESENCE_CONFIRMED_MSG = "Presenza confermata. Codice: ";
+
     @FXML
     private Label usernameLabel;
 
@@ -66,6 +68,9 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     @FXML
     private Button manageTradesButton;
+
+    @FXML
+    private ListView<model.bean.TradeTransactionBean> completedTradesList; // Nuova ListView per gli scambi conclusi
 
     // Navigation label fields to allow marking selected state
     @FXML
@@ -126,6 +131,29 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                     }
                 };
             });
+        }
+        if (completedTradesList != null) {
+            completedTradesList.setCellFactory(lv -> {
+                // reference lv to avoid 'parameter never used' warnings
+                lv.getItems();
+                return new ListCell<>() {
+                    @Override
+                    protected void updateItem(TradeTransactionBean item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || item == null) {
+                            setText(null);
+                            setGraphic(null);
+                            return;
+                        }
+                        setGraphic(createTradeCellContent(item));
+                    }
+                };
+            });
+        }
+        // Carica automaticamente sia gli scambi programmati che quelli conclusi all'apertura della pagina
+        if (controller != null) {
+            controller.loadScheduledTrades();
+            controller.loadCollectorCompletedTrades();
         }
     }
 
@@ -462,7 +490,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                         } else {
                             Label err = new Label("Codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); content.getChildren().add(err);
                         }
-                    } catch (NumberFormatException nfe) {
+                    } catch (NumberFormatException _) {
                         Label err = new Label("Formato codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); content.getChildren().add(err);
                     }
                     ev.consume();
@@ -481,7 +509,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
             if ((userIsProposer && transaction.isProposerArrived()) || (userIsReceiver && transaction.isReceiverArrived())) {
                 int code = userIsProposer ? transaction.getProposerSessionCode() : transaction.getReceiverSessionCode();
-                Label codeLabel = new Label("Presenza confermata. Codice: " + (code > 0 ? code : "---") + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
+                Label codeLabel = new Label(PRESENCE_CONFIRMED_MSG + (code > 0 ? code : "---") + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
                 codeLabel.setStyle(TEXT_FILL_WHITE);
                 actionArea.getChildren().add(codeLabel);
             } else {
@@ -494,12 +522,14 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                     }
                     int code = controller.confirmPresence(transaction.getTransactionId());
                     if (code > 0) {
-                        Label codeLabel = new Label("Presenza confermata. Codice: " + code + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
+                        Label codeLabel = new Label(PRESENCE_CONFIRMED_MSG + code + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
                         codeLabel.setStyle(TEXT_FILL_WHITE);
-                        actionArea.getChildren().setAll(codeLabel);
+                        actionArea.getChildren().add(codeLabel);
                         model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
                         if (updated != null) {
-                            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception ignore) {}
+                            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) {
+                                // ignore
+                            }
                         }
                         displayScheduledTrades(java.util.List.of(updated != null ? updated : transaction));
                         refresh();
@@ -540,51 +570,6 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         return new HBox(12, offeredList, requestedList);
     }
 
-    private Button buildConfirmButton(TradeTransactionBean transaction) {
-        Button confirmBtn = new Button("Conferma la tua presenza");
-        confirmBtn.setOnAction(ev -> {
-            if (controller == null) {
-                showError("Controller non connesso");
-                ev.consume();
-                return;
-            }
-
-            int code = controller.confirmPresence(transaction.getTransactionId());
-            if (code > 0) {
-                // Show modal dialog with the session code and clear instructions
-                Stage dlg = new Stage();
-                dlg.initOwner(stage);
-                dlg.initModality(Modality.WINDOW_MODAL);
-                dlg.setTitle("Presenza confermata");
-                VBox box = new VBox(10);
-                box.setPadding(new javafx.geometry.Insets(12));
-                Label msg = new Label("Presenza confermata. Codice: " + code);
-                msg.setStyle(TEXT_FILL_WHITE);
-                Label instr = new Label("Mostra questo codice allo store manager per confermare la tua presenza allo scambio");
-                instr.setStyle(TEXT_FILL_WHITE);
-                Button ok = new Button("OK");
-                ok.setOnAction(ae -> { dlg.close(); ae.consume(); });
-                box.getChildren().addAll(msg, instr, ok);
-                box.setStyle(BG_COLOR_STYLE);
-                Scene s = new Scene(box, 420, 150);
-                try {
-                    java.net.URL res = getClass().getResource(view.IView.themeCssPath());
-                    if (res != null) s.getStylesheets().add(res.toExternalForm());
-                } catch (Exception ex) { LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage()); }
-                dlg.setScene(s);
-                dlg.showAndWait();
-
-                confirmBtn.setDisable(true);
-            } else {
-                // show inline message
-                confirmBtn.setText("Errore durante la conferma");
-            }
-
-            ev.consume();
-        });
-
-        return confirmBtn;
-    }
 
 
     public void displayIspection() {
@@ -633,7 +618,47 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         javafx.application.Platform.runLater(() -> {
             if (scheduledTradesList != null) {
                 scheduledTradesList.getItems().clear();
-                if (scheduled != null) scheduledTradesList.getItems().addAll(scheduled);
+                if (scheduled != null) {
+                    for (model.bean.TradeTransactionBean t : scheduled) {
+                        String status = t.getStatus();
+                        if (status != null && (status.equalsIgnoreCase("COMPLETED") || status.equalsIgnoreCase("CANCELLED"))) {
+                            continue; // Non mostrare scambi conclusi tra i programmati
+                        }
+                        scheduledTradesList.getItems().add(t);
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public void displayCompletedTrades(java.util.List<model.bean.TradeTransactionBean> completedTrades) {
+        if (completedTradesList == null) return;
+        javafx.application.Platform.runLater(() -> {
+            // Diagnostic: log incoming completed trades count
+            try {
+                if (completedTrades == null || completedTrades.isEmpty()) {
+                    LOGGER.info(() -> "FXCollectorTradeView.displayCompletedTrades: received 0 completed trades");
+                } else {
+                    StringBuilder ids = new StringBuilder();
+                    for (model.bean.TradeTransactionBean t : completedTrades) ids.append(t.getTransactionId()).append(',');
+                    LOGGER.info(() -> "FXCollectorTradeView.displayCompletedTrades: received " + completedTrades.size() + " completed trades ids=" + ids.toString());
+                }
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "FXCollectorTradeView.displayCompletedTrades logging failed: " + ex.getMessage());
+            }
+
+            completedTradesList.getItems().clear();
+            if (completedTrades != null && !completedTrades.isEmpty()) {
+                completedTradesList.setItems(javafx.collections.FXCollections.observableArrayList(completedTrades));
+                completedTradesList.setVisible(true);
+                completedTradesList.setManaged(true);
+                completedTradesList.requestLayout();
+                completedTradesList.refresh();
+            } else {
+                completedTradesList.setItems(javafx.collections.FXCollections.observableArrayList());
+                completedTradesList.setVisible(true);
+                completedTradesList.setManaged(true);
             }
         });
     }

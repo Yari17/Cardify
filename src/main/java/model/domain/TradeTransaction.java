@@ -1,3 +1,4 @@
+        // Se entrambi sono true -> inspection passed (store must finalize exchange)
 package model.domain;
 
 
@@ -39,6 +40,7 @@ public class TradeTransaction {
         public final String proposerId;
         public final String receiverId;
         public final String storeId;
+
         public TradeParticipants(String proposerId, String receiverId, String storeId) {
             this.proposerId = proposerId;
             this.receiverId = receiverId;
@@ -54,6 +56,7 @@ public class TradeTransaction {
         public final LocalDateTime tradeDate;
         public final List<Card> offeredCards;
         public final List<Card> requestedCards;
+
         public TradeDetails(LocalDateTime creationTimestamp, LocalDateTime tradeDate, List<Card> offeredCards, List<Card> requestedCards) {
             this.creationTimestamp = creationTimestamp;
             this.tradeDate = tradeDate;
@@ -154,18 +157,25 @@ public class TradeTransaction {
             this.tradeStatus = TradeStatus.CANCELLED;
             return;
         }
+        this.tradeStatus = TradeStatus.INSPECTION_PASSED;
 
-        // Se entrambi sono true -> inspection passed (store must finalize exchange)
-        if (Boolean.TRUE.equals(this.proposerInspectionOk) && Boolean.TRUE.equals(this.receiverInspectionOk)) {
-            this.tradeStatus = TradeStatus.INSPECTION_PASSED;
-        }
     }
 
-    public boolean isProposerArrived() { return proposerArrived; }
-    public boolean isReceiverArrived() { return receiverArrived; }
+    public boolean isProposerArrived() {
+        return proposerArrived;
+    }
 
-    public Boolean getProposerInspectionOk() { return proposerInspectionOk; }
-    public Boolean getReceiverInspectionOk() { return receiverInspectionOk; }
+    public boolean isReceiverArrived() {
+        return receiverArrived;
+    }
+
+    public Boolean getProposerInspectionOk() {
+        return proposerInspectionOk;
+    }
+
+    public Boolean getReceiverInspectionOk() {
+        return receiverInspectionOk;
+    }
 
     // ===== Getters used by controllers/views =====
     public int getTransactionId() {
@@ -224,7 +234,5 @@ public class TradeTransaction {
     public boolean isReceiverReviewed() {
         return receiverReviewed;
     }
-
-    // proposalId intentionally removed: TradeTransaction no longer keeps a link to the originating Proposal
 
 }

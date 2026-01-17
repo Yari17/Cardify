@@ -154,7 +154,7 @@ public class LiveTradeController {
             }
             List<TradeTransactionBean> beans = new ArrayList<>();
             for (TradeTransaction t : list) {
-                beans.add(mapToBean(t));
+                beans.add(toBean(t));
             }
             if (storeView != null) {
                 LOGGER.info(() -> "loadScheduledTrades: dispatching " + beans.size() + " trades to store view");
@@ -166,6 +166,13 @@ public class LiveTradeController {
             } else if (view != null) {
                 LOGGER.info(() -> "loadScheduledTrades: dispatching " + beans.size() + " trades to collector view");
                 view.displayScheduledTrades(beans);
+                // Ensure completed trades are also loaded for collector views (diagnostic)
+                try {
+                    LOGGER.info(() -> "loadScheduledTrades: now loading completed trades for user=" + username);
+                    loadCollectorCompletedTrades();
+                } catch (Exception ex) {
+                    LOGGER.fine(() -> "loadScheduledTrades: failed to load completed trades: " + ex.getMessage());
+                }
             }
         } catch (Exception ex) {
             LOGGER.fine(() -> "loadScheduledTrades failed: " + ex.getMessage());
@@ -175,7 +182,7 @@ public class LiveTradeController {
     /**
      * Mappa una TradeTransaction in un TradeTransactionBean per la UI.
      */
-    private TradeTransactionBean mapToBean(TradeTransaction t) {
+    private TradeTransactionBean toBean(TradeTransaction t) {
         TradeTransactionBean b = new TradeTransactionBean();
         b.setTransactionId(t.getTransactionId());
         b.setProposerId(t.getProposerId());
@@ -303,7 +310,7 @@ public class LiveTradeController {
     // Navigate to the live trade view for the given proposal (delegates to ApplicationController)
     public void startTrade(String proposalId) {
         try {
-            navigationController.navigateToTrade(username, proposalId);
+            navigationController.navigateToTrade(username);
         } catch (Exception ex) {
             LOGGER.warning(() -> "startTrade navigation failed: " + ex.getMessage());
         }
@@ -448,10 +455,11 @@ public class LiveTradeController {
             tx.updateTradeStatus(model.domain.enumerations.TradeStatus.COMPLETED);
             tradeDao.save(tx);
             performCardExchange(tx);
-            TradeTransactionBean bean = refreshTradeStatus(transactionId);
+            // Dopo la conclusione, torna alla schermata principale e aggiorna le liste
             if (storeView != null) {
-                storeView.displayTrade(bean);
                 storeView.showMessage(TRADE_PREFIX + transactionId + " concluso con successo.");
+                // Naviga e aggiorna la schermata principale
+                navigationController.navigateToStoreTrades(tx.getStoreId());
             }
             if (view != null) {
                 view.onTradeComplete(String.valueOf(transactionId));
@@ -475,10 +483,85 @@ public class LiveTradeController {
                 LOGGER.warning(() -> "fetchTradeBySessionCodes: nessuna transazione trovata per i codici " + proposerCode + ", " + receiverCode);
                 return null;
             }
-            return mapToBean(tx);
+            return toBean(tx);
         } catch (Exception ex) {
             LOGGER.warning(() -> "fetchTradeBySessionCodes failed: " + ex.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Carica e mostra solo gli scambi programmati (presenza confermata da uno o entrambi, ma non ancora in inspection phase).
+     */
+    public void loadStoreScheduledTrades() {
+        try {
+            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            List<TradeTransaction> list = tradeDao.getStoreTradeScheduledTransactions(username, null);
+            List<TradeTransactionBean> beans = new ArrayList<>();
+            for (TradeTransaction t : list) {
+                beans.add(toBean(t));
+            }
+            if (storeView != null) {
+                storeView.displayScheduledTrades(beans);
+            }
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "loadStoreScheduledTrades failed: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Carica e mostra solo gli scambi in corso (inspection phase o inspection passed) per lo store.
+     */
+    public void loadStoreInProgressTrades() {
+        try {
+            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            List<TradeTransaction> list = tradeDao.getStoreTradeInProgressTransactions(username);
+            List<TradeTransactionBean> beans = new ArrayList<>();
+            for (TradeTransaction t : list) {
+                beans.add(toBean(t));
+            }
+            if (storeView != null) {
+                storeView.displayInProgressTrades(beans); // Mostra nella lista corretta
+            }
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "loadStoreInProgressTrades failed: " + ex.getMessage());
+        }
+    }
+
+    // Backwards-compatible entry point used by view factories / ApplicationController
+    public void loadCompletedTrades() {
+        // Delegate to collector-specific implementation for clarity
+        loadCollectorCompletedTrades();
+    }
+
+    /**
+     * Carica e mostra solo gli scambi conclusi (COMPLETED o CANCELLED) per il collezionista.
+     */
+    public void loadCollectorCompletedTrades() {
+        try {
+            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            List<TradeTransaction> all = tradeDao.getUserCompletedTrades(username);
+            // Diagnostic: log how many completed trades were returned by DAO
+            try {
+                if (all == null || all.isEmpty()) {
+                    LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned 0 completed trades for user=" + username);
+                } else {
+                    StringBuilder ids = new StringBuilder();
+                    for (TradeTransaction t : all) ids.append(t.getTransactionId()).append(',');
+                    LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned " + all.size() + " completed trades for user=" + username + " ids=" + ids.toString());
+                }
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "LiveTradeController.loadCollectorCompletedTrades logging failed: " + ex.getMessage());
+            }
+            List<TradeTransactionBean> completed = new ArrayList<>();
+            for (TradeTransaction t : all) {
+                completed.add(toBean(t));
+            }
+            if (view != null) {
+                view.displayCompletedTrades(completed);
+            }
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "loadCollectorCompletedTrades failed: " + ex.getMessage());
         }
     }
 }

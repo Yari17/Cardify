@@ -198,10 +198,21 @@ class LiveTradeControllerTest {
         @Override public List<TradeTransaction> getUserTradeTransactions(String username) { return new ArrayList<>(map.values()); }
         @Override public List<TradeTransaction> getStoreTradeScheduledTransactions(String userId, String tradeId) { return new ArrayList<>(map.values()); }
         @Override public List<TradeTransaction> getUserTradeTransactions(String userId, String tradeId) { return new ArrayList<>(map.values()); }
+        @Override public List<TradeTransaction> getUserCompletedTrades(String userId) {
+            List<TradeTransaction> res = new ArrayList<>();
+            for (TradeTransaction t : map.values()) {
+                if (t == null) continue;
+                if (!(userId.equals(t.getProposerId()) || userId.equals(t.getReceiverId()))) continue;
+                model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+                if (s == model.domain.enumerations.TradeStatus.COMPLETED || s == model.domain.enumerations.TradeStatus.CANCELLED) res.add(t);
+            }
+            return res;
+        }
         @Override public Optional<TradeTransaction> findByParticipantsAndDate(String proposerId, String receiverId, LocalDateTime tradeDate) { return Optional.empty(); }
         @Override public Optional<TradeTransaction> get(long id) { return Optional.empty(); }
         @Override public void update(TradeTransaction t, String[] params) {}
         @Override public void delete(TradeTransaction t) {}
+        @Override public List<TradeTransaction> getStoreTradeInProgressTransactions(String storeId) { return new ArrayList<>(map.values()); }
     }
     static class StubBinderDao implements IBinderDao {
         private final Map<String, List<Binder>> binders = new HashMap<>();
