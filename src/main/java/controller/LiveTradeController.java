@@ -1,21 +1,19 @@
 package controller;
 
 
-import model.api.ApiFactory;
 import model.bean.CardBean;
 import model.bean.TradeTransactionBean;
 import model.bean.UserBean;
-import model.dao.ITradeDao;
 import model.dao.IBinderDao;
+import model.dao.ITradeDao;
 import model.domain.Binder;
 import model.domain.Card;
 import model.domain.TradeTransaction;
 import view.ICollectorTradeView;
 
-import java.util.function.BiConsumer;
-import java.util.logging.Logger;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 //controller Trade - kept minimal; presentation/management moved to ManageTradeController and ManageTradeView
 public class LiveTradeController {
@@ -267,7 +265,12 @@ public class LiveTradeController {
                 LOGGER.warning(() -> "confirmPresence: TradeTransaction not found for id " + transactionId);
                 return -1;
             }
-
+            // FIX: Non permettere conferma se già entrambi arrivati o scambio concluso/annullato
+            if (tx.getTradeStatus() == model.domain.enumerations.TradeStatus.BOTH_ARRIVED
+                || tx.getTradeStatus() == model.domain.enumerations.TradeStatus.COMPLETED
+                || tx.getTradeStatus() == model.domain.enumerations.TradeStatus.CANCELLED) {
+                return -1;
+            }
             int code = tx.confirmPresence(username);
             tradeDao.save(tx);
 
@@ -351,6 +354,20 @@ public class LiveTradeController {
             LOGGER.warning(() -> "recordInspectionResult failed: " + ex.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Segnala l'esito negativo dell'ispezione per un collector: annulla lo scambio.
+     */
+    public boolean failInspection(int transactionId, String collectorId) {
+        return recordInspectionResult(transactionId, collectorId, false);
+    }
+
+    /**
+     * Conclude lo scambio manualmente, impostando lo stato a COMPLETED e trasferendo le carte.
+     */
+    public boolean completeTrade(int transactionId) {
+        return concludeTrade(transactionId);
     }
 
     private List<Card> toCardList(Object obj) {
