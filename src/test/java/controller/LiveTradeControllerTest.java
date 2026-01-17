@@ -1,12 +1,19 @@
 package controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import model.dao.IBinderDao;
+import model.dao.ITradeDao;
 import model.api.ICardProvider;
 import model.dao.factory.DaoFactory;
 import model.domain.Card;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import model.domain.Binder;
+import model.domain.TradeTransaction;
+import model.domain.enumerations.TradeStatus;
+import java.time.LocalDateTime;
+import java.util.*;
 
 class LiveTradeControllerTest {
     private StubApplicationController nav;
@@ -89,31 +96,44 @@ class LiveTradeControllerTest {
         @Override public void save(TradeTransaction tx) { map.put(tx.getTransactionId(), tx); }
         @Override public void updateTransactionStatus(int id, String status) {
             TradeTransaction tx = map.get(id);
-            if (tx != null && status != null) tx.updateTradeStatus(TradeStatus.valueOf(status));
+            if (tx != null && status != null) tx.updateTradeStatus(model.domain.enumerations.TradeStatus.valueOf(status));
         }
-        // ...implement only needed methods...
         @Override public TradeTransaction getTradeTransactionBySessionCodes(int proposerCode, int receiverCode) { return null; }
         @Override public List<TradeTransaction> getUserTradeTransactions(String username) { return new ArrayList<>(map.values()); }
-        @Override public List<TradeTransaction> getStoreTradeScheduledTransactions(String storeId, String filter) { return new ArrayList<>(map.values()); }
+        @Override public List<TradeTransaction> getStoreTradeScheduledTransactions(String userId, String tradeId) { return new ArrayList<>(map.values()); }
+        @Override public List<TradeTransaction> getUserTradeTransactions(String userId, String tradeId) { return new ArrayList<>(map.values()); }
+        @Override public Optional<TradeTransaction> findByParticipantsAndDate(String proposerId, String receiverId, LocalDateTime tradeDate) { return Optional.empty(); }
+        @Override public Optional<TradeTransaction> get(long id) { return Optional.empty(); }
+        @Override public void update(TradeTransaction t, String[] params) {}
+        @Override public void delete(TradeTransaction t) {}
     }
     static class StubBinderDao implements IBinderDao {
         private final Map<String, List<Binder>> binders = new HashMap<>();
-        @Override public List<Binder> getUserBinders(String username) { return binders.getOrDefault(username, new ArrayList<>()); }
-        @Override public void createBinder(String username, String setId, String setName) {
-            binders.computeIfAbsent(username, k -> new ArrayList<>()).add(new Binder(username, setId, setName));
+        @Override public List<Binder> getUserBinders(String owner) { return binders.getOrDefault(owner, new ArrayList<>()); }
+        @Override public List<Binder> getBindersExcludingOwner(String owner) { return new ArrayList<>(); }
+        @Override public void createBinder(String owner, String setId, String setName) {
+            binders.computeIfAbsent(owner, k -> new ArrayList<>()).add(new Binder(owner, setId, setName));
         }
-        @Override public void save(Binder binder) {}
+        @Override public void deleteBinder(String binderId) {}
+        @Override public Optional<Binder> get(long id) { return Optional.empty(); }
+        @Override public void save(Binder t) {}
+        @Override public void update(Binder t, String[] params) {}
+        @Override public void delete(Binder t) {}
     }
     static class StubCardProvider implements ICardProvider {
         Map<String, String> sets = new HashMap<>();
         @Override public Map<String, String> getAllSets() { return sets; }
-        // ...implement only needed methods...
+        @Override public List<Card> searchSet(String setId) { return new ArrayList<>(); }
+        @Override public List<Card> searchCardsByName(String cardName) { return new ArrayList<>(); }
+        @Override public <T extends Card> T getCardDetails(String cardId) { return null; }
     }
     static class StubDaoFactory extends DaoFactory {
         private final ITradeDao tradeDao; private final IBinderDao binderDao;
         public StubDaoFactory(ITradeDao t, IBinderDao b) { tradeDao = t; binderDao = b; }
         @Override public ITradeDao createTradeDao() { return tradeDao; }
         @Override public IBinderDao createBinderDao() { return binderDao; }
+        @Override public model.dao.IUserDao createUserDao() { return null; }
+        @Override public model.dao.IProposalDao createProposalDao() { return null; }
     }
     static class StubApplicationController extends ApplicationController {
         private final ITradeDao tradeDao; private final IBinderDao binderDao; private final ICardProvider cardProvider;
