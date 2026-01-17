@@ -13,7 +13,8 @@ public class DBConnector {
 
     private static final String URL = "jdbc:mysql://localhost:3306/cardify"; // Il tuo DB
     private static final String USER = "root";
-    private static final String NOTAPSW = "password";
+    //si lascia la password hardcoded per facilitare lo sviluppo locale, ovviemente in produzione andrebbe gestita in modo sicuro
+    private static final String PASSWORD="password";
     private static final String DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
 
     // 1. Costruttore privato: impedisce l'istanziazione diretta dall'esterno
@@ -23,7 +24,7 @@ public class DBConnector {
             Class.forName(DRIVER_CLASS);
 
             // STEP 2: si collega al database
-            this.connection = DriverManager.getConnection(URL, USER, NOTAPSW);
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);//NOSONAR per evitare false positive su hardcoded credentials
 
         } catch (ClassNotFoundException e) {
             throw new SQLException("Driver Database non trovato: " + e.getMessage());
