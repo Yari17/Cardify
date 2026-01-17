@@ -1,6 +1,6 @@
 package model.bean;
 
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +14,6 @@ public class ProposalBean {
     private String meetingDate; // date as string, expected format YYYY-MM-DD
     private String meetingTime; // time as string, expected format HH:mm (optional)
     private String status; // ProposalStatus name: PENDING, ACCEPTED, REJECTED, EXPIRED
-    private LocalDateTime lastUpdated;
 
     public String getProposalId() { return proposalId; }
     public void setProposalId(String proposalId) { this.proposalId = proposalId; }
@@ -42,9 +41,6 @@ public class ProposalBean {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
-
-    public LocalDateTime getLastUpdated() { return lastUpdated; }
-    public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
 
     @Override
     public String toString() {

@@ -29,4 +29,7 @@ public interface ITradeDao extends IDao<TradeTransaction> {
      * Restituisce la lista degli scambi in corso (inspection phase o inspection passed) per lo store.
      */
     List<TradeTransaction> getStoreTradeInProgressTransactions(String storeId);
+
+    // New: ritorna tutti gli scambi conclusi (COMPLETED o CANCELLED) per lo store
+    List<TradeTransaction> getStoreCompletedTrades(String storeId);
 }

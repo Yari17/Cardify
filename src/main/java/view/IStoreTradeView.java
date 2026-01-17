@@ -15,6 +15,8 @@ public interface IStoreTradeView extends IView {
     // Mostra la lista degli scambi programmati per lo store
     void displayScheduledTrades(List<TradeTransactionBean> scheduled);
 
+    void displayCompletedTrades(List<TradeTransactionBean> trades);
+
     // Mostra i dettagli di uno scambio selezionato (in una dialog o area dedicata)
     void displayTrade(TradeTransactionBean transaction);
 

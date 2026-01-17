@@ -4,30 +4,40 @@ import model.dao.*;
 import model.dao.demo.DemoBinderDao;
 import model.dao.demo.DemoUserDao;
 import model.dao.demo.DemoProposalDao;
+import model.dao.demo.DemoTradeDao;
 
 
 public class DemoDaoFactory extends DaoFactory {
 
+    // Cached demo DAO instances to preserve in-memory state across the application lifetime
+    private DemoUserDao userDao;
+    private DemoBinderDao binderDao;
+    private DemoProposalDao proposalDao;
+    private DemoTradeDao tradeDao;
+
     @Override
     public IUserDao createUserDao() {
-        return new DemoUserDao();
+        if (userDao == null) userDao = new DemoUserDao();
+        return userDao;
     }
 
     @Override
     public IBinderDao createBinderDao() {
-        return new DemoBinderDao();
+        if (binderDao == null) binderDao = new DemoBinderDao();
+        return binderDao;
     }
 
     @Override
     public IProposalDao createProposalDao() {
-        return new DemoProposalDao();
+        if (proposalDao == null) proposalDao = new DemoProposalDao();
+        return proposalDao;
     }
 
     @Override
     public model.dao.ITradeDao createTradeDao() {
-        return new model.dao.demo.DemoTradeDao();
+        if (tradeDao == null) tradeDao = new DemoTradeDao();
+        return tradeDao;
     }
 
-    // No additional factory methods required for demo implementation
 
 }

@@ -46,6 +46,10 @@ public class CliCollectorHPView implements ICollectorHPView {
         while (running) {
             printMainMenu();
             String choice = inputManager.readString();
+            if (choice == null) choice = "";
+            choice = choice.trim();
+            // Ignore empty lines which may come from piped input or accidental ENTER
+            if (choice.isEmpty()) continue;
             // Delegate handling to a separate method to reduce cognitive complexity in display()
             running = handleMainSelection(choice);
         }
@@ -77,13 +81,23 @@ public class CliCollectorHPView implements ICollectorHPView {
                     return true;
                 }
             case "5":
-                System.out.println("Effettua scambio selezionato.");
-                return true;
-            case "6":
+                // Manage Trades (corresponds to JavaFX Manage Trades)
                 if (controller != null) {
-                    showWelcomeMessage(controller.getUsername());
+                    controller.navigateToManageTrade();
+                    return false; // allow navigationController to display the destination view
+                } else {
+                    System.out.println("Controller non disponibile.");
+                    return true;
                 }
-                return true;
+            case "6":
+                // Go to Live Trades / Trade page (corresponds to JavaFX Trade)
+                if (controller != null) {
+                    controller.navigateToTrade();
+                    return false;
+                } else {
+                    System.out.println("Controller non disponibile.");
+                    return true;
+                }
             case "7":
                 if (controller != null) {
                     controller.onLogoutRequested();
@@ -94,11 +108,11 @@ public class CliCollectorHPView implements ICollectorHPView {
                     controller.onExitRequested();
                 }
                 return false;
-            default:
-                System.out.println("Opzione non valida. Riprova.");
-                return true;
-        }
-    }
+             default:
+                 System.out.println("Opzione non valida. Riprova.");
+                 return true;
+         }
+     }
 
     @Override
     public void close() {
@@ -125,7 +139,13 @@ public class CliCollectorHPView implements ICollectorHPView {
 
     @Override
     public void showCardOverview(CardBean card) {
-        // CLI uses a simple modal-style text output in showCardDetails/displayCards; overview not needed here.
+        // Provide a simple textual overview in CLI by delegating to the detailed view
+        if (card == null) {
+            System.out.println("Nessuna carta selezionata.");
+            return;
+        }
+        // Reuse the existing detailed card modal logic already used elsewhere in this class
+        showCardDetails(card);
     }
 
     @Override
@@ -176,6 +196,10 @@ public class CliCollectorHPView implements ICollectorHPView {
             System.out.println("\n" + (i + 1) + ". ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             System.out.println("   Nome:      " + card.getName());
             System.out.println("   ID:        " + card.getId());
+            // Show owner if present
+            if (card.getOwner() != null && !card.getOwner().isBlank()) {
+                System.out.println("   Owner:     " + card.getOwner());
+            }
             System.out.println("   Gioco:     " + card.getGameType());
             System.out.println("   Immagine:  " + (card.getImageUrl() != null ? "✓ Disponibile" : "✗ Non disponibile"));
         }
@@ -255,6 +279,9 @@ public class CliCollectorHPView implements ICollectorHPView {
         System.out.println("\n📇 Nome:        " + card.getName());
         System.out.println("🆔 ID:          " + card.getId());
         System.out.println("🎮 Gioco:       " + card.getGameType());
+        if (card.getOwner() != null && !card.getOwner().isBlank()) {
+            System.out.println("👤 Proprietario: " + card.getOwner());
+        }
         System.out
                 .println("🖼️  Immagine:    " + (card.getImageUrl() != null ? card.getImageUrl() : "Non disponibile"));
         System.out.println("\n" + SEPARATOR_LINE);
@@ -278,18 +305,19 @@ public class CliCollectorHPView implements ICollectorHPView {
     }
 
     private void showPopularCardsMenu() {
-        if (currentCards == null) {
-            System.out.println("\n🔄 Caricamento carte popolari in corso...");
-            if (controller != null) {
-                controller.loadPopularCards();
-            }
+        System.out.println("DEBUG: showPopularCardsMenu called");
+        // Always (re)load popular cards when the user selects the popular-cards menu.
+        System.out.println("\n🔄 Caricamento carte popolari in corso...");
+        if (controller != null) {
+            controller.loadPopularCards();
+            // controller will call displayCards(...) when data is ready
+            return;
         }
 
-        // Controller calls displayCards, so we don't need to call it here explicitly
-        // unless controller is null
-        if (controller == null && currentCards != null && !currentCards.isEmpty()) {
+        // If controller is not available (shouldn't normally happen), fall back to cached cards
+        if (currentCards != null && !currentCards.isEmpty()) {
             displayCards(currentCards);
-        } else if (controller == null) {
+        } else {
             System.out.println(NO_CARDS_AVAILABLE);
             System.out.print(PRESS_ENTER_TO_CONTINUE);
             inputManager.readString();
@@ -302,8 +330,8 @@ public class CliCollectorHPView implements ICollectorHPView {
         System.out.println("2. Cerca carte per nome");
         System.out.println("3. Cerca carte per set");
         System.out.println("4. Gestisci collezione");
-        System.out.println("5. Effettua scambio");
-        System.out.println("6. Visualizza profilo");
+        System.out.println("5. Gestisci proposte di scambio");
+        System.out.println("6. Scambia");
         System.out.println("7. Logout");
         System.out.println("0. Esci");
         System.out.print("Scegli un'opzione: ");

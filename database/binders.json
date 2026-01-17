@@ -540,10 +540,55 @@
         "quantity": 4,
         "isTradable": true,
         "status": ""
+      },
+      {
+        "id": "B1-002",
+        "name": "Mega Pinsir ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/002/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "B1-016",
+        "name": "Whimsicott ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/016/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "B1-013",
+        "name": "Pansage",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/013/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "B1-073",
+        "name": "Greninja ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/073/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "B1-085",
+        "name": "Mega Ampharos ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/085/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-16T20:28:18.256579",
-    "lastModified": "2026-01-16T20:28:31.882350"
+    "lastModified": "2026-01-17T16:48:14.240944"
   },
   {
     "id": 22,
@@ -605,10 +650,19 @@
         "quantity": 1,
         "isTradable": false,
         "status": ""
+      },
+      {
+        "id": "A2a-096",
+        "name": "Arceus ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/096/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-17T12:33:18.671928",
-    "lastModified": "2026-01-17T12:33:18.677304"
+    "lastModified": "2026-01-17T20:50:56.693448"
   },
   {
     "id": 24,
@@ -628,5 +682,43 @@
     ],
     "createdAt": "2026-01-17T12:33:18.681834",
     "lastModified": "2026-01-17T12:33:18.684223"
+  },
+  {
+    "id": 25,
+    "owner": "user2",
+    "setId": "base5",
+    "setName": "Team Rocket",
+    "cards": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-17T20:06:36.138639",
+    "lastModified": "2026-01-17T20:06:36.143318"
+  },
+  {
+    "id": 26,
+    "owner": "user1",
+    "setId": "ecard3",
+    "setName": "Skyridge",
+    "cards": [
+      {
+        "id": "ecard3-1",
+        "name": "Aerodactyl",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/1/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-17T20:06:36.147443",
+    "lastModified": "2026-01-17T20:06:36.150273"
   }
 ]

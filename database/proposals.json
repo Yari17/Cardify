@@ -56,10 +56,136 @@
         "quantity": 1
       }
     ],
-    "lastUpdated": "2026-01-17T15:48:22.833691",
-    "status": "PENDING",
+    "lastUpdated": "2026-01-17T16:47:21.907007",
+    "status": "REJECTED",
     "meetingPlace": "Store1",
     "meetingDate": "2026-01-19",
     "meetingTime": "13:30"
+  },
+  {
+    "proposalId": "3",
+    "proposerId": "user1",
+    "receiverId": "user2",
+    "cardsOffered": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "ecard3-1",
+        "name": "Aerodactyl",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/1/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-17T16:49:14.903998",
+    "status": "ACCEPTED",
+    "meetingPlace": "Nexus Comics",
+    "meetingDate": "2026-01-18",
+    "meetingTime": "12:00"
+  },
+  {
+    "proposalId": "4",
+    "proposerId": "user1",
+    "receiverId": "user2",
+    "cardsOffered": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "ecard3-13",
+        "name": "Jolteon",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/13/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-17T22:24:05.142602",
+    "status": "REJECTED",
+    "meetingPlace": "Store1",
+    "meetingDate": "2026-01-19",
+    "meetingTime": "17:10"
+  },
+  {
+    "proposalId": "5",
+    "proposerId": "user2",
+    "receiverId": "user1",
+    "cardsOffered": [
+      {
+        "id": "A2-047",
+        "name": "Wash Rotom",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "B1-085",
+        "name": "Mega Ampharos ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/085/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-17T22:35:18.468603",
+    "status": "PENDING",
+    "meetingPlace": "Store1",
+    "meetingDate": "2026-02-17",
+    "meetingTime": "16:15"
+  },
+  {
+    "proposalId": "6",
+    "proposerId": "user3",
+    "receiverId": "user2",
+    "cardsOffered": [
+      {
+        "id": "swsh10.5-079",
+        "name": "Mewtwo VSTAR",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/079/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      },
+      {
+        "id": "swsh10.5-011",
+        "name": "Radiant Charizard",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/011/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      },
+      {
+        "id": "A2a-047",
+        "name": "Garchomp ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "A2-007",
+        "name": "Yanmega ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/007/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-17T22:49:30.326492",
+    "status": "ACCEPTED",
+    "meetingPlace": "Store1",
+    "meetingDate": "2026-01-20",
+    "meetingTime": "17:30"
   }
 ]

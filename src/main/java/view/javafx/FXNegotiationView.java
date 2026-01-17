@@ -139,7 +139,7 @@ public class FXNegotiationView implements INegotiationView {
     public void registerOnConfirmRequested(Consumer<ProposalBean> onConfirm) { this.onConfirm = onConfirm; }
 
     @Override
-    public void setAvailableStores(List<String> storeUsernames) {
+    public void showAvailableStores(List<String> storeUsernames) {
         if (storeComboBox != null) {
             storeComboBox.getItems().clear();
             if (storeUsernames != null) storeComboBox.getItems().addAll(storeUsernames);
@@ -203,32 +203,6 @@ public class FXNegotiationView implements INegotiationView {
                 LOGGER.fine(() -> "NegotiationView refresh failed: " + ex.getMessage());
             }
         });
-    }
-
-    // METODI GET: lettura degli input correnti dalla UI per il controller
-    @Override
-    public List<CardBean> getProposedCards() {
-        return new ArrayList<>(proposedList.getItems());
-    }
-
-    @Override
-    public List<CardBean> getRequestedCards() {
-        return new ArrayList<>(requestedList.getItems());
-    }
-
-    @Override
-    public String getSelectedStore() {
-        return storeComboBox != null ? storeComboBox.getValue() : null;
-    }
-
-    @Override
-    public String getMeetingDateInput() {
-        return meetingDateField != null ? meetingDateField.getText() : null;
-    }
-
-    @Override
-    public String getMeetingTimeInput() {
-        return meetingTimeField != null ? meetingTimeField.getText() : null;
     }
 
     private void handleAdd() {

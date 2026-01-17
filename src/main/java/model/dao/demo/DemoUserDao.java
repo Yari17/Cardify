@@ -5,6 +5,7 @@ import model.domain.User;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -25,6 +26,25 @@ public class DemoUserDao implements IUserDao {
         LOGGER.info("DemoUserDao initialized - data will be volatile");
     }
 
+    // Seed users into demo DAO
+    public void loadFromCollection(Collection<User> initialUsers, Map<String, String> creds) {
+        users.clear();
+        credentials.clear();
+        if (initialUsers == null) {
+            LOGGER.log(Level.INFO, "DemoUserDao.loadFromCollection: loaded 0 users (null input)");
+            return;
+        }
+        int count = 0;
+        for (User u : initialUsers) {
+            if (u == null) continue;
+            if (u.getId() == 0) u.setId(nextId++);
+            users.put(u.getName(), u);
+            count++;
+        }
+        if (creds != null) credentials.putAll(creds);
+        LOGGER.log(Level.INFO, "DemoUserDao.loadFromCollection: loaded {0} users into memory", count);
+    }
+
     @Override
     public Optional<User> get(long id) {
         return users.values().stream()
@@ -42,7 +62,7 @@ public class DemoUserDao implements IUserDao {
             user.setId(nextId++);
         }
         users.put(user.getName(), user);
-        LOGGER.log(java.util.logging.Level.INFO, "User saved: {0}", user.getName());
+        LOGGER.log(Level.INFO, "User saved: {0}", user.getName());
     }
 
     @Override
@@ -54,7 +74,7 @@ public class DemoUserDao implements IUserDao {
             throw new IllegalStateException("User not found: " + user.getName());
         }
         users.put(user.getName(), user);
-        LOGGER.log(java.util.logging.Level.INFO, "User updated: {0}", user.getName());
+        LOGGER.log(Level.INFO, "User updated: {0}", user.getName());
     }
 
     @Override
@@ -62,7 +82,7 @@ public class DemoUserDao implements IUserDao {
         if (user != null) {
             users.remove(user.getName());
             credentials.remove(user.getName());
-            LOGGER.log(java.util.logging.Level.INFO, "User deleted: {0}", user.getName());
+            LOGGER.log(Level.INFO, "User deleted: {0}", user.getName());
         }
     }
 
@@ -97,7 +117,7 @@ public class DemoUserDao implements IUserDao {
 
         users.put(username, user);
         credentials.put(username, password);
-        LOGGER.log(java.util.logging.Level.INFO, "User registered: {0}", username);
+        LOGGER.log(Level.INFO, "User registered: {0}", username);
     }
 
     @Override

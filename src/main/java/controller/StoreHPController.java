@@ -9,7 +9,7 @@ public class StoreHPController {
 
     private final String username;
     private final ApplicationController navigationController;
-    private IStoreHPView view;
+    private view.IStoreHPView view;
 
     public StoreHPController(String username, ApplicationController navigationController) {
         this.username = username;
@@ -27,9 +27,9 @@ public class StoreHPController {
     public void setView(IStoreHPView view) {
         this.view = view;
         // Imposta anche il controller sulla view (la view sa come invocare il controller)
-        if (this.view != null) {
-            this.view.setController(this);
-            this.view.showWelcomeMessage(username);
+        if (view != null) {
+            view.setController(this);
+            view.showWelcomeMessage(username);
         }
     }
 
@@ -59,5 +59,48 @@ public class StoreHPController {
         LOGGER.log(Level.INFO, "StoreHP: richiesta di gestione scambi per {0}", username);
         // Delego la navigazione al controller dell'applicazione
         navigationController.navigateToStoreTrades(username);
+    }
+
+    /**
+     * Metodo chiamato dalla view quando l'utente vuole vedere gli scambi conclusi.
+     */
+    public void onViewCompletedTradesRequested() {
+        LOGGER.log(Level.INFO, "StoreHP: richiesta di visualizzazione scambi conclusi per {0}", username);
+        // Load completed trades and show them inside the Store Home Page (no navigation)
+        loadCompletedTrades();
+    }
+
+    /**
+     * Carica gli scambi conclusi per lo store e richiede alla view di mostrarli.
+     */
+    public void loadCompletedTrades() {
+        try {
+            model.dao.ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            java.util.List<model.domain.TradeTransaction> list = tradeDao.getStoreCompletedTrades(username);
+            java.util.List<model.bean.TradeTransactionBean> beans = new java.util.ArrayList<>();
+            if (list != null) {
+                for (model.domain.TradeTransaction t : list) {
+                    if (t == null) continue;
+                    model.bean.TradeTransactionBean b = new model.bean.TradeTransactionBean();
+                    b.setTransactionId(t.getTransactionId());
+                    b.setProposerId(t.getProposerId());
+                    b.setReceiverId(t.getReceiverId());
+                    b.setStoreId(t.getStoreId());
+                    b.setTradeDate(t.getTradeDate());
+                    b.setStatus(t.getTradeStatus() != null ? t.getTradeStatus().name() : null);
+                    beans.add(b);
+                }
+            }
+            // Delegate alla view
+            // view may be null if not set yet
+            // Use try/catch to avoid breaking navigation in case of view errors
+            try {
+                if (view != null) view.displayCompletedTrades(beans);
+            } catch (Exception ex) {
+                LOGGER.warning(() -> "Displaying completed trades failed: " + ex.getMessage());
+            }
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "loadCompletedTrades failed: " + ex.getMessage());
+        }
     }
 }

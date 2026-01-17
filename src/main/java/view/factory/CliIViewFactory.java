@@ -21,7 +21,11 @@ import view.INegotiationView;
 import view.cli.CliStoreTradeView;
 import view.IStoreTradeView;
 
+import java.util.logging.Logger;
+
 public class CliIViewFactory implements IViewFactory {
+
+    private static final Logger LOGGER = Logger.getLogger(CliIViewFactory.class.getName());
 
     private final InputManager inputManager;
 
@@ -68,6 +72,7 @@ public class CliIViewFactory implements IViewFactory {
     public ICollectorTradeView createTradeView(LiveTradeController controller) {
         CliCollectorTradeView view = new CliCollectorTradeView(inputManager);
         view.setController(controller);
+        LOGGER.info(() -> "CliIViewFactory.createTradeView -> " + view.getClass().getName());
         return view;
     }
 
@@ -93,8 +98,9 @@ public class CliIViewFactory implements IViewFactory {
 
     @Override
     public IStoreTradeView createStoreTradeView(LiveTradeController controller) {
-        CliStoreTradeView view = new CliStoreTradeView();
+        CliStoreTradeView view = new CliStoreTradeView(inputManager);
         view.setController(controller);
+        LOGGER.info(() -> "CliIViewFactory.createStoreTradeView -> " + view.getClass().getName());
         return view;
     }
 }

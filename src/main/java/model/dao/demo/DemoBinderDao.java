@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -27,6 +28,30 @@ public class DemoBinderDao implements IBinderDao {
         this.idGenerator = new AtomicLong(0);
 
         LOGGER.info("DemoBinderDao initialized - data will be volatile");
+    }
+
+    // Seed demo binders
+    public void loadFromCollection(Collection<Binder> initial) {
+        bindersById.clear();
+        bindersByOwner.clear();
+        if (initial == null) {
+            LOGGER.log(Level.INFO, "DemoBinderDao.loadFromCollection: loaded 0 binders (null input)");
+            return;
+        }
+        long max = 0;
+        int count = 0;
+        for (Binder b : initial) {
+            if (b == null) continue;
+            if (b.getId() == 0) b.setId(idGenerator.incrementAndGet());
+            if (b.getCreatedAt() == null) b.setCreatedAt(LocalDateTime.now());
+            b.setLastModified(LocalDateTime.now());
+            bindersById.put(b.getId(), b);
+            bindersByOwner.computeIfAbsent(b.getOwner(), k -> new ArrayList<>()).add(b);
+            if (b.getId() > max) max = b.getId();
+            count++;
+        }
+        if (max > 0) idGenerator.set(max);
+        LOGGER.log(Level.INFO, "DemoBinderDao.loadFromCollection: loaded {0} binders into memory", count);
     }
 
     @Override

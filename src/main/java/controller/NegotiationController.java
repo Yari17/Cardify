@@ -51,7 +51,7 @@ public class NegotiationController {
                         stores.add(u.getName());
                     }
                 }
-                view.setAvailableStores(stores);
+                view.showAvailableStores(stores);
                 // set tomorrow as hint
                 view.setMeetingDateHint(LocalDate.now().plusDays(1).toString());
             } catch (Exception ex) {
@@ -90,6 +90,12 @@ public class NegotiationController {
                  model.domain.Proposal p = mapToDomainProposal(proposalBean);
                  proposalDao.save(p);
                  if (view != null) view.showConfirmationResult(true, "Proposta inviata");
+                 // After successful send, navigate back to proposer's home page so CLI returns to homepage
+                 try {
+                     navigationController.navigateToCollectorHomePage(new model.bean.UserBean(proposerUsername, config.AppConfig.USER_TYPE_COLLECTOR));
+                 } catch (exception.NavigationException ne) {
+                     LOGGER.fine(() -> "Failed to navigate to collector home after sending proposal: " + ne.getMessage());
+                 }
                  return;
              }
          } catch (Exception ex) {

@@ -210,15 +210,27 @@ public class ApplicationController {
             LiveTradeController controller = new LiveTradeController(username, this);
             // Create the store-specific trade view and associate it with the controller
             view.IStoreTradeView storeView = viewFactory.createStoreTradeView(controller);
+            LOGGER.info(() -> "navigateToStoreTrades: created view instance: " + (storeView != null ? storeView.getClass().getName() : "<null>"));
             // controller.setStoreView(storeView); // already done by factory, but safe to call
             controller.setStoreView(storeView);
             // Ensure the view is shown first so its FXML controls are initialized
             displayView(storeView);
-            // Load both scheduled and in-progress trades after the view is displayed to guarantee UI is ready
-            controller.loadStoreScheduledTrades();
-            controller.loadStoreInProgressTrades();
+            // Do NOT auto-load lists here; the view (CLI/FX) decides when to request them.
         } catch (Exception ex) {
             throw new NavigationException("Failed to navigate to Store Trades", ex);
+        }
+    }
+
+    public void navigateToStoreCompletedTrades(String username) throws NavigationException {
+        try {
+            LiveTradeController controller = new LiveTradeController(username, this);
+            view.IStoreTradeView storeView = viewFactory.createStoreTradeView(controller);
+            controller.setStoreView(storeView);
+            displayView(storeView);
+            // After showing the view, ask the controller to load completed trades
+            controller.loadStoreCompletedTrades();
+        } catch (Exception ex) {
+            throw new NavigationException("Failed to navigate to Store Completed Trades", ex);
         }
     }
 
@@ -297,6 +309,7 @@ public class ApplicationController {
         }
 
         viewStack.addLast(newView);
+        LOGGER.info(() -> "displayView: about to display view instance: " + (newView != null ? newView.getClass().getName() : "<null>"));
         try {
             newView.display();
         } catch (Exception ex) {

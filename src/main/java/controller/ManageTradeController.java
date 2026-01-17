@@ -11,7 +11,6 @@ import view.cli.CliManageTradeView;
 import view.javafx.FXManageTradeView;
 import view.IManageTradeView;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -141,24 +140,6 @@ public class ManageTradeController {
         }
     }
 
-    private boolean isExpired(Proposal p, LocalDateTime now) {
-        if (p == null || p.getLastUpdated() == null)
-            return false;
-        return p.getLastUpdated().plusDays(1).isBefore(now);
-    }
-
-    private void persistProposalStatusChange(Proposal p) {
-        if (p == null)
-            return;
-        if (proposalDao == null)
-            return;
-        try {
-            proposalDao.update(p);
-        } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Unable to persist proposal status change for {0}: {1}",
-                    new Object[] { p.getProposalId(), ex.getMessage() });
-        }
-    }
 
     private ProposalBean toBean(Proposal p) {
         ProposalBean b = new ProposalBean();
@@ -169,7 +150,7 @@ public class ManageTradeController {
         b.setMeetingDate(p.getMeetingDate());
         b.setMeetingTime(p.getMeetingTime());
         b.setStatus(p.getStatus() != null ? p.getStatus().name() : null);
-        b.setLastUpdated(p.getLastUpdated());
+        // mapping dei campi essenziali
         b.setOffered(mapCardsToBeans(p.getCardsOffered()));
         b.setRequested(mapCardsToBeans(p.getCardsRequested()));
         return b;
@@ -265,31 +246,6 @@ public class ManageTradeController {
             LOGGER.log(java.util.logging.Level.WARNING, "Failed to navigate to Live Trades: {0}", ex.getMessage());
             if (view != null)
                 view.showError("Impossibile aprire la sezione Trade");
-        }
-    }
-
-    // Helper to process a single proposal into pending or concluded lists; keeps
-    // loadUserCollection concise
-    private void processProposal(Proposal p, List<ProposalBean> pending, List<ProposalBean> concluded,
-            LocalDateTime now) {
-        try {
-            boolean expired = isExpired(p, now);
-            if (expired) {
-                p.setStatus(ProposalStatus.EXPIRED);
-                persistProposalStatusChange(p);
-            }
-
-            if (p.getStatus() == ProposalStatus.PENDING) {
-                pending.add(toBean(p));
-            } else if (p.getStatus() == ProposalStatus.REJECTED || p.getStatus() == ProposalStatus.EXPIRED || p.getStatus() == ProposalStatus.ACCEPTED) {
-                // Treat REJECTED, EXPIRED and ACCEPTED as "concluded" proposals for Manage Trades
-                concluded.add(toBean(p));
-            }
-            // NOTE: ACCEPTED proposals used to be shown only as scheduled trades; they are now
-            // also included in the concluded proposals list per product requirement.
-        } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Failed processing proposal {0}: {1}",
-                    new Object[] { p.getProposalId(), ex.getMessage() });
         }
     }
 

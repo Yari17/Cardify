@@ -457,23 +457,39 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         HBox lists = buildTradeLists(transaction);
         content.getChildren().addAll(lists);
 
-        // Se la view è in modalità store mostriamo una UI diversa con refresh e form per il session code
+        // Append the store/collector specific action area (extracted for clarity)
+        content.getChildren().add(createActionArea(transaction, statusLabel, refreshBtn, date));
+
+        Scene scene = new Scene(content, 700, 500);
+        try {
+            java.net.URL res = getClass().getResource(view.IView.themeCssPath());
+            if (res != null) scene.getStylesheets().add(res.toExternalForm());
+        } catch (Exception ex) {
+            LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage());
+        }
+        return scene;
+    }
+
+    // Extracted action area builder to reduce method size and complexity
+    private VBox createActionArea(TradeTransactionBean transaction, Label statusLabel, Button refreshBtn, Label date) {
+        VBox actionArea = new VBox(6);
+        actionArea.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         if (storeMode) {
             boolean nobodyArrived = (transaction.getProposerSessionCode() == 0 && transaction.getReceiverSessionCode() == 0);
             if (nobodyArrived) {
                 Label msg = new Label("Nessuno dei due collezionisti è ancora arrivato in negozio, quando arriverà il primo ti fornirà il suo session code da inserire qui");
                 msg.setWrapText(true);
                 msg.setStyle(TEXT_FILL_WHITE);
-                content.getChildren().add(msg);
+                actionArea.getChildren().add(msg);
 
                 javafx.scene.control.TextField codeField = new javafx.scene.control.TextField();
                 codeField.setPromptText("Inserisci session code");
-                content.getChildren().add(codeField);
+                actionArea.getChildren().add(codeField);
 
                 HBox buttons = new HBox(8);
                 Button submit = new Button("Conferma codice");
-                buttons.getChildren().addAll(submit, refreshBtn); // usa lo stesso refreshBtn
-                content.getChildren().add(buttons);
+                buttons.getChildren().addAll(submit, refreshBtn);
+                actionArea.getChildren().add(buttons);
 
                 submit.setOnAction(ev -> {
                     String txt = codeField.getText();
@@ -488,22 +504,18 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                                 submit.setDisable(true);
                             }
                         } else {
-                            Label err = new Label("Codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); content.getChildren().add(err);
+                            Label err = new Label("Codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); actionArea.getChildren().add(err);
                         }
                     } catch (NumberFormatException _) {
-                        Label err = new Label("Formato codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); content.getChildren().add(err);
+                        Label err = new Label("Formato codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); actionArea.getChildren().add(err);
                     }
                     ev.consume();
                 });
             } else {
                 // Almeno uno è arrivato: mostra informazioni e pulsante refresh
-                content.getChildren().addAll(statusLabel, refreshBtn);
+                actionArea.getChildren().addAll(statusLabel, refreshBtn);
             }
         } else {
-            // Collector mode: if current user already arrived, show persistent code and hide confirm button
-            VBox actionArea = new VBox(6);
-            actionArea.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
             boolean userIsProposer = currentUsername != null && currentUsername.equals(transaction.getProposerId());
             boolean userIsReceiver = currentUsername != null && currentUsername.equals(transaction.getReceiverId());
 
@@ -515,11 +527,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
             } else {
                 Button confirmBtn = new Button("Conferma la tua presenza");
                 confirmBtn.setOnAction(ev -> {
-                    if (controller == null) {
-                        showError("Controller non connesso");
-                        ev.consume();
-                        return;
-                    }
+                    if (controller == null) { showError("Controller non connesso"); ev.consume(); return; }
                     int code = controller.confirmPresence(transaction.getTransactionId());
                     if (code > 0) {
                         Label codeLabel = new Label(PRESENCE_CONFIRMED_MSG + code + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
@@ -527,9 +535,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                         actionArea.getChildren().add(codeLabel);
                         model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
                         if (updated != null) {
-                            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) {
-                                // ignore
-                            }
+                            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) { /* ignore */ }
                         }
                         displayScheduledTrades(java.util.List.of(updated != null ? updated : transaction));
                         refresh();
@@ -540,18 +546,8 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                 });
                 actionArea.getChildren().add(confirmBtn);
             }
-
-            content.getChildren().add(actionArea);
         }
-
-        Scene scene = new Scene(content, 700, 500);
-        try {
-            java.net.URL res = getClass().getResource(view.IView.themeCssPath());
-            if (res != null) scene.getStylesheets().add(res.toExternalForm());
-        } catch (Exception ex) {
-            LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage());
-        }
-        return scene;
+        return actionArea;
     }
 
     private HBox buildTradeLists(TradeTransactionBean transaction) {

@@ -247,4 +247,28 @@ public class JsonTradeDao implements ITradeDao {
         return result;
     }
 
+    @Override
+    public List<TradeTransaction> getStoreCompletedTrades(String storeId) {
+        List<TradeTransaction> result = new ArrayList<>();
+        if (storeId == null) return result;
+        for (TradeTransaction t : tradesById.values()) {
+            if (t == null) continue;
+            if (!storeId.equals(t.getStoreId())) continue;
+            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+            if (s == model.domain.enumerations.TradeStatus.COMPLETED || s == model.domain.enumerations.TradeStatus.CANCELLED) {
+                result.add(t);
+            }
+        }
+        // Diagnostic logging
+        try {
+            if (result.isEmpty()) LOGGER.info(() -> "JsonTradeDao.getStoreCompletedTrades: found 0 completed trades for store=" + storeId);
+            else {
+                StringBuilder ids = new StringBuilder();
+                for (TradeTransaction tt : result) ids.append(tt.getTransactionId()).append(',');
+                LOGGER.info(() -> "JsonTradeDao.getStoreCompletedTrades: found " + result.size() + " completed trades for store=" + storeId + " ids=" + ids.toString());
+            }
+        } catch (Exception ex) { LOGGER.fine(() -> "JsonTradeDao.getStoreCompletedTrades logging failed: " + ex.getMessage()); }
+        return result;
+    }
+
 }

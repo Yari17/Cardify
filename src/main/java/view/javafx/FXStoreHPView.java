@@ -2,17 +2,23 @@ package view.javafx;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import controller.StoreHPController;
 import view.IStoreHPView;
+import model.bean.TradeTransactionBean;
 
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
 
 public class FXStoreHPView implements IStoreHPView {
     private static final Logger LOGGER = Logger.getLogger(FXStoreHPView.class.getName());
 
     @FXML
     private Label welcomeLabel;
+
+    @FXML
+    private ListView<TradeTransactionBean> completedList;
 
     private StoreHPController controller;
     private Stage stage;
@@ -21,6 +27,17 @@ public class FXStoreHPView implements IStoreHPView {
     private void initialize() {
         // Inizializzazione UI: eventuali impostazioni locali della view
         // Non eseguiamo logica di business qui (passare al controller)
+        if (completedList != null) {
+            completedList.setCellFactory(lv -> new javafx.scene.control.ListCell<>() {
+                @Override protected void updateItem(TradeTransactionBean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) { setText(null); setGraphic(null); return; }
+                    String p = item.getProposerId() != null ? item.getProposerId() : "?";
+                    String r = item.getReceiverId() != null ? item.getReceiverId() : "?";
+                    setText("tx-" + item.getTransactionId() + " — " + p + " vs " + r + " [" + (item.getStatus() != null ? item.getStatus() : "?") + "]");
+                }
+            });
+        }
     }
 
     @Override
@@ -66,6 +83,26 @@ public class FXStoreHPView implements IStoreHPView {
                 // re-apply current text to force UI update
                 welcomeLabel.setText(welcomeLabel.getText());
             }
+            if (completedList != null) completedList.refresh();
+        });
+    }
+
+    @Override
+    public void displayCompletedTrades(java.util.List<TradeTransactionBean> completed) {
+        javafx.application.Platform.runLater(() -> {
+            LOGGER.info(() -> "FXStoreHPView.displayCompletedTrades called with count=" + (completed == null ? 0 : completed.size()));
+            if (completedList == null) {
+                LOGGER.warning("completedList is null - ensure FXML contains the ListView with fx:id=completedList");
+                return;
+            }
+            if (completed == null || completed.isEmpty()) {
+                completedList.setItems(FXCollections.observableArrayList());
+                return;
+            }
+            completedList.setItems(FXCollections.observableArrayList(completed));
+            completedList.setVisible(true);
+            completedList.setManaged(true);
+            completedList.refresh();
         });
     }
 
@@ -87,6 +124,13 @@ public class FXStoreHPView implements IStoreHPView {
     private void onManageTradesClicked() {
         if (controller != null) {
             controller.onManageTradesRequested();
+        }
+    }
+
+    @FXML
+    private void onViewCompletedTradesClicked() {
+        if (controller != null) {
+            controller.onViewCompletedTradesRequested();
         }
     }
 

@@ -33,5 +33,86 @@
     "receiverReviewed": false,
     "proposerInspectionOk": true,
     "receiverInspectionOk": true
+  },
+  {
+    "transactionId": 1285913425,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "user1",
+    "receiverId": "user2",
+    "proposerSessionCode": 120044,
+    "receiverSessionCode": 246670,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Nexus Comics",
+    "creationTimestamp": "2026-01-17T16:49:14.906256",
+    "tradeDate": "2026-01-18T12:00",
+    "offeredCards": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "ecard3-1",
+        "name": "Aerodactyl",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/1/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false,
+    "proposerInspectionOk": true
+  },
+  {
+    "transactionId": 1307528872,
+    "tradeStatus": "PARTIALLY_ARRIVED",
+    "proposerId": "user3",
+    "receiverId": "user2",
+    "proposerSessionCode": 0,
+    "receiverSessionCode": 198178,
+    "proposerArrived": false,
+    "receiverArrived": true,
+    "storeId": "Store1",
+    "creationTimestamp": "2026-01-17T22:49:30.353282",
+    "tradeDate": "2026-01-20T17:30",
+    "offeredCards": [
+      {
+        "id": "swsh10.5-079",
+        "name": "Mewtwo VSTAR",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/079/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      },
+      {
+        "id": "swsh10.5-011",
+        "name": "Radiant Charizard",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/011/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      },
+      {
+        "id": "A2a-047",
+        "name": "Garchomp ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "A2-007",
+        "name": "Yanmega ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/007/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
   }
 ]

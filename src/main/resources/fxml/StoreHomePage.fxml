@@ -28,8 +28,12 @@
                     <children>
                         <Button text="Gestisci scambi" prefWidth="200.0" prefHeight="50.0"
                                 styleClass="button-accent" onAction="#onManageTradesClicked"/>
+                        <Button text="Scambi conclusi" prefWidth="200.0" prefHeight="50.0"
+                                styleClass="button-secondary" onAction="#onViewCompletedTradesClicked"/>
                     </children>
                 </HBox>
+
+                <ListView fx:id="completedList" prefHeight="200.0"/>
 
                 <Separator styleClass="nav-separator"/>
 

@@ -310,6 +310,8 @@ public class LiveTradeController {
     // Navigate to the live trade view for the given proposal (delegates to ApplicationController)
     public void startTrade(String proposalId) {
         try {
+            // Use the incoming proposalId for diagnostic purposes; navigation remains by username
+            LOGGER.fine(() -> "startTrade requested for proposalId=" + proposalId + " user=" + username);
             navigationController.navigateToTrade(username);
         } catch (Exception ex) {
             LOGGER.warning(() -> "startTrade navigation failed: " + ex.getMessage());
@@ -528,12 +530,6 @@ public class LiveTradeController {
         }
     }
 
-    // Backwards-compatible entry point used by view factories / ApplicationController
-    public void loadCompletedTrades() {
-        // Delegate to collector-specific implementation for clarity
-        loadCollectorCompletedTrades();
-    }
-
     /**
      * Carica e mostra solo gli scambi conclusi (COMPLETED o CANCELLED) per il collezionista.
      */
@@ -547,21 +543,35 @@ public class LiveTradeController {
                     LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned 0 completed trades for user=" + username);
                 } else {
                     StringBuilder ids = new StringBuilder();
-                    for (TradeTransaction t : all) ids.append(t.getTransactionId()).append(',');
-                    LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned " + all.size() + " completed trades for user=" + username + " ids=" + ids.toString());
-                }
-            } catch (Exception ex) {
-                LOGGER.fine(() -> "LiveTradeController.loadCollectorCompletedTrades logging failed: " + ex.getMessage());
-            }
+                    for (TradeTransaction t : all) { if (t != null) ids.append(t.getTransactionId()).append(','); }
+                    LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned " + all.size() + " completed trades for user=" + username + " ids=" + ids);
+                 }
+             } catch (Exception ex) {
+                 LOGGER.fine(() -> "LiveTradeController.loadCollectorCompletedTrades logging failed: " + ex.getMessage());
+             }
+             List<TradeTransactionBean> completed = new ArrayList<>();
+            if (all != null) for (TradeTransaction t : all) completed.add(toBean(t));
+             if (view != null) {
+                 view.displayCompletedTrades(completed);
+             }
+         } catch (Exception ex) {
+             LOGGER.warning(() -> "loadCollectorCompletedTrades failed: " + ex.getMessage());
+         }
+     }
+
+    /**
+     * Carica e mostra solo gli scambi conclusi (COMPLETED o CANCELLED) per lo store.
+     */
+    public void loadStoreCompletedTrades() {
+        try {
+            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            List<TradeTransaction> all = tradeDao.getStoreCompletedTrades(username);
+            if (all == null) all = new ArrayList<>();
             List<TradeTransactionBean> completed = new ArrayList<>();
-            for (TradeTransaction t : all) {
-                completed.add(toBean(t));
-            }
-            if (view != null) {
-                view.displayCompletedTrades(completed);
-            }
+            for (TradeTransaction t : all) completed.add(toBean(t));
+            if (storeView != null) storeView.displayCompletedTrades(completed);
         } catch (Exception ex) {
-            LOGGER.warning(() -> "loadCollectorCompletedTrades failed: " + ex.getMessage());
+            LOGGER.fine(() -> "loadStoreCompletedTrades failed: " + ex.getMessage());
         }
     }
-}
+ }

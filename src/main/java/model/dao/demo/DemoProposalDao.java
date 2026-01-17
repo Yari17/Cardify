@@ -7,10 +7,43 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DemoProposalDao implements IProposalDao {
+    private static final Logger LOGGER = Logger.getLogger(DemoProposalDao.class.getName());
     private final Map<String, Proposal> map = new ConcurrentHashMap<>();
     private final AtomicLong idGen = new AtomicLong(0);
+
+    public DemoProposalDao() {
+        LOGGER.info("DemoProposalDao initialized - data will be volatile");
+    }
+
+    // Allow seeding demo data
+    public void loadFromCollection(Collection<Proposal> initial) {
+        map.clear();
+        if (initial == null) {
+            LOGGER.log(Level.INFO, "DemoProposalDao.loadFromCollection: loaded 0 proposals (null input)");
+            return;
+        }
+        long max = 0;
+        int count = 0;
+        for (Proposal p : initial) {
+            if (p == null) continue;
+            if (p.getProposalId() == null || p.getProposalId().isEmpty()) {
+                p.setProposalId(String.valueOf(idGen.incrementAndGet()));
+            }
+            map.put(p.getProposalId(), p);
+            try {
+                long numeric = Long.parseLong(p.getProposalId());
+                if (numeric > max) max = numeric;
+            } catch (NumberFormatException ignored) {
+            }
+            count++;
+        }
+        if (max > 0) idGen.set(max);
+        LOGGER.log(Level.INFO, "DemoProposalDao.loadFromCollection: loaded {0} proposals into memory", count);
+    }
 
     @Override
     public List<Proposal> getAll() {
@@ -29,6 +62,7 @@ public class DemoProposalDao implements IProposalDao {
         }
         proposal.setLastUpdated(LocalDateTime.now());
         map.put(proposal.getProposalId(), proposal);
+        LOGGER.log(Level.INFO, "Saved proposal {0} into demo memory", proposal.getProposalId());
     }
 
     @Override
@@ -36,12 +70,14 @@ public class DemoProposalDao implements IProposalDao {
         if (proposal == null || proposal.getProposalId() == null) return;
         proposal.setLastUpdated(LocalDateTime.now());
         map.put(proposal.getProposalId(), proposal);
+        LOGGER.log(Level.INFO, "Updated proposal {0} in demo memory", proposal.getProposalId());
     }
 
     @Override
     public void delete(Proposal proposal) {
         if (proposal == null || proposal.getProposalId() == null) return;
         map.remove(proposal.getProposalId());
+        LOGGER.log(Level.INFO, "Deleted proposal {0} from demo memory", proposal.getProposalId());
     }
 
     @Override
@@ -109,18 +145,14 @@ public class DemoProposalDao implements IProposalDao {
     public List<Proposal> getCompletedProposals(String username) {
         List<Proposal> res = new ArrayList<>();
         for (Proposal p : map.values()) {
-            // Avoid using multiple continue/break statements: use structured ifs instead
-            if (p == null) {
-                // skip null entries
-            } else {
-                boolean involves = (username == null) || username.equals(p.getProposerId()) || username.equals(p.getReceiverId());
-                if (involves) {
-                    model.domain.enumerations.ProposalStatus s = p.getStatus();
-                    if (s == model.domain.enumerations.ProposalStatus.ACCEPTED
-                            || s == model.domain.enumerations.ProposalStatus.REJECTED
-                            || s == model.domain.enumerations.ProposalStatus.EXPIRED) {
-                        res.add(p);
-                    }
+            if (p == null) continue; // single continue allowed
+            boolean involves = (username == null) || username.equals(p.getProposerId()) || username.equals(p.getReceiverId());
+            if (involves) {
+                model.domain.enumerations.ProposalStatus s = p.getStatus();
+                if (s == model.domain.enumerations.ProposalStatus.ACCEPTED
+                        || s == model.domain.enumerations.ProposalStatus.REJECTED
+                        || s == model.domain.enumerations.ProposalStatus.EXPIRED) {
+                    res.add(p);
                 }
             }
         }
