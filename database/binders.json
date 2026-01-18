@@ -824,5 +824,43 @@
     ],
     "createdAt": "2026-01-18T01:40:30.421265",
     "lastModified": "2026-01-18T01:40:30.423843"
+  },
+  {
+    "id": 32,
+    "owner": "collectortest1",
+    "setId": "P-A",
+    "setName": "Promos-A",
+    "cards": [
+      {
+        "id": "P-A-010",
+        "name": "Mewtwo",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/P-A/010/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-18T23:41:28.227335",
+    "lastModified": "2026-01-18T23:41:44.998077"
+  },
+  {
+    "id": 35,
+    "owner": "collectortest2",
+    "setId": "sm115",
+    "setName": "Hidden Fates",
+    "cards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 4,
+        "isTradable": true,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-18T23:44:13.576288",
+    "lastModified": "2026-01-18T23:44:28.245824"
   }
 ]

@@ -18,6 +18,8 @@ public class FXRegistrationView implements IRegistrationView {
     @FXML private PasswordField passwordField;
     @FXML private ComboBox<String> userTypeComboBox;
     @FXML private Label messageLabel;
+    @FXML private Button backButton;
+    @FXML private javafx.scene.control.ComboBox<String> persistenceComboBox;
     @FXML private Label persistenceLabel;
 
     
@@ -42,6 +44,20 @@ public class FXRegistrationView implements IRegistrationView {
             
             userTypeComboBox.getSelectionModel().selectFirst();
         }
+        // Initialize persistence combo only if not demo mode
+        try {
+            String cfg = config.AppConfig.getPersistenceType();
+            if (config.AppConfig.DAO_TYPE_MEMORY.equals(cfg)) {
+                if (persistenceComboBox != null) persistenceComboBox.setVisible(false);
+            } else {
+                if (persistenceComboBox != null) {
+                    persistenceComboBox.getItems().addAll("JSON", "JDBC");
+                    persistenceComboBox.getSelectionModel().select("JSON");
+                }
+            }
+        } catch (Exception ex) {
+            if (persistenceComboBox != null) persistenceComboBox.setVisible(false);
+        }
     }
 
     @FXML
@@ -58,7 +74,18 @@ public class FXRegistrationView implements IRegistrationView {
         }
     }
 
-    
+    @FXML
+    private void onBackClicked() {
+        try {
+            if (appController != null) {
+                appController.onBackToLoginRequested();
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Back action failed", ex);
+        }
+    }
+
+
 
     @Override
     public UserBean getUserData() {
@@ -151,5 +178,13 @@ public class FXRegistrationView implements IRegistrationView {
                 LOGGER.fine(() -> "RegistrationView refresh failed: " + ex.getMessage());
             }
         });
+    }
+
+    @Override
+    public model.domain.enumerations.PersistenceType getPersistenceType() {
+        if (persistenceComboBox == null || !persistenceComboBox.isVisible()) return null;
+        String val = persistenceComboBox.getValue();
+        if ("JDBC".equalsIgnoreCase(val)) return model.domain.enumerations.PersistenceType.JDBC;
+        return model.domain.enumerations.PersistenceType.JSON;
     }
  }

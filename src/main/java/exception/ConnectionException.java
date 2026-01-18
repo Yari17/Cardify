@@ -8,8 +8,5 @@ package exception;
  * data couldn't be fetched because of network issues.
  */
 public class ConnectionException extends RuntimeException {
-    public ConnectionException() { super(); }
-    public ConnectionException(String message) { super(message); }
     public ConnectionException(String message, Throwable cause) { super(message, cause); }
-    public ConnectionException(Throwable cause) { super(cause); }
 }

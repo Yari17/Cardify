@@ -116,6 +116,14 @@ public class ApplicationController {
         displayView(view);
     }
 
+    // Navigate to registration using a provided IUserDao (selected at runtime)
+    public void navigateToRegistrationWithDao(model.dao.IUserDao userDaoForRegistration) throws NavigationException {
+        RegistrationController controller = new RegistrationController(userDaoForRegistration, this);
+        IRegistrationView view = viewFactory.createRegistrationView(controller);
+        controller.setView(view);
+        displayView(view);
+    }
+
     public void navigateToCollectorHomePage(UserBean user) throws NavigationException {
         model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
         CollectorHPController controller = new CollectorHPController(user.getUsername(), this, binderDao);

@@ -11,7 +11,7 @@ public class DBConnector {
     // L'oggetto Connection che rimarrà sempre aperto e unico
     private final Connection connection;
 
-    private static final String URL = "jdbc:mysql://localhost:3306/cardify"; // Il tuo DB
+    private static final String URL = "jdbc:mysql://localhost:3306/Cardify"; // Il tuo DB
     private static final String USER = "root";
     //si lascia la password hardcoded per facilitare lo sviluppo locale, ovviemente in produzione andrebbe gestita in modo sicuro
     private static final String PASSWORD="password";

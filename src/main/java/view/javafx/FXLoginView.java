@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import config.AppConfig;
 import controller.LoginController;
 import model.bean.UserBean;
+import model.domain.enumerations.PersistenceType;
 import view.ILoginView;
 
 import java.util.logging.Level;
@@ -18,6 +19,7 @@ public class FXLoginView implements ILoginView {
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
     @FXML private Label persistenceLabel;
+    @FXML private javafx.scene.control.ComboBox<String> persistenceComboBox;
 
     
     private LoginController loginController;
@@ -30,13 +32,28 @@ public class FXLoginView implements ILoginView {
         if (persistenceLabel != null) {
             persistenceLabel.setText(AppConfig.getPersistenceLabel());
         }
+        // Initialize persistence combo only if not demo mode
+        try {
+            String cfg = config.AppConfig.getPersistenceType();
+            if (config.AppConfig.DAO_TYPE_MEMORY.equals(cfg)) {
+                if (persistenceComboBox != null) persistenceComboBox.setVisible(false);
+            } else {
+                if (persistenceComboBox != null) {
+                    persistenceComboBox.getItems().addAll("JSON", "JDBC");
+                    persistenceComboBox.getSelectionModel().select("JSON");
+                }
+            }
+        } catch (Exception _) {
+            // ignore and default to hidden
+            if (persistenceComboBox != null) persistenceComboBox.setVisible(false);
+        }
     }
 
     @FXML
     private void onLoginClicked() {
         try {
             if (loginController != null) {
-                
+
                 loginController.onLoginRequested();
             } else {
                 LOGGER.warning("Application controller not set on FXLoginView");
@@ -67,6 +84,14 @@ public class FXLoginView implements ILoginView {
         String username = usernameField != null ? usernameField.getText() : "";
         String password = passwordField != null ? passwordField.getText() : "";
         return new UserBean(username, password);
+    }
+
+    @Override
+    public PersistenceType getPersistenceType() {
+        if (persistenceComboBox == null || !persistenceComboBox.isVisible()) return null;
+        String val = persistenceComboBox.getValue();
+        if ("JDBC".equalsIgnoreCase(val)) return PersistenceType.JDBC;
+        return PersistenceType.JSON;
     }
 
     @Override

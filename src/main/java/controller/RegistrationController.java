@@ -51,4 +51,13 @@ public class RegistrationController {
             view.showInputError("Si è verificato un errore. Riprova.");
         }
     }
+
+    // Handle back/cancel action from the registration view
+    public void onBackToLoginRequested() {
+        try {
+            navigationController.navigateToLogin();
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Failed to navigate back to login", ex);
+        }
+    }
 }

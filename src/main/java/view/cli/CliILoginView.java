@@ -4,6 +4,7 @@ import controller.LoginController;
 import model.bean.UserBean;
 import config.InputManager;
 import javafx.stage.Stage;
+import model.domain.enumerations.PersistenceType;
 import view.ILoginView;
 
 
@@ -12,6 +13,7 @@ public class CliILoginView implements ILoginView {
     private LoginController controller;
     private String username;
     private String password;
+    private model.domain.enumerations.PersistenceType selectedPersistence = null;
 
     public CliILoginView(InputManager inputManager) {
         this.inputManager = inputManager;
@@ -58,6 +60,17 @@ public class CliILoginView implements ILoginView {
         System.out.print("Password: ");
         this.password = inputManager.readString();
 
+        // Ask the user which persistence to use for this login (unless app in demo)
+        String appMode = config.AppConfig.getPersistenceType();
+        if (!config.AppConfig.DAO_TYPE_MEMORY.equals(appMode)) {
+            System.out.println("Scegli persistenza per il login: 1) JSON  2) JDBC");
+            System.out.print("Scelta (1-2, default 1): ");
+            String p = inputManager.readString();
+            selectedPersistence = "2".equals(p) ? model.domain.enumerations.PersistenceType.JDBC : model.domain.enumerations.PersistenceType.JSON;
+        } else {
+            selectedPersistence = model.domain.enumerations.PersistenceType.DEMO;
+        }
+
         if (controller != null) {
             controller.onLoginRequested();
         }
@@ -68,6 +81,11 @@ public class CliILoginView implements ILoginView {
     @Override
     public UserBean getUserCredentials() {
         return new UserBean(username, password);
+    }
+
+    @Override
+    public PersistenceType getPersistenceType() {
+        return selectedPersistence;
     }
 
     @Override

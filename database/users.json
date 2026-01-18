@@ -7,6 +7,13 @@
       "reviewCount": 0,
       "userType": "Collezionista"
     },
+    "newuser": {
+      "id": 0,
+      "name": "newuser",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
     "nexus_comics": {
       "id": 14,
       "name": "Nexus Comics",
@@ -112,9 +119,23 @@
       "reviewCount": 0,
       "userType": "Collezionista"
     },
+    "collectortest2": {
+      "id": 0,
+      "name": "collectortest2",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
     "marco_rossi": {
       "id": 3,
       "name": "Marco Rossi",
+      "reliabilityScore": 0,
+      "reviewCount": 0,
+      "userType": "Collezionista"
+    },
+    "collectortest1": {
+      "id": 0,
+      "name": "collectortest1",
       "reliabilityScore": 0,
       "reviewCount": 0,
       "userType": "Collezionista"
@@ -143,6 +164,7 @@
   },
   "credentials": {
     "user1": "password",
+    "newuser": "password123",
     "nexus_comics": "password",
     "user2": "password",
     "alessandro_bianchi": "password",
@@ -158,7 +180,9 @@
     "giulia_neri": "password",
     "elena_sanna": "password",
     "lucia_ferri": "password",
+    "collectortest2": "password",
     "marco_rossi": "password",
+    "collectortest1": "password",
     "andrea_marini": "password",
     "CiccioGamer89TCG": "password",
     "giochi_di_carta": "password"

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import config.DBConnector;
 
 public class JdbcUserDao implements IUserDao {
     private static final Logger LOGGER = Logger.getLogger(JdbcUserDao.class.getName());
@@ -44,7 +45,14 @@ public class JdbcUserDao implements IUserDao {
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
+        // Prefer the application's DBConnector singleton to obtain the Connection
+        try {
+            return DBConnector.getInstance().getConnection();
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "DBConnector not available, falling back to DriverManager: {0}", e.getMessage());
+            // Fallback to DriverManager if DBConnector cannot provide a connection
+            return DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
+        }
     }
 
     private void initializeDatabase() {

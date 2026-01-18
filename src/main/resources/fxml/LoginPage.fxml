@@ -20,6 +20,7 @@
                            maxWidth="300.0" styleClass="text-field-custom"/>
                 <PasswordField fx:id="passwordField" promptText="Password"
                                maxWidth="300.0" styleClass="text-field-custom"/>
+                <ComboBox fx:id="persistenceComboBox" promptText="Seleziona persistenza" maxWidth="200.0" />
                 <Button fx:id="loginButton" text="Login" maxWidth="300.0"
                         onAction="#onLoginClicked" styleClass="button-accent"/>
                 <Button fx:id="registerButton" text="Registrati" maxWidth="300.0"
