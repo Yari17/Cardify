@@ -6,13 +6,14 @@ import model.bean.TradeTransactionBean;
 import model.bean.UserBean;
 import model.dao.IBinderDao;
 import model.dao.ITradeDao;
-import model.domain.Binder;
 import model.domain.Card;
 import model.domain.TradeTransaction;
 import view.ICollectorTradeView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
 //controller Trade - kept minimal; presentation/management moved to ManageTradeController and ManageTradeView
@@ -71,11 +72,13 @@ public class LiveTradeController {
 
     private void notifyTradeStatusViews(TradeTransaction tx, int transactionId) {
         try {
-            TradeTransactionBean updatedBean = refreshTradeStatus(transactionId);
+            refreshTradeStatus(transactionId);
             if (tx.getTradeStatus() == model.domain.enumerations.TradeStatus.INSPECTION_PHASE) {
                 if (storeView != null) {
                     storeView.showMessage("Both collectors arrived. Inspection phase started for trade " + transactionId);
-                    storeView.displayTrade(updatedBean);
+                    // Do not open a new dialog here - the store view that initiated the verification
+                    // should update its existing UI. We just send a message; views can refresh themselves
+                    // if they need to by calling controller.refreshTradeStatus().
                 }
                 if (view != null) view.displayIspection();
             } else if (tx.getTradeStatus() == model.domain.enumerations.TradeStatus.PARTIALLY_ARRIVED && storeView != null) {
@@ -158,24 +161,28 @@ public class LiveTradeController {
             }
             if (storeView != null) {
                 LOGGER.info(() -> "loadScheduledTrades: dispatching " + beans.size() + " trades to store view");
-                if (!beans.isEmpty()) {
-                    TradeTransactionBean first = beans.get(0);
-                    LOGGER.fine(() -> "First trade bean: id=" + first.getTransactionId() + " proposer=" + first.getProposerId() + " receiver=" + first.getReceiverId());
-                }
+                beans.stream().findFirst().ifPresent(first -> LOGGER.fine(() -> "First trade bean: id=" + first.getTransactionId() + " proposer=" + first.getProposerId() + " receiver=" + first.getReceiverId()));
                 storeView.displayScheduledTrades(beans);
             } else if (view != null) {
                 LOGGER.info(() -> "loadScheduledTrades: dispatching " + beans.size() + " trades to collector view");
                 view.displayScheduledTrades(beans);
                 // Ensure completed trades are also loaded for collector views (diagnostic)
-                try {
-                    LOGGER.info(() -> "loadScheduledTrades: now loading completed trades for user=" + username);
-                    loadCollectorCompletedTrades();
-                } catch (Exception ex) {
-                    LOGGER.fine(() -> "loadScheduledTrades: failed to load completed trades: " + ex.getMessage());
-                }
+                safeLoadCollectorCompletedTrades();
             }
         } catch (Exception ex) {
             LOGGER.fine(() -> "loadScheduledTrades failed: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Helper that wraps the diagnostic loading of collector completed trades used from the UI thread.
+     */
+    private void safeLoadCollectorCompletedTrades() {
+        try {
+            LOGGER.info(() -> "loadScheduledTrades: now loading completed trades for user=" + username);
+            loadCollectorCompletedTrades();
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "loadScheduledTrades: failed to load completed trades: " + ex.getMessage());
         }
     }
 
@@ -365,20 +372,42 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Segnala l'esito negativo dell'ispezione per un collector: annulla lo scambio.
-     */
     public boolean failInspection(int transactionId, String collectorId) {
         return recordInspectionResult(transactionId, collectorId, false);
     }
 
     /**
-     * Conclude lo scambio manualmente, impostando lo stato a COMPLETED e trasferendo le carte.
+     * Mark the inspection as passed for the transaction (store confirms inspection).
+     * This forces the transaction into INSPECTION_PASSED and persists the change.
      */
-    public boolean completeTrade(int transactionId) {
-        return concludeTrade(transactionId);
+    public boolean markInspectionPassed(int transactionId) {
+        try {
+            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
+            if (tx == null) {
+                LOGGER.warning(() -> "markInspectionPassed: TradeTransaction not found for id " + transactionId);
+                return false;
+            }
+            tx.updateTradeStatus(model.domain.enumerations.TradeStatus.INSPECTION_PASSED);
+            tradeDao.save(tx);
+            // Notify UI
+            TradeTransactionBean bean = refreshTradeStatus(transactionId);
+            if (storeView != null) {
+                storeView.displayTrade(bean);
+                storeView.showMessage(TRADE_PREFIX + transactionId + " inspection passed.");
+            }
+            if (view != null) {
+                // Inform collector views if needed (username unknown here)
+                view.onIspectionComplete(null);
+            }
+            return true;
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "markInspectionPassed failed: " + ex.getMessage());
+            return false;
+        }
     }
 
+    // Utility to safely cast a raw object (from DAO) into a List<Card> when possible.
     private List<Card> toCardList(Object obj) {
         if (obj instanceof List<?> raw) {
             List<Card> result = new ArrayList<>();
@@ -392,53 +421,16 @@ public class LiveTradeController {
 
     /**
      * Effettua lo scambio delle carte tra i binders dei collezionisti.
-     * Per ogni carta trasferita, controlla se il ricevente ha già un binder per il set della carta.
-     * Se non esiste, lo crea e aggiunge la carta. Se esiste, aggiunge la carta al binder.
-     * Il controllo viene fatto per entrambi i collezionisti.
+     * Delegates the detailed operations to CardExchangeManager to keep this controller small.
      */
     public void performCardExchange(TradeTransaction tx) {
-        IBinderDao binderDao = navigationController.getDaoFactory().createBinderDao();
-        // Usa il provider polimorfico
-        model.api.ICardProvider cardProvider = navigationController.getCardProvider();
-        // Scambio carte offerte dal proposer al receiver
-        for (Card card : tx.getOfferedCards()) {
-            String receiver = tx.getReceiverId();
-            String setId = card.getId().split("-")[0]; // Assumendo che l'id contenga il set
-            List<Binder> receiverBinders = binderDao.getUserBinders(receiver);
-            Binder binder = receiverBinders.stream()
-                    .filter(b -> b.getSetId().equals(setId))
-                    .findFirst()
-                    .orElse(null);
-            if (binder == null) {
-                String setName = cardProvider.getAllSets().get(setId);
-                binderDao.createBinder(receiver, setId, setName);
-                receiverBinders = binderDao.getUserBinders(receiver);
-                binder = receiverBinders.stream().filter(b -> b.getSetId().equals(setId)).findFirst().orElse(null);
-            }
-            if (binder != null) {
-                binder.addCard(card.toBean());
-                binderDao.save(binder);
-            }
-        }
-        // Scambio carte offerte dal receiver al proposer
-        for (Card card : tx.getRequestedCards()) {
-            String proposer = tx.getProposerId();
-            String setId = card.getId().split("-")[0];
-            List<Binder> proposerBinders = binderDao.getUserBinders(proposer);
-            Binder binder = proposerBinders.stream()
-                    .filter(b -> b.getSetId().equals(setId))
-                    .findFirst()
-                    .orElse(null);
-            if (binder == null) {
-                String setName = cardProvider.getAllSets().get(setId);
-                binderDao.createBinder(proposer, setId, setName);
-                proposerBinders = binderDao.getUserBinders(proposer);
-                binder = proposerBinders.stream().filter(b -> b.getSetId().equals(setId)).findFirst().orElse(null);
-            }
-            if (binder != null) {
-                binder.addCard(card.toBean());
-                binderDao.save(binder);
-            }
+        try {
+            IBinderDao binderDao = navigationController.getDaoFactory().createBinderDao();
+            model.api.ICardProvider cardProvider = navigationController.getCardProvider();
+            CardExchangeManager manager = new CardExchangeManager(binderDao, cardProvider);
+            manager.executeExchange(tx);
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "performCardExchange failed delegated execution: " + ex.getMessage());
         }
     }
 
@@ -538,26 +530,34 @@ public class LiveTradeController {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
             List<TradeTransaction> all = tradeDao.getUserCompletedTrades(username);
             // Diagnostic: log how many completed trades were returned by DAO
-            try {
-                if (all == null || all.isEmpty()) {
-                    LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned 0 completed trades for user=" + username);
-                } else {
-                    StringBuilder ids = new StringBuilder();
-                    for (TradeTransaction t : all) { if (t != null) ids.append(t.getTransactionId()).append(','); }
-                    LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned " + all.size() + " completed trades for user=" + username + " ids=" + ids);
-                 }
-             } catch (Exception ex) {
-                 LOGGER.fine(() -> "LiveTradeController.loadCollectorCompletedTrades logging failed: " + ex.getMessage());
-             }
-             List<TradeTransactionBean> completed = new ArrayList<>();
-            if (all != null) for (TradeTransaction t : all) completed.add(toBean(t));
-             if (view != null) {
-                 view.displayCompletedTrades(completed);
-             }
+            logCompletedTradesDiagnostic(all);
+            List<TradeTransactionBean> completed = new ArrayList<>();
+            if (all != null) {
+                for (TradeTransaction t : all) {
+                    completed.add(toBean(t));
+                }
+            }
+            if (view != null) {
+                view.displayCompletedTrades(completed);
+            }
          } catch (Exception ex) {
              LOGGER.warning(() -> "loadCollectorCompletedTrades failed: " + ex.getMessage());
          }
      }
+
+    // Extracted helper for diagnostic logging to satisfy single responsibility and ease testing
+    private void logCompletedTradesDiagnostic(List<TradeTransaction> all) {
+        try {
+            if (all == null || all.isEmpty()) {
+                LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned 0 completed trades for user=" + username);
+            } else {
+                String ids = all.stream().filter(Objects::nonNull).map(t -> String.valueOf(t.getTransactionId())).collect(Collectors.joining(","));
+                LOGGER.info(() -> "LiveTradeController.loadCollectorCompletedTrades: DAO returned " + all.size() + " completed trades for user=" + username + " ids=" + ids);
+            }
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "LiveTradeController.loadCollectorCompletedTrades logging failed: " + ex.getMessage());
+        }
+    }
 
     /**
      * Carica e mostra solo gli scambi conclusi (COMPLETED o CANCELLED) per lo store.
@@ -572,6 +572,36 @@ public class LiveTradeController {
             if (storeView != null) storeView.displayCompletedTrades(completed);
         } catch (Exception ex) {
             LOGGER.fine(() -> "loadStoreCompletedTrades failed: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Cancella una trade transaction: imposta lo stato a CANCELLED e persiste la modifica.
+     * Utilizzato dallo store quando segnala un problema durante l'ispezione.
+     */
+    public boolean cancelTrade(int transactionId) {
+        try {
+            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
+            if (tx == null) {
+                LOGGER.warning(() -> "cancelTrade: TradeTransaction not found for id " + transactionId);
+                return false;
+            }
+            tx.updateTradeStatus(model.domain.enumerations.TradeStatus.CANCELLED);
+            tradeDao.save(tx);
+            // Notify UI
+            TradeTransactionBean bean = refreshTradeStatus(transactionId);
+            if (storeView != null) {
+                storeView.displayTrade(bean);
+                storeView.showMessage(TRADE_PREFIX + transactionId + " cancelled during inspection.");
+            }
+            if (view != null) {
+                view.showError(TRADE_PREFIX + transactionId + " cancelled during inspection");
+            }
+            return true;
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "cancelTrade failed: " + ex.getMessage());
+            return false;
         }
     }
  }

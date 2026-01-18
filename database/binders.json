@@ -307,7 +307,7 @@
         "name": "Radiant Charizard",
         "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/011/high.png",
         "gameType": "POKEMON",
-        "quantity": 4,
+        "quantity": 3,
         "isTradable": true,
         "status": ""
       },
@@ -343,13 +343,13 @@
         "name": "Mewtwo VSTAR",
         "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/079/high.png",
         "gameType": "POKEMON",
-        "quantity": 12,
+        "quantity": 10,
         "isTradable": true,
         "status": ""
       }
     ],
     "createdAt": "2026-01-14T11:58:00.051488",
-    "lastModified": "2026-01-15T19:46:09.850337"
+    "lastModified": "2026-01-18T01:40:30.433022"
   },
   {
     "id": 16,
@@ -481,7 +481,7 @@
         "name": "Yanmega ex",
         "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/007/high.png",
         "gameType": "POKEMON",
-        "quantity": 3,
+        "quantity": 2,
         "isTradable": true,
         "status": ""
       },
@@ -505,7 +505,7 @@
       }
     ],
     "createdAt": "2026-01-15T19:43:46.581327",
-    "lastModified": "2026-01-15T19:44:16.914233"
+    "lastModified": "2026-01-18T01:40:30.436427"
   },
   {
     "id": 20,
@@ -628,13 +628,13 @@
         "name": "Garchomp ex",
         "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/047/high.png",
         "gameType": "POKEMON",
-        "quantity": 10,
+        "quantity": 9,
         "isTradable": true,
         "status": ""
       }
     ],
     "createdAt": "2026-01-16T20:29:35.728634",
-    "lastModified": "2026-01-16T20:30:06.846206"
+    "lastModified": "2026-01-18T01:40:30.434668"
   },
   {
     "id": 23,
@@ -720,5 +720,109 @@
     ],
     "createdAt": "2026-01-17T20:06:36.147443",
     "lastModified": "2026-01-17T20:06:36.150273"
+  },
+  {
+    "id": 27,
+    "owner": "user1",
+    "setId": "A2",
+    "setName": "Space-Time Smackdown",
+    "cards": [
+      {
+        "id": "A2-047",
+        "name": "Wash Rotom",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-17T23:58:59.519045",
+    "lastModified": "2026-01-17T23:58:59.525741"
+  },
+  {
+    "id": 28,
+    "owner": "user2",
+    "setId": "B1",
+    "setName": "Mega Rising",
+    "cards": [
+      {
+        "id": "B1-085",
+        "name": "Mega Ampharos ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/085/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-17T23:58:59.532962",
+    "lastModified": "2026-01-17T23:58:59.535795"
+  },
+  {
+    "id": 29,
+    "owner": "user2",
+    "setId": "swsh10.5",
+    "setName": "Pokémon GO",
+    "cards": [
+      {
+        "id": "swsh10.5-079",
+        "name": "Mewtwo VSTAR",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/079/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      },
+      {
+        "id": "swsh10.5-011",
+        "name": "Radiant Charizard",
+        "imageUrl": "https://assets.tcgdex.net/en/swsh/swsh10.5/011/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-18T01:40:30.395212",
+    "lastModified": "2026-01-18T01:40:30.408407"
+  },
+  {
+    "id": 30,
+    "owner": "user2",
+    "setId": "A2a",
+    "setName": "Triumphant Light",
+    "cards": [
+      {
+        "id": "A2a-047",
+        "name": "Garchomp ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-18T01:40:30.413843",
+    "lastModified": "2026-01-18T01:40:30.417398"
+  },
+  {
+    "id": 31,
+    "owner": "user3",
+    "setId": "A2",
+    "setName": "Space-Time Smackdown",
+    "cards": [
+      {
+        "id": "A2-007",
+        "name": "Yanmega ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/007/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-18T01:40:30.421265",
+    "lastModified": "2026-01-18T01:40:30.423843"
   }
 ]

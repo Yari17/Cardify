@@ -3,7 +3,7 @@ package view.javafx;
 
 import controller.LiveTradeController;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -21,12 +21,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.util.Duration;
 
 public class FXStoreTradeView implements IStoreTradeView {
     private static final Logger LOGGER = Logger.getLogger(FXStoreTradeView.class.getName());
 
     private LiveTradeController controller;
     private Stage stage;
+    // Debounce flag to prevent scheduling multiple delayed summary updates
+    private boolean pendingSummaryUpdate = false;
 
     @FXML
     private ListView<TradeTransactionBean> scheduledList;
@@ -54,6 +58,17 @@ public class FXStoreTradeView implements IStoreTradeView {
     @Override
     public void setController(LiveTradeController controller) {
         this.controller = controller;
+        // If the controller is set after FXMLLoader.initialize(), trigger initial data load so lists show immediately
+        javafx.application.Platform.runLater(() -> {
+            try {
+                if (this.controller != null) {
+                    this.controller.loadStoreScheduledTrades();
+                    this.controller.loadStoreInProgressTrades();
+                }
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "setController initial load failed: " + ex.getMessage());
+            }
+        });
     }
 
 
@@ -114,23 +129,35 @@ public class FXStoreTradeView implements IStoreTradeView {
             }
             scheduledList.getItems().clear();
             if (scheduled != null && !scheduled.isEmpty()) {
-                scheduledList.setItems(FXCollections.observableArrayList(scheduled));
+                // Filter out trades that are in inspection or already completed/cancelled - those belong to inProgress or completed sections
+                java.util.List<TradeTransactionBean> filtered = new java.util.ArrayList<>();
+                for (TradeTransactionBean t : scheduled) {
+                    if (t == null) continue;
+                    String s = t.getStatus() != null ? t.getStatus().toUpperCase() : "";
+                    if ("COMPLETED".equals(s) || "CANCELLED".equals(s) || "INSPECTION_PHASE".equals(s) || "INSPECTION_PASSED".equals(s)) {
+                        // skip: belongs to other section
+                        continue;
+                    }
+                    filtered.add(t);
+                }
+                scheduledList.setItems(FXCollections.observableArrayList(filtered));
                 // log IDs for debugging
                 StringBuilder ids = new StringBuilder();
-                for (TradeTransactionBean t : scheduled) ids.append(t.getTransactionId()).append(',');
-                LOGGER.info(() -> "Scheduled trades IDs: " + ids);
+                for (TradeTransactionBean t : scheduledList.getItems()) ids.append(t.getTransactionId()).append(',');
+                LOGGER.info(() -> "Scheduled trades IDs (filtered): " + ids);
                 // Ensure the list is visible and layout is refreshed
                 scheduledList.setVisible(true);
                 scheduledList.setManaged(true);
                 scheduledList.requestLayout();
                 scheduledList.refresh();
-                if (messageLabel != null) messageLabel.setText("Caricati " + scheduled.size() + " scambi");
-                LOGGER.fine(() -> "Added " + scheduled.size() + " trades to scheduledList");
+                // keep message consistent across both lists
+                updateSummaryMessage();
+                LOGGER.fine(() -> "Added " + scheduledList.getItems().size() + " trades to scheduledList");
             } else {
                 scheduledList.setItems(FXCollections.observableArrayList());
                 scheduledList.setVisible(true);
                 scheduledList.setManaged(true);
-                if (messageLabel != null) messageLabel.setText("Nessun scambio programmato al momento");
+                updateSummaryMessage();
                 LOGGER.info("No scheduled trades to display");
             }
         });
@@ -185,10 +212,13 @@ public class FXStoreTradeView implements IStoreTradeView {
                 inProgressList.setManaged(true);
                 inProgressList.requestLayout();
                 inProgressList.refresh();
+                // keep message consistent across both lists
+                updateSummaryMessage();
             } else {
                 inProgressList.setItems(FXCollections.observableArrayList());
                 inProgressList.setVisible(true);
                 inProgressList.setManaged(true);
+                updateSummaryMessage();
             }
         });
     }
@@ -258,6 +288,10 @@ public class FXStoreTradeView implements IStoreTradeView {
                 Label receiverLabel = new Label("Inserisci session code di " + transaction.getReceiverId());
                 TextField receiverField = new TextField(); receiverField.setPromptText("Codice receiver");
                 Button searchBtn = new Button("Convalida codici");
+
+                // create form container early so the searchBtn handler can hide it
+                VBox form = new VBox();
+
                 searchBtn.setOnAction(e -> {
                     if (controller == null) { showError("Controller non disponibile"); return; }
                     String ptxt = proposerField.getText().trim(); String rtxt = receiverField.getText().trim();
@@ -271,18 +305,23 @@ public class FXStoreTradeView implements IStoreTradeView {
                     TradeTransactionBean updated = controller.refreshTradeStatus(txId);
                     if (updated == null) { showError("Impossibile aggiornare lo scambio dopo la convalida"); return; }
                     applyTradeUpdate(updated, info, details, statusLabel, concludeBtn);
-                    inspectionBox.setVisible(true); inspectionBox.setManaged(true);
+                    // Show inspection controls by replacing the form content (inspectionBox is a child of form)
                     inspectionBox.getChildren().setAll(createInspectionControls(updated, info, details, statusLabel, concludeBtn, refreshBtn));
+                    inspectionBox.setVisible(true);
+                    inspectionBox.setManaged(true);
+                    // Replace the form content so the dialog displays the inspection UI instead of hiding the entire form
+                    form.getChildren().setAll(backBtn, statusLabel, info, details, inspectionBox);
+                    searchBtn.setDisable(true);
                     if (INSPECTION_PASSED.equals(updated.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
-                });
+                 });
 
-                VBox form = new VBox(10, backBtn, statusLabel, info, proposerLabel, proposerField, receiverLabel, receiverField, new HBox(8, searchBtn, refreshBtn), details, inspectionBox);
-                form.setStyle("-fx-padding: 10;");
-                Scene scene = new Scene(form, 520, 520);
-                dialog.setScene(scene);
-                dialog.show();
-                return;
-            }
+                 form.getChildren().setAll(backBtn, statusLabel, info, proposerLabel, proposerField, receiverLabel, receiverField, new HBox(8, searchBtn, refreshBtn), details, inspectionBox);
+                 form.setStyle("-fx-padding: 10;");
+                 Scene scene = new Scene(form, 520, 520);
+                 dialog.setScene(scene);
+                 dialog.show();
+                 return;
+             }
 
             VBox root = new VBox(10, backBtn, statusLabel, info, details, inspectionBox);
             root.setStyle("-fx-padding: 10;");
@@ -307,36 +346,50 @@ public class FXStoreTradeView implements IStoreTradeView {
 
     // Build inspection control buttons and wire them to update the provided UI nodes
     private List<javafx.scene.Node> createInspectionControls(TradeTransactionBean txn, Label info, TextArea details, Label statusLabel, Button concludeBtn, Button refreshBtn) {
-        Button proposerConfirm = new Button("Proponente: Conferma ispezione");
-        Button receiverConfirm = new Button("Ricevente: Conferma ispezione");
+        // Single store-level confirmation button: marks the whole inspection as passed
+        Button confirmInspection = new Button("Conferma ispezione");
         Button proposerProblem = new Button("Proponente: Segnala problema");
         Button receiverProblem = new Button("Ricevente: Segnala problema");
 
-        if (Boolean.TRUE.equals(txn.getProposerInspectionOk())) proposerConfirm.setDisable(true);
-        if (Boolean.TRUE.equals(txn.getReceiverInspectionOk())) receiverConfirm.setDisable(true);
-        if (Boolean.FALSE.equals(txn.getProposerInspectionOk())) { proposerProblem.setDisable(true); proposerConfirm.setDisable(true); }
-        if (Boolean.FALSE.equals(txn.getReceiverInspectionOk())) { receiverProblem.setDisable(true); receiverConfirm.setDisable(true); }
+        // Disable problem buttons if inspection already failed for that collector
+        if (Boolean.FALSE.equals(txn.getProposerInspectionOk())) { proposerProblem.setDisable(true); }
+        if (Boolean.FALSE.equals(txn.getReceiverInspectionOk())) { receiverProblem.setDisable(true); }
 
-        proposerConfirm.setOnAction(ev -> {
-            boolean ok = controller.recordInspectionResult(txn.getTransactionId(), txn.getProposerId(), true);
-            if (ok) { proposerConfirm.setDisable(true); proposerProblem.setDisable(true); }
-            TradeTransactionBean u2 = controller.refreshTradeStatus(txn.getTransactionId());
-            if (u2 != null) applyTradeUpdate(u2, info, details, statusLabel, concludeBtn);
-        });
+        // If inspection already passed, disable the confirm button
+        if ("INSPECTION_PASSED".equals(txn.getStatus())) confirmInspection.setDisable(true);
 
-        receiverConfirm.setOnAction(ev -> {
-            boolean ok = controller.recordInspectionResult(txn.getTransactionId(), txn.getReceiverId(), true);
-            if (ok) { receiverConfirm.setDisable(true); receiverProblem.setDisable(true); }
-            TradeTransactionBean u2 = controller.refreshTradeStatus(txn.getTransactionId());
-            if (u2 != null) applyTradeUpdate(u2, info, details, statusLabel, concludeBtn);
+        confirmInspection.setOnAction(ev -> {
+            boolean ok = false;
+            try {
+                ok = controller.markInspectionPassed(txn.getTransactionId());
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "confirmInspection failed: " + ex.getMessage());
+            }
+            if (ok) {
+                confirmInspection.setDisable(true);
+                proposerProblem.setDisable(true);
+                receiverProblem.setDisable(true);
+                TradeTransactionBean u2 = controller.refreshTradeStatus(txn.getTransactionId());
+                if (u2 != null) applyTradeUpdate(u2, info, details, statusLabel, concludeBtn);
+            }
         });
 
         proposerProblem.setOnAction(ev -> {
             Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del proponente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
             Optional<ButtonType> res = a.showAndWait();
             if (res.isPresent() && res.get() == ButtonType.YES) {
-                boolean ok = controller.recordInspectionResult(txn.getTransactionId(), txn.getProposerId(), false);
-                if (ok) { proposerProblem.setDisable(true); proposerConfirm.setDisable(true); TradeTransactionBean u2 = controller.refreshTradeStatus(txn.getTransactionId()); if (u2 != null) applyTradeUpdate(u2, info, details, statusLabel, concludeBtn); }
+                boolean ok = false;
+                try {
+                    ok = controller.cancelTrade(txn.getTransactionId());
+                } catch (Exception ex) {
+                    LOGGER.fine(() -> "proposerProblem cancel failed: " + ex.getMessage());
+                }
+                if (ok) {
+                    proposerProblem.setDisable(true);
+                    confirmInspection.setDisable(true);
+                    TradeTransactionBean u2 = controller.refreshTradeStatus(txn.getTransactionId());
+                    if (u2 != null) applyTradeUpdate(u2, info, details, statusLabel, concludeBtn);
+                }
             }
         });
 
@@ -344,14 +397,24 @@ public class FXStoreTradeView implements IStoreTradeView {
             Alert a = new Alert(Alert.AlertType.CONFIRMATION, "Confermi di segnalare un problema per le carte del ricevente? Questo annullerà lo scambio.", ButtonType.YES, ButtonType.NO);
             Optional<ButtonType> res = a.showAndWait();
             if (res.isPresent() && res.get() == ButtonType.YES) {
-                boolean ok = controller.recordInspectionResult(txn.getTransactionId(), txn.getReceiverId(), false);
-                if (ok) { receiverProblem.setDisable(true); receiverConfirm.setDisable(true); TradeTransactionBean u2 = controller.refreshTradeStatus(txn.getTransactionId()); if (u2 != null) applyTradeUpdate(u2, info, details, statusLabel, concludeBtn); }
+                boolean ok = false;
+                try {
+                    ok = controller.cancelTrade(txn.getTransactionId());
+                } catch (Exception ex) {
+                    LOGGER.fine(() -> "receiverProblem cancel failed: " + ex.getMessage());
+                }
+                if (ok) {
+                    receiverProblem.setDisable(true);
+                    confirmInspection.setDisable(true);
+                    TradeTransactionBean u2 = controller.refreshTradeStatus(txn.getTransactionId());
+                    if (u2 != null) applyTradeUpdate(u2, info, details, statusLabel, concludeBtn);
+                }
             }
         });
 
         if (INSPECTION_PASSED.equals(txn.getStatus())) { concludeBtn.setVisible(true); concludeBtn.setManaged(true); }
 
-        return java.util.List.of(proposerConfirm, proposerProblem, receiverConfirm, receiverProblem, concludeBtn, refreshBtn);
+        return java.util.List.of(confirmInspection, proposerProblem, receiverProblem, concludeBtn, refreshBtn);
     }
 
     // Mostra direttamente i dettagli dello scambio in corso senza richiedere session code
@@ -418,7 +481,20 @@ public class FXStoreTradeView implements IStoreTradeView {
 
     @Override
     public void display() {
-        if (stage != null) stage.show();
+        if (stage != null) {
+            stage.show();
+            // Ensure data is loaded when view is shown (safety in case controller was set earlier/later)
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    if (controller != null) {
+                        controller.loadStoreScheduledTrades();
+                        controller.loadStoreInProgressTrades();
+                    }
+                } catch (Exception ex) {
+                    LOGGER.fine(() -> "display initial load failed: " + ex.getMessage());
+                }
+            });
+        }
     }
 
     @Override
@@ -455,6 +531,36 @@ public class FXStoreTradeView implements IStoreTradeView {
         if (t.getRequested() == null || t.getRequested().isEmpty()) sb.append(" - (nessuna)\n");
         else for (CardBean cb : t.getRequested()) sb.append(" - ").append(cb.getName()).append(" x").append(cb.getQuantity()).append("\n");
         return sb.toString();
+    }
+
+    // Update the summary message using both scheduled and in-progress counts so the UI is consistent
+    private void updateSummaryMessage() {
+        if (messageLabel == null) return;
+        int scheduledCount = (scheduledList != null && scheduledList.getItems() != null) ? scheduledList.getItems().size() : 0;
+        int inProgressCount = (inProgressList != null && inProgressList.getItems() != null) ? inProgressList.getItems().size() : 0;
+        if (scheduledCount == 0 && inProgressCount == 0) {
+            // If both are zero, another Platform.runLater may still populate one of them.
+            // Schedule a one-shot delayed re-check to avoid showing "0" prematurely.
+            if (!pendingSummaryUpdate) {
+                pendingSummaryUpdate = true;
+                PauseTransition pt = new PauseTransition(Duration.millis(120));
+                pt.setOnFinished(ev -> {
+                    pendingSummaryUpdate = false;
+                    updateSummaryMessage();
+                });
+                pt.play();
+            }
+            // Use a conservative placeholder until the delayed re-check happens
+            messageLabel.setText("Aggiornamento in corso...");
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        if (scheduledCount > 0) sb.append("Caricati ").append(scheduledCount).append(" scambi");
+        if (inProgressCount > 0) {
+            if (sb.length() > 0) sb.append(" — ");
+            sb.append("Caricati ").append(inProgressCount).append(" scambi in corso");
+        }
+        messageLabel.setText(sb.toString());
     }
 
 }

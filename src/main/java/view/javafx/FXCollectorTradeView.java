@@ -551,19 +551,29 @@ public class FXCollectorTradeView implements ICollectorTradeView {
     }
 
     private HBox buildTradeLists(TradeTransactionBean transaction) {
-        Label offeredLbl = new Label("Carte offerte:"); offeredLbl.setStyle(TEXT_FILL_WHITE);
+        // Left column: what the current user is giving (Stai cedendo)
+        Label youGiveLabel = new Label("Stai cedendo");
+        youGiveLabel.setStyle(TEXT_FILL_WHITE + " -fx-font-weight: bold;");
         ListView<String> offeredList = new ListView<>();
         if (transaction.getOffered() != null) {
             for (CardBean cb : transaction.getOffered()) offeredList.getItems().add(cb.getName() + " x" + cb.getQuantity());
         }
+        VBox left = new VBox(6, youGiveLabel, offeredList);
+        left.setPrefWidth(320);
 
-        Label requestedLbl = new Label("Carta richiesta:"); requestedLbl.setStyle(TEXT_FILL_WHITE);
+        // Right column: what the user will receive (Avrai in cambio)
+        Label youGetLabel = new Label("Avrai in cambio");
+        youGetLabel.setStyle(TEXT_FILL_WHITE + " -fx-font-weight: bold;");
         ListView<String> requestedList = new ListView<>();
         if (transaction.getRequested() != null) {
             for (CardBean cb : transaction.getRequested()) requestedList.getItems().add(cb.getName() + " x" + cb.getQuantity());
         }
+        VBox right = new VBox(6, youGetLabel, requestedList);
+        right.setPrefWidth(320);
 
-        return new HBox(12, offeredList, requestedList);
+        HBox wrapper = new HBox(12, left, right);
+        wrapper.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        return wrapper;
     }
 
 

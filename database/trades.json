@@ -70,12 +70,12 @@
   },
   {
     "transactionId": 1307528872,
-    "tradeStatus": "PARTIALLY_ARRIVED",
+    "tradeStatus": "COMPLETED",
     "proposerId": "user3",
     "receiverId": "user2",
-    "proposerSessionCode": 0,
+    "proposerSessionCode": 266981,
     "receiverSessionCode": 198178,
-    "proposerArrived": false,
+    "proposerArrived": true,
     "receiverArrived": true,
     "storeId": "Store1",
     "creationTimestamp": "2026-01-17T22:49:30.353282",
@@ -114,5 +114,39 @@
     ],
     "proposerReviewed": false,
     "receiverReviewed": false
+  },
+  {
+    "transactionId": 1310525879,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "user2",
+    "receiverId": "user1",
+    "proposerSessionCode": 966066,
+    "receiverSessionCode": 894099,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Store1",
+    "creationTimestamp": "2026-01-17T23:39:27.360545",
+    "tradeDate": "2026-02-17T16:15",
+    "offeredCards": [
+      {
+        "id": "A2-047",
+        "name": "Wash Rotom",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/047/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "B1-085",
+        "name": "Mega Ampharos ex",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/B1/085/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false,
+    "proposerInspectionOk": true
   }
 ]

@@ -210,8 +210,8 @@ public class JsonBinderDao implements IBinderDao {
             } else {
                 LOGGER.log(Level.WARNING, "No binder found to delete with id: {0}", binderId);
             }
-        } catch (NumberFormatException ignored) {
-            throw new DataPersistenceException("Invalid binder ID format: " + binderId, ignored);
+        } catch (NumberFormatException message) {
+            throw new DataPersistenceException("Invalid binder ID format: " + binderId, message);
         }
     }
 
