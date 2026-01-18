@@ -30,10 +30,6 @@ public class CliNegotiationView implements INegotiationView {
     private static final String ITEM_LINE_FMT = " %d) %s x%d%n";
     private static final String INVALID_INDEX_MSG = "Invalid index";
 
-    public CliNegotiationView() {
-        this.inputManager = new config.InputManager();
-    }
-
     public CliNegotiationView(InputManager inputManager) {
         this.inputManager = inputManager;
     }
@@ -103,54 +99,71 @@ public class CliNegotiationView implements INegotiationView {
     public void display() {
         // simple interactive loop
         while (true) {
-            System.out.println("=== TRADE NEGOTIATION ===");
-            System.out.println("Requested items:");
-            for (int i = 0; i < requested.size(); i++) {
-                System.out.printf(ITEM_LINE_FMT, i + 1, requested.get(i).getName(), requested.get(i).getQuantity());
-            }
-            System.out.println("Your inventory:");
-            for (int i = 0; i < inventory.size(); i++) {
-                System.out.printf(ITEM_LINE_FMT, i + 1, inventory.get(i).getName(), inventory.get(i).getQuantity());
-            }
-            System.out.println("Proposed items:");
-            for (int i = 0; i < proposed.size(); i++) {
-                System.out.printf(ITEM_LINE_FMT, i + 1, proposed.get(i).getName(), proposed.get(i).getQuantity());
-            }
+            printNegotiationView();
 
-            System.out.println("Comandi disponibili:");
-            System.out.println("  0) indietro");
-            System.out.println("  1) send propose (conferma l'invio della proposta)");
-            System.out.println("  add,<numero>     -> aggiungi la carta numero <numero> dall'inventario alla proposta");
-            System.out.println("  remove,<numero>  -> rimuovi la carta numero <numero> dalla lista proposta");
             System.out.print("Comando: ");
-
             String line = inputManager.readString();
             if (line == null) line = "";
             line = line.trim();
-            if (line.isEmpty()) continue;
+            // single continue for empty input
+            if (line.isEmpty()) {
+                continue;
+            }
 
+            String lower = line.toLowerCase();
             if ("0".equals(line)) return;
+
             if ("1".equals(line)) {
                 handleConfirm();
-                // if the proposal was sent successfully, exit the negotiation loop to return to homepage
                 if (proposalSent) return;
-                continue;
-            }
-
-            // support add,<n> and remove,<n>
-            if (line.toLowerCase().startsWith("add,")) {
+            } else if (lower.startsWith("add,")) {
                 String param = line.substring(4).trim();
                 handleAdd(param);
-                continue;
-            }
-            if (line.toLowerCase().startsWith("remove,")) {
+            } else if (lower.startsWith("remove,")) {
                 String param = line.substring(7).trim();
                 handleRemove(param);
-                continue;
+            } else {
+                System.out.println("Comando non riconosciuto. Usa 0, 1, add,<n> o remove,<n>");
             }
-
-            System.out.println("Comando non riconosciuto. Usa 0, 1, add,<n> o remove,<n>");
         }
+    }
+
+    // Print helpers extracted to reduce complexity of display()
+    private void printNegotiationView() {
+        System.out.println("=== TRADE NEGOTIATION ===");
+        printRequestedItems();
+        printInventoryItems();
+        printProposedItems();
+        printCommandsHelp();
+    }
+
+    private void printRequestedItems() {
+        System.out.println("Requested items:");
+        for (int i = 0; i < requested.size(); i++) {
+            System.out.printf(ITEM_LINE_FMT, i + 1, requested.get(i).getName(), requested.get(i).getQuantity());
+        }
+    }
+
+    private void printInventoryItems() {
+        System.out.println("Your inventory:");
+        for (int i = 0; i < inventory.size(); i++) {
+            System.out.printf(ITEM_LINE_FMT, i + 1, inventory.get(i).getName(), inventory.get(i).getQuantity());
+        }
+    }
+
+    private void printProposedItems() {
+        System.out.println("Proposed items:");
+        for (int i = 0; i < proposed.size(); i++) {
+            System.out.printf(ITEM_LINE_FMT, i + 1, proposed.get(i).getName(), proposed.get(i).getQuantity());
+        }
+    }
+
+    private void printCommandsHelp() {
+        System.out.println("Comandi disponibili:");
+        System.out.println("  0) indietro");
+        System.out.println("  1) send propose (conferma l'invio della proposta)");
+        System.out.println("  add,<numero>     -> aggiungi la carta numero <numero> dall'inventario alla proposta");
+        System.out.println("  remove,<numero>  -> rimuovi la carta numero <numero> dalla lista proposta");
     }
 
     private void handleAdd(String param) {
@@ -159,27 +172,27 @@ public class CliNegotiationView implements INegotiationView {
             int idx = Integer.parseInt(param) - 1;
             if (idx < 0 || idx >= inventory.size()) { System.out.println(INVALID_INDEX_MSG); return; }
             CardBean card = inventory.get(idx);
-            // add a copy to proposed to avoid aliasing issues
-            // We'll add one unit at a time. First find current proposed qty for this card
             String cardId = card.getId();
             int availableQty = card.getQuantity();
-            int currentProposedQty = 0;
-            for (CardBean pb : proposed) {
-                if (pb != null && cardId != null && cardId.equals(pb.getId())) currentProposedQty += pb.getQuantity();
-            }
+
+            // compute current proposed quantity for this card using streams (removes manual loop)
+            int currentProposedQty = proposed.stream()
+                    .filter(pb -> pb != null && cardId != null && cardId.equals(pb.getId()))
+                    .mapToInt(CardBean::getQuantity)
+                    .sum();
+
             if (currentProposedQty >= availableQty) {
                 System.out.println("Non puoi aggiungere oltre " + availableQty + " unità di questa carta.");
                 return;
             }
-            // Defensive: make sure proposed is modifiable (controller may pass unmodifiable list)
-            if (!(proposed instanceof java.util.ArrayList)) {
-                proposed = new java.util.ArrayList<>(proposed);
-            }
-            // Try to find an existing entry to increment
-            CardBean existing = null;
-            for (CardBean pb : proposed) {
-                if (pb != null && cardId != null && cardId.equals(pb.getId())) { existing = pb; break; }
-            }
+
+            ensureProposedIsModifiable();
+
+            // find existing proposed entry (if any) using stream
+            CardBean existing = proposed.stream()
+                    .filter(pb -> pb != null && cardId != null && cardId.equals(pb.getId()))
+                    .findFirst().orElse(null);
+
             if (existing != null) {
                 existing.setQuantity(existing.getQuantity() + 1);
                 // notify one-unit proposed
@@ -194,10 +207,17 @@ public class CliNegotiationView implements INegotiationView {
                 if (onPropose != null) onPropose.accept(new CardBean(copy));
                 System.out.println("Aggiunta: " + copy.getName() + " x1");
             }
-         } catch (NumberFormatException ex) {
-             System.out.println(INVALID_INDEX_MSG);
-         }
-     }
+        } catch (NumberFormatException _) {
+            System.out.println(INVALID_INDEX_MSG);
+        }
+    }
+
+    // Ensure the proposed list is modifiable (keeps original defensive behavior)
+    private void ensureProposedIsModifiable() {
+        if (!(proposed instanceof java.util.ArrayList)) {
+            proposed = new java.util.ArrayList<>(proposed);
+        }
+    }
 
      private void handleRemove(String param) {
          if (param == null || param.isEmpty()) { System.out.println("Specificare l'indice della carta proposta da rimuovere (es. remove,2)"); return; }
@@ -222,7 +242,7 @@ public class CliNegotiationView implements INegotiationView {
                 if (onUnpropose != null) onUnpropose.accept(removed);
                 System.out.println("Rimossa: " + removed.getName() + " x1");
             }
-         } catch (NumberFormatException ex) {
+         } catch (NumberFormatException _) {
              System.out.println(INVALID_INDEX_MSG);
          }
      }
@@ -233,44 +253,64 @@ public class CliNegotiationView implements INegotiationView {
             System.out.println("Devi offrire almeno una carta prima di confermare la proposta.");
             return;
         }
-        // Ask for meeting place and date in CLI
+        String chosenStore = selectStore();
+        if (chosenStore == null) return;
+
+        String dateIn = readAndValidateDate();
+        if (dateIn == null) return;
+
+        String timeIn = readOptionalTime();
+
+        ProposalBean bean = getProposalBean(chosenStore, dateIn, timeIn);
+        if (onConfirm != null) onConfirm.accept(bean);
+    }
+
+    // Extracted helper: prompt user to select a store, return null on cancel/invalid
+    private String selectStore() {
         System.out.println("Available stores:");
         for (int i = 0; i < availableStores.size(); i++) {
             System.out.printf(" %d) %s%n", i + 1, availableStores.get(i));
         }
         System.out.print("Select store index: ");
-        String s = inputManager.readString().trim();
-        String chosenStore = null;
+        String s = inputManager.readString();
+        if (s == null) s = "";
+        s = s.trim();
         try {
             int idx = Integer.parseInt(s) - 1;
-            if (idx >= 0 && idx < availableStores.size()) chosenStore = availableStores.get(idx);
-        } catch (NumberFormatException _) {System.out.println(INVALID_INDEX_MSG);}
-        if (chosenStore == null) {
-            System.out.println("Invalid store selection");
-            return;
-        }
+            if (idx >= 0 && idx < availableStores.size()) return availableStores.get(idx);
+        } catch (NumberFormatException _) { System.out.println(INVALID_INDEX_MSG); }
+        System.out.println("Invalid store selection");
+        return null;
+    }
+
+    // Extracted helper: read and validate meeting date, returns the input string or null on failure
+    private String readAndValidateDate() {
         System.out.print("Enter meeting date (YYYY-MM-DD) [hint: " + (meetingDateHint != null ? meetingDateHint : "tomorrow") + "]: ");
-        String dateIn = inputManager.readString().trim();
+        String dateIn = inputManager.readString();
+        if (dateIn == null) dateIn = "";
+        dateIn = dateIn.trim();
         try {
             java.time.LocalDate d = java.time.LocalDate.parse(dateIn);
             if (!d.isAfter(java.time.LocalDate.now())) {
                 System.out.println("Date must be after today");
-                return;
+                return null;
             }
         } catch (Exception ex) {
             LOGGER.fine(() -> "Invalid date format input in CLI negotiation: " + ex.getMessage());
             System.out.println("Invalid date format");
-            return;
+            return null;
         }
+        return dateIn;
+    }
 
-        // Prompt optional time HH:mm
+    // Extracted helper: read optional time, returns null if empty
+    private String readOptionalTime() {
         System.out.print("Enter meeting time (HH:mm) [optional, press ENTER to skip]: ");
-        String timeIn = inputManager.readString().trim();
-        if (timeIn.isEmpty()) timeIn = null;
-
-
-        ProposalBean bean = getProposalBean(chosenStore, dateIn, timeIn);
-        if (onConfirm != null) onConfirm.accept(bean);
+        String timeIn = inputManager.readString();
+        if (timeIn == null) timeIn = "";
+        timeIn = timeIn.trim();
+        if (timeIn.isEmpty()) return null;
+        return timeIn;
     }
 
     @NotNull

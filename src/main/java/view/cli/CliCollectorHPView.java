@@ -15,6 +15,7 @@ public class CliCollectorHPView implements ICollectorHPView {
     private static final String NO_CARDS_AVAILABLE = "\nNessuna carta disponibile.";
     private static final String HEADER_TOP_BORDER = "\n╔════════════════════════════════════════════════════════════════════╗";
     private static final String HEADER_BOTTOM_BORDER = "╚════════════════════════════════════════════════════════════════════╝";
+    private static final String CONTROLLER_NON_DISPONIBILE="Controller non disponibile";
 
     private final InputManager inputManager;
     private CollectorHPController controller;
@@ -77,7 +78,7 @@ public class CliCollectorHPView implements ICollectorHPView {
                     controller.navigateToCollection();
                     return false; // stop CLI loop
                 } else {
-                    System.out.println("Controller non disponibile.");
+                    System.out.println(CONTROLLER_NON_DISPONIBILE);
                     return true;
                 }
             case "5":
@@ -86,7 +87,7 @@ public class CliCollectorHPView implements ICollectorHPView {
                     controller.navigateToManageTrade();
                     return false; // allow navigationController to display the destination view
                 } else {
-                    System.out.println("Controller non disponibile.");
+                    System.out.println(CONTROLLER_NON_DISPONIBILE);
                     return true;
                 }
             case "6":
@@ -95,7 +96,7 @@ public class CliCollectorHPView implements ICollectorHPView {
                     controller.navigateToTrade();
                     return false;
                 } else {
-                    System.out.println("Controller non disponibile.");
+                    System.out.println(CONTROLLER_NON_DISPONIBILE);
                     return true;
                 }
             case "7":

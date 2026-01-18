@@ -91,11 +91,7 @@ public class NegotiationController {
                  proposalDao.save(p);
                  if (view != null) view.showConfirmationResult(true, "Proposta inviata");
                  // After successful send, navigate back to proposer's home page so CLI returns to homepage
-                 try {
-                     navigationController.navigateToCollectorHomePage(new model.bean.UserBean(proposerUsername, config.AppConfig.USER_TYPE_COLLECTOR));
-                 } catch (exception.NavigationException ne) {
-                     LOGGER.fine(() -> "Failed to navigate to collector home after sending proposal: " + ne.getMessage());
-                 }
+                 safeNavigateToCollectorHome();
                  return;
              }
          } catch (Exception ex) {
@@ -103,6 +99,15 @@ public class NegotiationController {
          }
          if (view != null) view.showConfirmationResult(false, "Impossibile salvare la proposta");
      }
+
+    // Extracted helper to encapsulate the nested navigation try/catch
+    private void safeNavigateToCollectorHome() {
+        try {
+            navigationController.navigateToCollectorHomePage(new model.bean.UserBean(proposerUsername, config.AppConfig.USER_TYPE_COLLECTOR));
+        } catch (exception.NavigationException _) {
+            LOGGER.fine(() -> "Failed to navigate to collector home after sending proposal: ");
+        }
+    }
 
     private model.domain.Proposal mapToDomainProposal(ProposalBean bean) {
         model.domain.Proposal p = new model.domain.Proposal();

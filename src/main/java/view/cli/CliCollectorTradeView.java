@@ -11,6 +11,10 @@ import java.util.List;
 public class CliCollectorTradeView implements ICollectorTradeView {
 
     private static final String CONTROLLER_NOT_CONNECTED = "Controller non connesso";
+    private static final String BACK_TO_LIST = "0) Torna alla lista di scambi";
+    private static final String PROMPT_CHOICE = "Scelta: ";
+    private static final String INVALID_OPTION = "Opzione non valida.";
+    private static final String INPUT_INVALID_NUMBER_MSG = "Input non valido. Inserisci il numero dello scambio o 0 per tornare.";
 
     private final InputManager inputManager;
     private LiveTradeController controller;
@@ -54,32 +58,7 @@ public class CliCollectorTradeView implements ICollectorTradeView {
     private void renderCombinedTradeListLoop() {
         while (true) {
             // Build combined list: scheduled (non-completed) first, then completed/canceled
-            java.util.List<TradeTransactionBean> combined = new java.util.ArrayList<>();
-
-            System.out.printf("%n=== SCHEDULED TRADES ===%n");
-            int idx = 0;
-            if (scheduledCache != null && !scheduledCache.isEmpty()) {
-                for (TradeTransactionBean t : scheduledCache) {
-                    // ensure we only show non-completed in scheduled
-                    String status = t.getStatus() != null ? t.getStatus().toUpperCase() : "";
-                    if ("COMPLETED".equals(status) || "CANCELLED".equals(status)) continue;
-                    combined.add(t);
-                    idx++;
-                    System.out.printf("%d) tx-%d: %s vs %s @ %s%n", idx, t.getTransactionId(), t.getProposerId(), t.getReceiverId(), t.getStoreId());
-                }
-            }
-            if (idx == 0) System.out.println("(nessuno)");
-
-            System.out.printf("%n=== COMPLETED/CANCELLED TRADES ===%n");
-            if (completedCache != null && !completedCache.isEmpty()) {
-                for (TradeTransactionBean t : completedCache) {
-                    combined.add(t);
-                    idx++;
-                    System.out.printf("%d) tx-%d: %s vs %s @ %s [%s]%n", idx, t.getTransactionId(), t.getProposerId(), t.getReceiverId(), t.getStoreId(), t.getStatus() != null ? t.getStatus() : "?");
-                }
-            } else {
-                System.out.println("(nessuno)");
-            }
+            java.util.List<TradeTransactionBean> combined = buildCombinedListAndPrint();
 
             System.out.println();
             System.out.println("0) Torna all'homepage");
@@ -91,19 +70,72 @@ public class CliCollectorTradeView implements ICollectorTradeView {
                 if (controller != null) controller.navigateToHome();
                 return;
             }
-            try {
-                int n = Integer.parseInt(sel);
-                if (n <= 0 || n > combined.size()) {
-                    System.out.println("Numero non valido. Riprova.");
-                    continue;
-                }
-                TradeTransactionBean chosen = combined.get(n - 1);
+
+            TradeTransactionBean chosen = selectTradeFromCombined(sel, combined);
+            if (chosen != null) {
                 displayTrade(chosen);
-                // after viewing details, loop back to the lists
-            } catch (NumberFormatException ex) {
-                System.out.println("Input non valido. Inserisci il numero dello scambio o 0 per tornare.");
+            }
+            // after viewing details, loop back to the lists
+        }
+    }
+
+    // Parse selection string and return the selected TradeTransactionBean or null (and print message)
+    private TradeTransactionBean selectTradeFromCombined(String sel, java.util.List<TradeTransactionBean> combined) {
+        if (!isPositiveInteger(sel)) {
+            System.out.println(INPUT_INVALID_NUMBER_MSG);
+            return null;
+        }
+        int n = Integer.parseInt(sel);
+        if (n <= 0 || n > combined.size()) {
+            System.out.println("Numero non valido. Riprova.");
+            return null;
+        }
+        return combined.get(n - 1);
+    }
+
+    // Build combined list and print entries; returns the combined list in the same order printed
+    private java.util.List<TradeTransactionBean> buildCombinedListAndPrint() {
+        java.util.List<TradeTransactionBean> combined = new java.util.ArrayList<>();
+        int idx = printScheduledAndCollect(combined);
+        printCompletedAndCollect(combined, idx);
+        return combined;
+    }
+
+    private int printScheduledAndCollect(java.util.List<TradeTransactionBean> combined) {
+        System.out.printf("%n=== SCHEDULED TRADES ===%n");
+        int idx = 0;
+        if (scheduledCache != null && !scheduledCache.isEmpty()) {
+            for (TradeTransactionBean t : scheduledCache) {
+                String status = t.getStatus() != null ? t.getStatus().toUpperCase() : "";
+                if ("COMPLETED".equals(status) || "CANCELLED".equals(status)) continue;
+                combined.add(t);
+                idx++;
+                System.out.printf("%d) tx-%d: %s vs %s @ %s%n", idx, t.getTransactionId(), t.getProposerId(), t.getReceiverId(), t.getStoreId());
             }
         }
+        if (idx == 0) System.out.println("(nessuno)");
+        return idx;
+    }
+
+    private void printCompletedAndCollect(java.util.List<TradeTransactionBean> combined, int startIdx) {
+        System.out.printf("%n=== COMPLETED/CANCELLED TRADES ===%n");
+        int idx = startIdx;
+        if (completedCache != null && !completedCache.isEmpty()) {
+            for (TradeTransactionBean t : completedCache) {
+                combined.add(t);
+                idx++;
+                System.out.printf("%d) tx-%d: %s vs %s @ %s [%s]%n", idx, t.getTransactionId(), t.getProposerId(), t.getReceiverId(), t.getStoreId(), t.getStatus() != null ? t.getStatus() : "?");
+            }
+        } else {
+            System.out.println("(nessuno)");
+        }
+    }
+
+    private boolean isPositiveInteger(String s) {
+        if (s == null || s.isEmpty()) return false;
+        if (!s.matches("\\d+")) return false;
+        // simple guard against exceedingly long numbers
+        return s.length() <= 10;
     }
 
     @Override
@@ -142,15 +174,13 @@ public class CliCollectorTradeView implements ICollectorTradeView {
         System.out.println("Status: " + (t.getStatus() != null ? t.getStatus() : "?"));
 
         // If the current user already confirmed presence, show their session code
-        try {
-            if (currentUsername != null) {
-                if (currentUsername.equals(t.getProposerId()) && t.isProposerArrived()) {
-                    System.out.println("Il tuo session code: " + t.getProposerSessionCode());
-                } else if (currentUsername.equals(t.getReceiverId()) && t.isReceiverArrived()) {
-                    System.out.println("Il tuo session code: " + t.getReceiverSessionCode());
-                }
+        if (currentUsername != null) {
+            if (currentUsername.equals(t.getProposerId()) && t.isProposerArrived()) {
+                System.out.println("Il tuo session code: " + t.getProposerSessionCode());
+            } else if (currentUsername.equals(t.getReceiverId()) && t.isReceiverArrived()) {
+                System.out.println("Il tuo session code: " + t.getReceiverSessionCode());
             }
-        } catch (Exception ignored) {}
+        }
 
         printOffered(t);
         printRequested(t);
@@ -211,51 +241,59 @@ public class CliCollectorTradeView implements ICollectorTradeView {
 
         if (isFinal) {
             // Completed or cancelled: only allow returning to list
-            while (true) {
-                System.out.println("\n0) Torna alla lista di scambi");
-                System.out.print("Scelta: ");
-                String c = inputManager.readString();
-                if (c != null && c.trim().equals("0")) return;
-                System.out.println("Opzione non valida.");
-            }
-        }
-
-        // Scheduled flow
-        if (!userArrived) {
+            loopReturnToList();
+        } else if (!userArrived) {
             // user hasn't confirmed presence yet: show only back + confirm
-            while (true) {
-                System.out.println("\n0) Torna alla lista di scambi");
-                System.out.println("1) Conferma presenza");
-                System.out.print("Scelta: ");
-                String c = inputManager.readString();
-                if (c == null) { System.out.println("Opzione non valida."); continue; }
-                c = c.trim();
-                if (c.equals("0")) return;
-                if (c.equals("1")) {
-                    if (controller != null) {
-                        int code = controller.confirmPresence(t.getTransactionId());
-                        if (code > 0) {
-                            System.out.println("Presenza confermata. Codice: " + code);
-                        } else {
-                            System.out.println("Errore durante la conferma della presenza.");
-                        }
-                    } else {
-                        System.out.println(CONTROLLER_NOT_CONNECTED);
-                    }
-                    // after confirming (success or not), return to list
-                    return;
-                }
-                System.out.println("Opzione non valida.");
-            }
+            loopConfirmPresence(t);
         } else {
             // user already arrived: only back to list
-            while (true) {
-                System.out.println("\n0) Torna alla lista di scambi");
-                System.out.print("Scelta: ");
-                String c = inputManager.readString();
-                if (c != null && c.trim().equals("0")) return;
-                System.out.println("Opzione non valida.");
+            loopReturnToList();
+        }
+    }
+
+    private void loopReturnToList() {
+        while (true) {
+            System.out.println("\n" + BACK_TO_LIST);
+            System.out.print(PROMPT_CHOICE);
+            String c = inputManager.readString();
+            if (c != null && c.trim().equals("0")) return;
+            System.out.println(INVALID_OPTION);
+        }
+    }
+
+    private void loopConfirmPresence(TradeTransactionBean t) {
+        boolean keepAsking = true;
+        while (keepAsking) {
+            System.out.println("\n" + BACK_TO_LIST);
+            System.out.println("1) Conferma presenza");
+            System.out.print(PROMPT_CHOICE);
+            String c = inputManager.readString();
+            if (c == null) {
+                System.out.println(INVALID_OPTION);
+                continue;
             }
+            c = c.trim();
+            if (c.equals("0")) return;
+            if (c.equals("1")) {
+                confirmPresenceAction(t);
+                // after confirming (success or not), stop asking and return to list
+                keepAsking = false;
+            } else {
+                System.out.println(INVALID_OPTION);
+            }
+        }
+    }
+
+    private void confirmPresenceAction(TradeTransactionBean t) {
+        if (controller != null) {
+            int code = controller.confirmPresence(t.getTransactionId());
+            if (code > 0) {
+                System.out.println("Presenza confermata. Codice: " + code);
+            } else {
+                System.out.println("Errore durante la conferma della presenza.");
+            }
+        } else {
+            System.out.println(CONTROLLER_NOT_CONNECTED);
         }
     }
 

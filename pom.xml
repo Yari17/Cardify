@@ -155,7 +155,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>${maven.compiler.target}</jvmTarget>
+                    <jvmTarget>23</jvmTarget>
                 </configuration>
             </plugin>
             <plugin>
@@ -165,8 +165,8 @@
                 <configuration>
                     <!-- Use release to ensure correct JDK API level (Java 23) -->
                     <release>23</release>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>23</source>
+                    <target>23</target>
                 </configuration>
                 <executions>
                     <execution>
@@ -190,6 +190,28 @@
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Enforce Java version to avoid compilation with older JDKs -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>23</version>
+                                </requireJavaVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

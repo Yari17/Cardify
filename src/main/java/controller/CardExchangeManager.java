@@ -71,70 +71,80 @@ public class CardExchangeManager {
     }
 
     private void removeOfferedCardsFromProposer(TradeTransaction tx) {
-        for (Card card : tx.getOfferedCards()) {
-            String proposer = tx.getProposerId();
+        removeCardsFromOwner(tx.getProposerId(), tx.getOfferedCards(), this::logProposerBinderMissing, this::logProposerCardMissing);
+    }
+
+    private void removeRequestedCardsFromReceiver(TradeTransaction tx) {
+        removeCardsFromOwner(tx.getReceiverId(), tx.getRequestedCards(), this::logReceiverBinderMissing, this::logReceiverCardMissing);
+    }
+
+    // Helper functional interfaces for succinct logging callbacks
+    @FunctionalInterface
+    private interface BinderMissingLogger {
+        void log(String setId, String owner);
+    }
+
+    @FunctionalInterface
+    private interface CardMissingLogger {
+        void log(String cardId, String owner);
+    }
+
+    // Generic remover shared by both proposer and receiver flows.
+    private void removeCardsFromOwner(String owner, List<Card> cardsToRemove, BinderMissingLogger missingBinderLog,
+                                      CardMissingLogger missingCardLog) {
+        if (owner == null || cardsToRemove == null) return;
+        for (Card card : cardsToRemove) {
             String setId = card.getId().split("-")[0];
-            List<Binder> proposerBinders = binderDao.getUserBinders(proposer);
-            Binder binder = proposerBinders.stream().filter(b -> b.getSetId().equals(setId)).findFirst().orElse(null);
+            List<Binder> ownerBinders = binderDao.getUserBinders(owner);
+            Binder binder = ownerBinders.stream().filter(b -> b.getSetId().equals(setId)).findFirst().orElse(null);
             if (binder == null) {
-                LOGGER.fine(() -> "CardExchangeManager: proposer binder not found for set=" + setId + " owner=" + proposer);
+                missingBinderLog.log(setId, owner);
                 continue;
             }
-            List<model.bean.CardBean> cards = binder.getCards();
-            boolean modified = false;
-            for (ListIterator<model.bean.CardBean> it = cards.listIterator(); it.hasNext(); ) {
-                model.bean.CardBean cb = it.next();
-                if (cb != null && card.getId().equals(cb.getId())) {
-                    int remaining = cb.getQuantity() - card.getQuantity();
-                    if (remaining > 0) {
-                        cb.setQuantity(remaining);
-                    } else {
-                        it.remove();
-                    }
-                    modified = true;
-                    break;
-                }
-            }
-            if (modified) {
-                binder.setCards(cards);
-                binderDao.save(binder);
-            } else {
-                LOGGER.fine(() -> "CardExchangeManager: could not find offered card " + card.getId() + " in proposer binder for owner=" + proposer);
+            boolean removed = removeCardFromBinder(binder, card);
+            if (!removed) {
+                missingCardLog.log(card.getId(), owner);
             }
         }
     }
 
-    private void removeRequestedCardsFromReceiver(TradeTransaction tx) {
-        for (Card card : tx.getRequestedCards()) {
-            String receiver = tx.getReceiverId();
-            String setId = card.getId().split("-")[0];
-            List<Binder> receiverBinders = binderDao.getUserBinders(receiver);
-            Binder binder = receiverBinders.stream().filter(b -> b.getSetId().equals(setId)).findFirst().orElse(null);
-            if (binder == null) {
-                LOGGER.fine(() -> "CardExchangeManager: receiver binder not found for set=" + setId + " owner=" + receiver);
-                continue;
-            }
-            List<model.bean.CardBean> cards = binder.getCards();
-            boolean modified = false;
-            for (ListIterator<model.bean.CardBean> it = cards.listIterator(); it.hasNext(); ) {
-                model.bean.CardBean cb = it.next();
-                if (cb != null && card.getId().equals(cb.getId())) {
-                    int remaining = cb.getQuantity() - card.getQuantity();
-                    if (remaining > 0) {
-                        cb.setQuantity(remaining);
-                    } else {
-                        it.remove();
-                    }
-                    modified = true;
-                    break;
+    // Extracted helper: remove the specified card from a binder, adjusting quantity or removing the bean.
+    // Returns true if the binder was modified and saved.
+    private boolean removeCardFromBinder(Binder binder, Card card) {
+        if (binder == null || card == null) return false;
+        List<model.bean.CardBean> cards = binder.getCards();
+        for (ListIterator<model.bean.CardBean> it = cards.listIterator(); it.hasNext(); ) {
+            model.bean.CardBean cb = it.next();
+            if (cb != null && card.getId().equals(cb.getId())) {
+                int remaining = cb.getQuantity() - card.getQuantity();
+                if (remaining > 0) {
+                    cb.setQuantity(remaining);
+                } else {
+                    it.remove();
                 }
-            }
-            if (modified) {
                 binder.setCards(cards);
                 binderDao.save(binder);
-            } else {
-                LOGGER.fine(() -> "CardExchangeManager: could not find requested card " + card.getId() + " in receiver binder for owner=" + receiver);
+                return true;
             }
         }
+        return false;
     }
+
+    // Logging helpers extracted from lambdas to reduce caller cognitive complexity
+    private void logProposerBinderMissing(String setId, String owner) {
+        LOGGER.fine(() -> "CardExchangeManager: proposer binder not found for set=" + setId + " owner=" + owner);
+    }
+
+    private void logProposerCardMissing(String cardId, String owner) {
+        LOGGER.fine(() -> "CardExchangeManager: could not find offered card " + cardId + " in proposer binder for owner=" + owner);
+    }
+
+    private void logReceiverBinderMissing(String setId, String owner) {
+        LOGGER.fine(() -> "CardExchangeManager: receiver binder not found for set=" + setId + " owner=" + owner);
+    }
+
+    private void logReceiverCardMissing(String cardId, String owner) {
+        LOGGER.fine(() -> "CardExchangeManager: could not find requested card " + cardId + " in receiver binder for owner=" + owner);
+    }
+
 }

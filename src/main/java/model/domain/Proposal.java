@@ -92,14 +92,20 @@ public class Proposal {
         try {
             java.time.LocalDate date = java.time.LocalDate.parse(this.meetingDate);
             if (this.meetingTime != null && !this.meetingTime.isEmpty()) {
-                try {
-                    LocalTime time = LocalTime.parse(this.meetingTime);
-                    return Optional.of(LocalDateTime.of(date, time));
-                } catch (DateTimeParseException _) {
-                    // ignore and fallback to start of day
-                }
+                Optional<LocalTime> maybeTime = parseMeetingTime(this.meetingTime);
+                if (maybeTime.isPresent()) return Optional.of(LocalDateTime.of(date, maybeTime.get()));
             }
             return Optional.of(date.atStartOfDay());
+        } catch (DateTimeParseException _) {
+            return Optional.empty();
+        }
+    }
+
+    // Extracted helper to parse meetingTime into LocalTime, ignoring parse errors
+    private Optional<LocalTime> parseMeetingTime(String mt) {
+        try {
+            LocalTime time = LocalTime.parse(mt);
+            return Optional.of(time);
         } catch (DateTimeParseException _) {
             return Optional.empty();
         }

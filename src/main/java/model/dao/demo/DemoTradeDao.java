@@ -56,7 +56,7 @@ public class DemoTradeDao implements ITradeDao {
             t.updateTradeStatus(ts);
             tradesById.put(id, t);
             LOGGER.log(Level.INFO, "DemoTradeDao.updateTransactionStatus: updated transaction {0} to status {1}", new Object[]{id, status});
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             LOGGER.log(Level.WARNING, "DemoTradeDao.updateTransactionStatus: unknown status {0} for transaction {1}", new Object[]{status, id});
         }
     }
@@ -64,9 +64,10 @@ public class DemoTradeDao implements ITradeDao {
     @Override
     public List<TradeTransaction> getUserTradeTransactions(String userId) {
         List<TradeTransaction> result = new ArrayList<>();
+        if (userId == null) return result;
         for (TradeTransaction t : tradesById.values()) {
-            if (t == null) continue;
-            if (userId != null && (userId.equals(t.getProposerId()) || userId.equals(t.getReceiverId()))) result.add(t);
+            if (t == null) continue; // single continue
+            if (userId.equals(t.getProposerId()) || userId.equals(t.getReceiverId())) result.add(t);
         }
         return result;
     }
@@ -76,12 +77,13 @@ public class DemoTradeDao implements ITradeDao {
         List<TradeTransaction> result = new ArrayList<>();
         if (userId == null) return result;
         for (TradeTransaction t : tradesById.values()) {
-            if (t == null) continue;
-            if (!userId.equals(t.getStoreId())) continue;
-            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
-            if (s == null || (s != model.domain.enumerations.TradeStatus.COMPLETED
-                    && s != model.domain.enumerations.TradeStatus.CANCELLED)) {
-                result.add(t);
+            if (t == null) continue; // single continue per loop
+            if (userId.equals(t.getStoreId())) {
+                model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+                if (s != model.domain.enumerations.TradeStatus.COMPLETED
+                        && s != model.domain.enumerations.TradeStatus.CANCELLED) {
+                    result.add(t);
+                }
             }
         }
         return result;
@@ -92,7 +94,7 @@ public class DemoTradeDao implements ITradeDao {
         List<TradeTransaction> result = new ArrayList<>();
         if (userId == null) return result;
         for (TradeTransaction t : tradesById.values()) {
-            if (t == null) continue;
+            if (t == null) continue; // single continue
             if ((userId.equals(t.getProposerId()) || userId.equals(t.getReceiverId())) && String.valueOf(t.getTransactionId()).equals(tradeId)) {
                 result.add(t);
             }
@@ -105,26 +107,38 @@ public class DemoTradeDao implements ITradeDao {
         List<TradeTransaction> result = new ArrayList<>();
         if (userId == null) return result;
         for (TradeTransaction t : tradesById.values()) {
-            if (t == null) continue;
-            if (!(userId.equals(t.getProposerId()) || userId.equals(t.getReceiverId()))) continue;
-            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
-            if (s == model.domain.enumerations.TradeStatus.COMPLETED || s == model.domain.enumerations.TradeStatus.CANCELLED) {
+            if (t == null) continue; // single continue per loop
+            if (isCompletedForUser(t, userId)) {
                 result.add(t);
             }
         }
         // Diagnostic logging similar to JsonTradeDao
+        logUserCompletedTrades(result, userId);
+        return result;
+    }
+
+    // Helper: determine whether a trade is completed/canceled and involves the given user
+    private boolean isCompletedForUser(TradeTransaction t, String userId) {
+        boolean involved = (userId.equals(t.getProposerId()) || userId.equals(t.getReceiverId()));
+        if (!involved) return false;
+        model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+        return s == model.domain.enumerations.TradeStatus.COMPLETED || s == model.domain.enumerations.TradeStatus.CANCELLED;
+    }
+
+    // Helper: centralized logging for completed trades
+    private void logUserCompletedTrades(List<TradeTransaction> result, String userId) {
         try {
             if (result.isEmpty()) {
                 LOGGER.info(() -> "DemoTradeDao.getUserCompletedTrades: found 0 completed trades for user=" + userId);
             } else {
                 StringBuilder ids = new StringBuilder();
                 for (TradeTransaction tt : result) ids.append(tt.getTransactionId()).append(',');
-                LOGGER.info(() -> "DemoTradeDao.getUserCompletedTrades: found " + result.size() + " completed trades for user=" + userId + " ids=" + ids.toString());
+                String idsStr = ids.toString();
+                LOGGER.info(() -> "DemoTradeDao.getUserCompletedTrades: found " + result.size() + " completed trades for user=" + userId + " ids=" + idsStr);
             }
         } catch (Exception ex) {
             LOGGER.fine(() -> "DemoTradeDao.getUserCompletedTrades logging failed: " + ex.getMessage());
         }
-        return result;
     }
 
     @Override
@@ -160,17 +174,20 @@ public class DemoTradeDao implements ITradeDao {
     @Override
     public Optional<TradeTransaction> findByParticipantsAndDate(String proposerId, String receiverId, LocalDateTime tradeDate) {
         for (TradeTransaction t : tradesById.values()) {
-            if (t == null) continue;
-            boolean match = true;
-            if (proposerId != null) match = proposerId.equals(t.getProposerId());
-            if (match && receiverId != null) match = receiverId.equals(t.getReceiverId());
-            if (match && tradeDate != null) {
-                if (t.getTradeDate() == null) match = false;
-                else match = t.getTradeDate().toLocalDate().equals(tradeDate.toLocalDate());
-            }
-            if (match) return Optional.of(t);
+            if (t == null) continue; // single continue
+            if (matchesParticipantsAndDate(t, proposerId, receiverId, tradeDate)) return Optional.of(t);
         }
         return Optional.empty();
+    }
+
+    private boolean matchesParticipantsAndDate(TradeTransaction t, String proposerId, String receiverId, LocalDateTime tradeDate) {
+        if (proposerId != null && !proposerId.equals(t.getProposerId())) return false;
+        if (receiverId != null && !receiverId.equals(t.getReceiverId())) return false;
+        if (tradeDate != null) {
+            if (t.getTradeDate() == null) return false;
+            return t.getTradeDate().toLocalDate().equals(tradeDate.toLocalDate());
+        }
+        return true;
     }
 
     @Override
@@ -189,12 +206,13 @@ public class DemoTradeDao implements ITradeDao {
         List<TradeTransaction> result = new ArrayList<>();
         if (storeId == null) return result;
         for (TradeTransaction t : tradesById.values()) {
-            if (t == null) continue;
-            if (!storeId.equals(t.getStoreId())) continue;
-            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
-            if (s == model.domain.enumerations.TradeStatus.INSPECTION_PHASE
-                    || s == model.domain.enumerations.TradeStatus.INSPECTION_PASSED) {
-                result.add(t);
+            if (t == null) continue; // single continue per loop
+            if (storeId.equals(t.getStoreId())) {
+                model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+                if (s == model.domain.enumerations.TradeStatus.INSPECTION_PHASE
+                        || s == model.domain.enumerations.TradeStatus.INSPECTION_PASSED) {
+                    result.add(t);
+                }
             }
         }
         return result;
@@ -205,11 +223,12 @@ public class DemoTradeDao implements ITradeDao {
         List<TradeTransaction> result = new ArrayList<>();
         if (storeId == null) return result;
         for (TradeTransaction t : tradesById.values()) {
-            if (t == null) continue;
-            if (!storeId.equals(t.getStoreId())) continue;
-            model.domain.enumerations.TradeStatus s = t.getTradeStatus();
-            if (s == model.domain.enumerations.TradeStatus.COMPLETED || s == model.domain.enumerations.TradeStatus.CANCELLED) {
-                result.add(t);
+            if (t == null) continue; // single continue per loop
+            if (storeId.equals(t.getStoreId())) {
+                model.domain.enumerations.TradeStatus s = t.getTradeStatus();
+                if (s == model.domain.enumerations.TradeStatus.COMPLETED || s == model.domain.enumerations.TradeStatus.CANCELLED) {
+                    result.add(t);
+                }
             }
         }
         try {
@@ -217,7 +236,8 @@ public class DemoTradeDao implements ITradeDao {
             else {
                 StringBuilder ids = new StringBuilder();
                 for (TradeTransaction tt : result) ids.append(tt.getTransactionId()).append(',');
-                LOGGER.info(() -> "DemoTradeDao.getStoreCompletedTrades: found " + result.size() + " completed trades for store=" + storeId + " ids=" + ids.toString());
+                String idsStr = ids.toString();
+                LOGGER.info(() -> "DemoTradeDao.getStoreCompletedTrades: found " + result.size() + " completed trades for store=" + storeId + " ids=" + idsStr);
             }
         } catch (Exception ex) { LOGGER.fine(() -> "DemoTradeDao.getStoreCompletedTrades logging failed: " + ex.getMessage()); }
         return result;

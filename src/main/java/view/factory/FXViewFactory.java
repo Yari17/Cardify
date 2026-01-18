@@ -24,7 +24,6 @@ import view.javafx.FXStoreTradeView;
 import view.IStoreTradeView;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FXViewFactory implements IViewFactory {
@@ -54,7 +53,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load LoginPage.fxml", ex);
             throw new IllegalStateException("Cannot create LoginView: FXML file not found or invalid", ex);
         }
     }
@@ -83,7 +81,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load RegistrationDialog.fxml", ex);
             throw new IllegalStateException("Cannot create RegistrationView: FXML file not found or invalid", ex);
         }
     }
@@ -112,7 +109,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load CollectorHomePage.fxml", ex);
             throw new IllegalStateException("Cannot create CollectorHomePageView: FXML file not found or invalid", ex);
         }
     }
@@ -141,7 +137,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load StoreHomePage.fxml", ex);
             throw new IllegalStateException("Cannot create StoreHomePageView: FXML file not found or invalid", ex);
         }
     }
@@ -171,7 +166,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load CollectionPage.fxml", ex);
             throw new IllegalStateException("Cannot create CollectionView: FXML file not found or invalid", ex);
         }
     }
@@ -207,7 +201,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load CollectorTradePage.fxml", ex);
             throw new IllegalStateException("Cannot create TradeView: FXML file not found or invalid", ex);
         }
     }
@@ -235,11 +228,7 @@ public class FXViewFactory implements IViewFactory {
                 // associate the store view with the controller (controller applicativo)
                 controller.setStoreView(storeView);
                 // Trigger a load after association to ensure UI receives data (defensive)
-                try {
-                    controller.loadScheduledTrades();
-                } catch (Exception ex) {
-                    LOGGER.fine(() -> "Deferred loadScheduledTrades failed: " + ex.getMessage());
-                }
+                safeLoadScheduledTrades(controller);
 
                 return storeView;
             } else {
@@ -249,7 +238,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load StoreTradePage.fxml", ex);
             throw new IllegalStateException("Cannot create StoreTradeView: FXML file not found or invalid", ex);
         }
     }
@@ -279,7 +267,6 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load ManageTradesPage.fxml", ex);
             throw new IllegalStateException("Cannot create ManageTradeView: FXML file not found or invalid", ex);
         }
     }
@@ -309,8 +296,15 @@ public class FXViewFactory implements IViewFactory {
             }
 
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, "Failed to load TradeNegotiationPage.fxml", ex);
             throw new IllegalStateException("Cannot create NegotiationView: FXML file not found or invalid", ex);
+        }
+    }
+
+    private void safeLoadScheduledTrades(LiveTradeController controller) {
+        try {
+            controller.loadScheduledTrades();
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Deferred loadScheduledTrades failed: " + ex.getMessage());
         }
     }
 

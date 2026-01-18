@@ -29,6 +29,7 @@ public class FXCollectionView implements ICollectionView {
     private static final String CARD_HOVER_STYLE = "card-hover";
     // centralized constant for repeated style class
     private static final String BUTTON_ACCENT = "button-accent";
+    private static final String MANAGE="manage";
     // navigation constants
     private static final String NAV_SELECTED = "nav-selected";
     private static final String NAV_COLLECTION = "collection";
@@ -856,7 +857,7 @@ public class FXCollectionView implements ICollectionView {
             case "home" -> addNavSelectedTo(homeLabel);
             case NAV_COLLECTION -> addNavSelectedTo(collectionLabel);
             case "live" -> addNavSelectedTo(liveTradeLabel);
-            case "manage" -> addNavSelectedTo(manageTradesLabel);
+            case MANAGE -> addNavSelectedTo(manageTradesLabel);
             case "logout" -> addNavSelectedTo(logoutLabel);
             default -> {
                 // unknown selection: no-op
@@ -900,35 +901,44 @@ public class FXCollectionView implements ICollectionView {
     @FXML
     private void onTradeClicked() {
         LOGGER.info("Trade clicked - navigating to trade/manage page");
+        // Decide which action the user intended based on which button has focus.
+        // If the live trade button is focused, prefer live; if the manage button is focused, prefer manage.
+        // Defaults differ depending on whether controller is available (preserve original behavior):
+        // - when controller present default to MANAGE
+        // - when controller absent default to LIVE
+        String target = determineTradeTarget(controller != null);
+
         if (controller != null) {
-            // Decide which action the user intended based on which button has focus.
-            // If the live trade button is focused, navigate to live trades; if the manage
-            // trades button is focused, navigate to manage trades.
             try {
-                if (liveTradeButton != null && liveTradeButton.isFocused()) {
-                    controller.navigateToTrade();
-                    markNavSelected("live");
-                } else if (tradeButton != null && tradeButton.isFocused()) {
-                    controller.navigateToManageTrade();
-                    markNavSelected("manage");
-                } else {
-                    // Fallback: prefer Manage Trades when the dedicated trade button was used
-                    controller.navigateToManageTrade();
-                    markNavSelected("manage");
-                }
+                performNavigationForTarget(target);
+                markNavForTarget(target);
             } catch (Exception ex) {
                 LOGGER.fine(() -> "Navigation from Collection onTradeClicked failed: " + ex.getMessage());
             }
         } else {
             // still update nav selection to be safe
-            if (liveTradeButton != null && liveTradeButton.isFocused()) {
-                markNavSelected("live");
-            } else if (tradeButton != null && tradeButton.isFocused()) {
-                markNavSelected("manage");
-            } else {
-                markNavSelected("live");
-            }
+            markNavForTarget(target);
         }
+    }
+
+    // Determine intended trade action based on focus; preferManageDefault controls fallback when no focus
+    private String determineTradeTarget(boolean preferManageDefault) {
+        if (liveTradeButton != null && liveTradeButton.isFocused()) return "live";
+        if (tradeButton != null && tradeButton.isFocused()) return MANAGE;
+        return preferManageDefault ? MANAGE : "live";
+    }
+
+    private void performNavigationForTarget(String target) {
+        if (MANAGE.equals(target)) {
+            controller.navigateToManageTrade();
+        } else {
+            controller.navigateToTrade();
+        }
+    }
+
+    private void markNavForTarget(String target) {
+        if (MANAGE.equals(target)) markNavSelected(MANAGE);
+        else markNavSelected("live");
     }
 
     @FXML

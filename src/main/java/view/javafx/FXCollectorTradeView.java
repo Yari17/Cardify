@@ -43,31 +43,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
     private Label usernameLabel;
 
     @FXML
-    private ImageView profileImageView;
-
-    @FXML
-    private Button homeButton;
-
-    @FXML
-    private Button collectionButton;
-
-    @FXML
-    private Button tradeButton;
-
-    @FXML
-    private Button logoutButton;
-
-    @FXML
-    private VBox logoutButtonContainer;
-
-    @FXML
     private ListView<model.bean.TradeTransactionBean> scheduledTradesList;
-
-    @FXML
-    private Button liveTradeButton;
-
-    @FXML
-    private Button manageTradesButton;
 
     @FXML
     private ListView<model.bean.TradeTransactionBean> completedTradesList; // Nuova ListView per gli scambi conclusi
@@ -90,71 +66,47 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     private LiveTradeController controller;
     private Stage stage;
-    private boolean storeMode = false; // quando true la view si comporta come interfaccia dello store
+    private static final boolean STORE_MODE = false; // quando true la view si comporta come interfaccia dello store
     private String currentUsername;
 
     public FXCollectorTradeView() {
         // FXML fields will be injected by FXMLLoader
     }
 
-    // Utility to load image from resource path or URL. Returns null on failure.
-    private javafx.scene.image.Image loadImageResource(String path, double w, double h) {
-        try {
-            if (path == null) return null;
-            if (path.startsWith("/")) {
-                java.net.URL res = getClass().getResource(path);
-                if (res != null) return new javafx.scene.image.Image(res.toExternalForm(), w, h, true, true);
-            }
-            return new javafx.scene.image.Image(path, w, h, true, true);
-        } catch (Exception ex) {
-            LOGGER.fine(() -> "Failed to load image resource: " + path + " => " + ex.getMessage());
-            return null;
-        }
-    }
-
     @FXML
     public void initialize() {
         if (scheduledTradesList != null) {
-            scheduledTradesList.setCellFactory(lv -> {
-                // reference lv to avoid 'parameter never used' warnings
-                lv.getItems();
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(TradeTransactionBean item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null) {
-                            setText(null);
-                            setGraphic(null);
-                            return;
-                        }
-                        setGraphic(createTradeCellContent(item));
-                    }
-                };
-            });
+            setTradeListCellFactory(scheduledTradesList);
         }
         if (completedTradesList != null) {
-            completedTradesList.setCellFactory(lv -> {
-                // reference lv to avoid 'parameter never used' warnings
-                lv.getItems();
-                return new ListCell<>() {
-                    @Override
-                    protected void updateItem(TradeTransactionBean item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty || item == null) {
-                            setText(null);
-                            setGraphic(null);
-                            return;
-                        }
-                        setGraphic(createTradeCellContent(item));
-                    }
-                };
-            });
+            setTradeListCellFactory(completedTradesList);
         }
         // Carica automaticamente sia gli scambi programmati che quelli conclusi all'apertura della pagina
         if (controller != null) {
             controller.loadScheduledTrades();
             controller.loadCollectorCompletedTrades();
         }
+    }
+
+    // Helper to attach the standard trade cell factory to a ListView
+    private void setTradeListCellFactory(javafx.scene.control.ListView<model.bean.TradeTransactionBean> listView) {
+        if (listView == null) return;
+        listView.setCellFactory(lv -> {
+            // reference lv to avoid 'parameter never used' warnings
+            lv.getItems();
+            return new ListCell<>() {
+                @Override
+                protected void updateItem(TradeTransactionBean item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                        return;
+                    }
+                    setGraphic(createTradeCellContent(item));
+                }
+            };
+        });
     }
 
     // Extracted helper to construct the Node used as ListCell graphic
@@ -180,11 +132,17 @@ public class FXCollectorTradeView implements ICollectorTradeView {
     }
 
     private ImageView buildIcon() {
-        javafx.scene.image.Image img = loadImageResource("/icons/trade.png", ICON_W, ICON_H);
-        if (img == null) return null;
-        ImageView icon = new ImageView(img);
-        icon.getStyleClass().add("trade-direction-icon");
-        return icon;
+        try {
+            java.net.URL res = getClass().getResource("/icons/trade.png");
+            if (res == null) return null;
+            javafx.scene.image.Image img = new javafx.scene.image.Image(res.toExternalForm(), ICON_W, ICON_H, true, true);
+            ImageView icon = new ImageView(img);
+            icon.getStyleClass().add("trade-direction-icon");
+            return icon;
+        } catch (Exception ex) {
+            LOGGER.fine(() -> "Failed to load trade icon resource: " + ex.getMessage());
+            return null;
+        }
     }
 
     private VBox buildTextVBox(TradeTransactionBean item) {
@@ -472,89 +430,119 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     // Extracted action area builder to reduce method size and complexity
     private VBox createActionArea(TradeTransactionBean transaction, Label statusLabel, Button refreshBtn, Label date) {
+        if (STORE_MODE) {
+            return createStoreActionArea(transaction, statusLabel, refreshBtn);
+        }
+        return createCollectorActionArea(transaction, date);
+    }
+
+    // Extracted store-mode branch from createActionArea
+    private VBox createStoreActionArea(TradeTransactionBean transaction, Label statusLabel, Button refreshBtn) {
         VBox actionArea = new VBox(6);
         actionArea.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        if (storeMode) {
-            boolean nobodyArrived = (transaction.getProposerSessionCode() == 0 && transaction.getReceiverSessionCode() == 0);
-            if (nobodyArrived) {
-                Label msg = new Label("Nessuno dei due collezionisti è ancora arrivato in negozio, quando arriverà il primo ti fornirà il suo session code da inserire qui");
-                msg.setWrapText(true);
-                msg.setStyle(TEXT_FILL_WHITE);
-                actionArea.getChildren().add(msg);
-
-                javafx.scene.control.TextField codeField = new javafx.scene.control.TextField();
-                codeField.setPromptText("Inserisci session code");
-                actionArea.getChildren().add(codeField);
-
-                HBox buttons = new HBox(8);
-                Button submit = new Button("Conferma codice");
-                buttons.getChildren().addAll(submit, refreshBtn);
-                actionArea.getChildren().add(buttons);
-
-                submit.setOnAction(ev -> {
-                    String txt = codeField.getText();
-                    try {
-                        int code = Integer.parseInt(txt.trim());
-                        boolean ok = controller.verifySessionCode(transaction.getTransactionId(), code);
-                        if (ok) {
-                            model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
-                            if (updated != null) {
-                                statusLabel.setText("Codice valido. Stato corrente: " + (updated.getStatus() != null ? updated.getStatus() : "?"));
-                                codeField.setDisable(true);
-                                submit.setDisable(true);
-                            }
-                        } else {
-                            Label err = new Label("Codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); actionArea.getChildren().add(err);
-                        }
-                    } catch (NumberFormatException _) {
-                        Label err = new Label("Formato codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); actionArea.getChildren().add(err);
-                    }
-                    ev.consume();
-                });
-            } else {
-                // Almeno uno è arrivato: mostra informazioni e pulsante refresh
-                actionArea.getChildren().addAll(statusLabel, refreshBtn);
-            }
-        } else {
-            boolean userIsProposer = currentUsername != null && currentUsername.equals(transaction.getProposerId());
-            boolean userIsReceiver = currentUsername != null && currentUsername.equals(transaction.getReceiverId());
-
-            if ((userIsProposer && transaction.isProposerArrived()) || (userIsReceiver && transaction.isReceiverArrived())) {
-                int code = userIsProposer ? transaction.getProposerSessionCode() : transaction.getReceiverSessionCode();
-                Label codeLabel = new Label(PRESENCE_CONFIRMED_MSG + (code > 0 ? code : "---") + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
-                codeLabel.setStyle(TEXT_FILL_WHITE);
-                actionArea.getChildren().add(codeLabel);
-            } else {
-                Button confirmBtn = new Button("Conferma la tua presenza");
-                confirmBtn.setOnAction(ev -> {
-                    if (controller == null) { showError("Controller non connesso"); ev.consume(); return; }
-                    int code = controller.confirmPresence(transaction.getTransactionId());
-                    if (code > 0) {
-                        Label codeLabel = new Label(PRESENCE_CONFIRMED_MSG + code + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
-                        codeLabel.setStyle(TEXT_FILL_WHITE);
-                        actionArea.getChildren().add(codeLabel);
-                        model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
-                        if (updated != null) {
-                            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) { /* ignore */ }
-                        }
-                        displayScheduledTrades(java.util.List.of(updated != null ? updated : transaction));
-                        refresh();
-                    } else {
-                        confirmBtn.setText("Errore durante la conferma");
-                    }
-                    ev.consume();
-                });
-                actionArea.getChildren().add(confirmBtn);
-            }
+        boolean nobodyArrived = (transaction.getProposerSessionCode() == 0 && transaction.getReceiverSessionCode() == 0);
+        if (nobodyArrived) {
+            actionArea.getChildren().add(createStoreNobodyArrivedArea(transaction, statusLabel, refreshBtn));
+            return actionArea;
         }
+        // Almeno uno è arrivato: mostra informazioni e pulsante refresh
+        actionArea.getChildren().addAll(statusLabel, refreshBtn);
         return actionArea;
+    }
+
+    private VBox createStoreNobodyArrivedArea(TradeTransactionBean transaction, Label statusLabel, Button refreshBtn) {
+        VBox node = new VBox(6);
+        Label msg = new Label("Nessuno dei due collezionisti è ancora arrivato in negozio, quando arriverà il primo ti fornirà il suo session code da inserire qui");
+        msg.setWrapText(true);
+        msg.setStyle(TEXT_FILL_WHITE);
+        node.getChildren().add(msg);
+
+        javafx.scene.control.TextField codeField = new javafx.scene.control.TextField();
+        codeField.setPromptText("Inserisci session code");
+        node.getChildren().add(codeField);
+
+        HBox buttons = new HBox(8);
+        Button submit = new Button("Conferma codice");
+        buttons.getChildren().addAll(submit, refreshBtn);
+        node.getChildren().add(buttons);
+
+        submit.setOnAction(ev -> handleSubmitSessionCode(ev, codeField, submit, transaction, statusLabel, node));
+        return node;
+    }
+
+    // Extracted collector-mode branch from createActionArea
+    private VBox createCollectorActionArea(TradeTransactionBean transaction, Label date) {
+        VBox actionArea = new VBox(6);
+        actionArea.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        boolean userIsProposer = currentUsername != null && currentUsername.equals(transaction.getProposerId());
+        boolean userIsReceiver = currentUsername != null && currentUsername.equals(transaction.getReceiverId());
+
+        if ((userIsProposer && transaction.isProposerArrived()) || (userIsReceiver && transaction.isReceiverArrived())) {
+            int code = userIsProposer ? transaction.getProposerSessionCode() : transaction.getReceiverSessionCode();
+            Label codeLabel = new Label(PRESENCE_CONFIRMED_MSG + (code > 0 ? code : "---") + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
+            codeLabel.setStyle(TEXT_FILL_WHITE);
+            actionArea.getChildren().add(codeLabel);
+            return actionArea;
+        }
+
+        Button confirmBtn = new Button("Conferma la tua presenza");
+        confirmBtn.setOnAction(ev -> handleConfirmPresence(ev, transaction, date, actionArea));
+        actionArea.getChildren().add(confirmBtn);
+        return actionArea;
+    }
+
+    // Extracted handler for confirm presence to reduce complexity in the factory method
+    private void handleConfirmPresence(javafx.event.ActionEvent ev, TradeTransactionBean transaction, Label date, VBox actionArea) {
+        if (controller == null) { showError("Controller non connesso"); ev.consume(); return; }
+        int code = controller.confirmPresence(transaction.getTransactionId());
+        if (code > 0) {
+            Label codeLabel = new Label(PRESENCE_CONFIRMED_MSG + code + "\nMostra questo codice allo store manager per confermare la tua presenza allo scambio");
+            codeLabel.setStyle(TEXT_FILL_WHITE);
+            actionArea.getChildren().add(codeLabel);
+            model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+            processPresenceConfirmed(updated, transaction, date);
+        } else {
+            // find the confirm button and update text
+            if (ev.getSource() instanceof Button b) b.setText("Errore durante la conferma");
+        }
+        ev.consume();
+    }
+
+    // Handler for submitting session code (extracted to reduce complexity)
+    private void handleSubmitSessionCode(javafx.event.ActionEvent ev, javafx.scene.control.TextField codeField, Button submit, TradeTransactionBean transaction, Label statusLabel, VBox actionArea) {
+        String txt = codeField.getText();
+        try {
+            int code = Integer.parseInt(txt.trim());
+            boolean ok = controller.verifySessionCode(transaction.getTransactionId(), code);
+            if (ok) {
+                model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
+                if (updated != null) {
+                    statusLabel.setText("Codice valido. Stato corrente: " + (updated.getStatus() != null ? updated.getStatus() : "?"));
+                    codeField.setDisable(true);
+                    submit.setDisable(true);
+                }
+            } else {
+                Label err = new Label("Codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); actionArea.getChildren().add(err);
+            }
+        } catch (NumberFormatException _) {
+            Label err = new Label("Formato codice non valido"); err.setStyle("-fx-text-fill: #ff6b6b;"); actionArea.getChildren().add(err);
+        }
+        ev.consume();
+    }
+
+    private void processPresenceConfirmed(model.bean.TradeTransactionBean updated, TradeTransactionBean transaction, Label date) {
+        if (updated != null) {
+            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) { /* ignore */ }
+        }
+        displayScheduledTrades(java.util.List.of(updated != null ? updated : transaction));
+        refresh();
     }
 
     private HBox buildTradeLists(TradeTransactionBean transaction) {
         // Left column: what the current user is giving (Stai cedendo)
         Label youGiveLabel = new Label("Stai cedendo");
         youGiveLabel.setStyle(TEXT_FILL_WHITE + " -fx-font-weight: bold;");
-        ListView<String> offeredList = new ListView<>();
+        javafx.scene.control.ListView<String> offeredList = new javafx.scene.control.ListView<>();
         if (transaction.getOffered() != null) {
             for (CardBean cb : transaction.getOffered()) offeredList.getItems().add(cb.getName() + " x" + cb.getQuantity());
         }
@@ -564,7 +552,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         // Right column: what the user will receive (Avrai in cambio)
         Label youGetLabel = new Label("Avrai in cambio");
         youGetLabel.setStyle(TEXT_FILL_WHITE + " -fx-font-weight: bold;");
-        ListView<String> requestedList = new ListView<>();
+        javafx.scene.control.ListView<String> requestedList = new javafx.scene.control.ListView<>();
         if (transaction.getRequested() != null) {
             for (CardBean cb : transaction.getRequested()) requestedList.getItems().add(cb.getName() + " x" + cb.getQuantity());
         }
@@ -576,65 +564,37 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         return wrapper;
     }
 
-
-
+    @Override
     public void displayIspection() {
         // Minimal placeholder: show a dialog indicating inspection should happen
-        javafx.application.Platform.runLater(() -> {
-            Stage dlg = new Stage();
-            dlg.initOwner(stage);
-            dlg.initModality(Modality.WINDOW_MODAL);
-            dlg.setTitle("Ispezione");
-            VBox box = new VBox(10);
-            box.setPadding(new Insets(12));
-            Label msg = new Label("Inspect cards in store (UI pending)");
-            msg.setStyle(TEXT_FILL_WHITE);
-            Button ok = new Button("OK"); ok.setOnAction(ex -> { dlg.close(); ex.consume(); }); box.getChildren().addAll(msg, ok); box.setStyle(BG_COLOR_STYLE);
-            Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource(view.IView.themeCssPath()); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception ex) { LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage()); }
-            dlg.setScene(s); dlg.showAndWait();
-        });
+        javafx.application.Platform.runLater(() -> showModalDialog("Ispezione", "Inspect cards in store (UI pending)"));
     }
 
+    @Override
     public void onIspectionComplete(String username) {
         // simple feedback; real logic should update domain via controller
-        javafx.application.Platform.runLater(() -> {
-            Stage dlg = new Stage(); dlg.initOwner(stage); dlg.initModality(Modality.WINDOW_MODAL); dlg.setTitle("Ispezione completata");
-            VBox box = new VBox(10); box.setPadding(new Insets(12));
-            Label msg = new Label("Ispezione completata da: " + (username != null ? username : "?")); msg.setStyle(TEXT_FILL_WHITE);
-            Button ok = new Button("OK"); ok.setOnAction(ex -> { dlg.close(); ex.consume(); }); box.getChildren().addAll(msg, ok); box.setStyle(BG_COLOR_STYLE);
-            Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource(view.IView.themeCssPath()); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception ex) { LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage()); }
-            dlg.setScene(s); dlg.showAndWait();
-        });
-    }
-
-    public void onTradeComplete(String tradeId) {
-        // minimal feedback: inform user the trade is complete
-        javafx.application.Platform.runLater(() -> {
-            Stage dlg = new Stage(); dlg.initOwner(stage); dlg.initModality(Modality.WINDOW_MODAL); dlg.setTitle("Trade completato");
-            VBox box = new VBox(10); box.setPadding(new Insets(12));
-            Label msg = new Label("Trade " + (tradeId != null ? tradeId : "<id>") + " completato"); msg.setStyle(TEXT_FILL_WHITE);
-            Button ok = new Button("OK"); ok.setOnAction(e -> { dlg.close(); e.consume(); }); box.getChildren().addAll(msg, ok); box.setStyle(BG_COLOR_STYLE);
-            Scene s = new Scene(box, 360, 120); try { java.net.URL res = getClass().getResource(view.IView.themeCssPath()); if (res != null) s.getStylesheets().add(res.toExternalForm()); } catch (Exception ex) { LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage()); }
-            dlg.setScene(s); dlg.showAndWait();
-        });
+        javafx.application.Platform.runLater(() -> showModalDialog("Ispezione completata", "Ispezione completata da: " + (username != null ? username : "?")));
     }
 
     @Override
     public void displayScheduledTrades(java.util.List<model.bean.TradeTransactionBean> scheduled) {
         javafx.application.Platform.runLater(() -> {
-            if (scheduledTradesList != null) {
-                scheduledTradesList.getItems().clear();
-                if (scheduled != null) {
-                    for (model.bean.TradeTransactionBean t : scheduled) {
-                        String status = t.getStatus();
-                        if (status != null && (status.equalsIgnoreCase("COMPLETED") || status.equalsIgnoreCase("CANCELLED"))) {
-                            continue; // Non mostrare scambi conclusi tra i programmati
-                        }
-                        scheduledTradesList.getItems().add(t);
-                    }
-                }
+            if (scheduledTradesList == null) return;
+            scheduledTradesList.getItems().clear();
+            if (scheduled == null || scheduled.isEmpty()) return;
+            for (model.bean.TradeTransactionBean t : scheduled) {
+                if (isFinalizedStatus(t)) continue; // Non mostrare scambi conclusi tra i programmati
+                scheduledTradesList.getItems().add(t);
             }
         });
+    }
+
+    // Helper to detect finalized statuses
+    private boolean isFinalizedStatus(TradeTransactionBean t) {
+        if (t == null) return false;
+        String status = t.getStatus();
+        if (status == null) return false;
+        return status.equalsIgnoreCase("COMPLETED") || status.equalsIgnoreCase("CANCELLED");
     }
 
     @Override
@@ -648,11 +608,12 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                 } else {
                     StringBuilder ids = new StringBuilder();
                     for (model.bean.TradeTransactionBean t : completedTrades) ids.append(t.getTransactionId()).append(',');
-                    LOGGER.info(() -> "FXCollectorTradeView.displayCompletedTrades: received " + completedTrades.size() + " completed trades ids=" + ids.toString());
-                }
-            } catch (Exception ex) {
-                LOGGER.fine(() -> "FXCollectorTradeView.displayCompletedTrades logging failed: " + ex.getMessage());
-            }
+                    String idsStr = ids.toString();
+                    LOGGER.info(() -> "FXCollectorTradeView.displayCompletedTrades: received " + completedTrades.size() + " completed trades ids=" + idsStr);
+                 }
+             } catch (Exception ex) {
+                 LOGGER.fine(() -> "FXCollectorTradeView.displayCompletedTrades logging failed: " + ex.getMessage());
+             }
 
             completedTradesList.getItems().clear();
             if (completedTrades != null && !completedTrades.isEmpty()) {
@@ -669,4 +630,37 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         });
     }
 
-}
+    @Override
+    public void onTradeComplete(String tradeId) {
+        // minimal feedback: inform user the trade is complete
+        javafx.application.Platform.runLater(() -> showModalDialog("Trade completato", "Trade " + (tradeId != null ? tradeId : "<id>") + " completato"));
+    }
+
+    // Helper to show a small modal dialog with a message and OK button (standard size)
+    private void showModalDialog(String title, String message) {
+        final int MODAL_WIDTH = 360;
+        final int MODAL_HEIGHT = 120;
+        Stage dlg = new Stage();
+        dlg.initOwner(stage);
+        dlg.initModality(Modality.WINDOW_MODAL);
+        dlg.setTitle(title);
+        VBox box = new VBox(10);
+        box.setPadding(new Insets(12));
+        Label msg = new Label(message);
+        msg.setStyle(TEXT_FILL_WHITE);
+        Button ok = new Button("OK");
+        ok.setOnAction(e -> { dlg.close(); e.consume(); });
+        box.getChildren().addAll(msg, ok);
+        box.setStyle(BG_COLOR_STYLE);
+        Scene s = new Scene(box, MODAL_WIDTH, MODAL_HEIGHT);
+        try {
+            java.net.URL res = getClass().getResource(view.IView.themeCssPath());
+            if (res != null) s.getStylesheets().add(res.toExternalForm());
+        } catch (Exception ex) {
+            LOGGER.fine(() -> UNABLE_APPLY_MSG + ex.getMessage());
+        }
+        dlg.setScene(s);
+        dlg.showAndWait();
+    }
+
+ }

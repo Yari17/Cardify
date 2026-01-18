@@ -94,13 +94,17 @@ public class StoreHPController {
             // Delegate alla view
             // view may be null if not set yet
             // Use try/catch to avoid breaking navigation in case of view errors
-            try {
-                if (view != null) view.displayCompletedTrades(beans);
-            } catch (Exception ex) {
-                LOGGER.warning(() -> "Displaying completed trades failed: " + ex.getMessage());
-            }
+            safeDisplayCompletedTrades(beans);
         } catch (Exception ex) {
             LOGGER.warning(() -> "loadCompletedTrades failed: " + ex.getMessage());
+        }
+    }
+
+    private void safeDisplayCompletedTrades(java.util.List<model.bean.TradeTransactionBean> beans) {
+        try {
+            if (view != null) view.displayCompletedTrades(beans);
+        } catch (Exception ex) {
+            LOGGER.warning(() -> "Displaying completed trades failed: " + ex.getMessage());
         }
     }
 }

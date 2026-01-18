@@ -16,129 +16,163 @@ public class CliManageTradeView implements IManageTradeView {
     private java.util.function.Consumer<String> onTradeClickCallback;
     private java.util.function.Consumer<String> onTradeNowClickCallback;
     private java.util.List<model.bean.ProposalBean> lastPending = new java.util.ArrayList<>();
-    private java.util.List<model.bean.ProposalBean> lastConcluded = new java.util.ArrayList<>();
 
     @Override
     public void display() {
-        // Simplified flow: show only pending proposals; prompt 0 to go back or a number to view
-        java.util.Scanner scanner = new java.util.Scanner(System.in);
-        try {
-            // Ensure latest pending proposals are loaded
-            if (manageController != null) {
-                manageController.loadAndDisplayTrades(this);
-            }
+        java.util.Scanner scanner = new java.util.Scanner(System.in); // do not close System.in
 
-            while (true) {
-                // Display only pending proposals (minimal view as requested)
-                System.out.println("=== PROPOSTE IN ATTESA ===");
-                if (lastPending == null || lastPending.isEmpty()) {
-                    System.out.println("(nessuna proposta in attesa)");
-                } else {
-                    for (int i = 0; i < lastPending.size(); i++) {
-                        model.bean.ProposalBean p = lastPending.get(i);
-                        String other;
-                        boolean incoming = false;
-                        if (currentUsername != null) {
-                            incoming = currentUsername.equals(p.getToUser());
-                            other = currentUsername.equals(p.getFromUser()) ? p.getToUser() : p.getFromUser();
-                        } else {
-                            other = p.getFromUser() != null ? p.getFromUser() : p.getToUser();
-                        }
-                        String direction = incoming ? "(ricevuta)" : "(inviata)";
-                        System.out.printf("%d) %s %s - %s %n", i + 1, p.getProposalId(), direction, other);
-                    }
-                }
-
-                System.out.println();
-                System.out.println("0) Torna all'homepage");
-                System.out.print("Inserisci numero di proposta da visualizzare: ");
-
-                String line;
-                try {
-                    line = scanner.nextLine();
-                } catch (Exception ex) {
-                    // EOF -> return to caller
-                    return;
-                }
-                if (line == null) return;
-                line = line.trim();
-                if (line.isEmpty()) continue;
-
-                if ("0".equals(line)) {
-                    if (manageController != null) {
-                        manageController.navigateToHome();
-                    }
-                    return;
-                }
-
-                int idx;
-                try {
-                    idx = Integer.parseInt(line) - 1;
-                } catch (NumberFormatException ex) {
-                    System.out.println("Input non valido. Inserisci 0 o il numero della proposta.");
-                    continue;
-                }
-
-                if (lastPending == null || idx < 0 || idx >= lastPending.size()) {
-                    System.out.println("Numero proposta non valido.");
-                    continue;
-                }
-
-                // Show proposal details
-                model.bean.ProposalBean sel = lastPending.get(idx);
-                System.out.println("\n=== OVERVIEW PROPOSTA: " + sel.getProposalId() + " ===");
-                System.out.println("Proposer: " + sel.getFromUser());
-                System.out.println("Receiver: " + sel.getToUser());
-                System.out.println();
-
-                System.out.println("== CARTE OFFERTE DA " + sel.getFromUser() + " ==");
-                if (sel.getOffered() == null || sel.getOffered().isEmpty()) {
-                    System.out.println("(nessuna carta)");
-                } else {
-                    for (model.bean.CardBean cb : sel.getOffered()) {
-                        System.out.printf(" - %s x%d\n", cb.getName(), cb.getQuantity());
-                    }
-                }
-
-                System.out.println();
-                System.out.println("== CARTE RICHIESTE IN CAMBIO ==");
-                if (sel.getRequested() == null || sel.getRequested().isEmpty()) {
-                    System.out.println("(nessuna carta)");
-                } else {
-                    for (model.bean.CardBean cb : sel.getRequested()) {
-                        System.out.printf(" - %s x%d\n", cb.getName(), cb.getQuantity());
-                    }
-                }
-
-                boolean isReceived = currentUsername != null && currentUsername.equals(sel.getToUser());
-                if (isReceived) {
-                    // Offer accept/reject/back
-                    System.out.println();
-                    System.out.println("1) Accetta");
-                    System.out.println("2) Rifiuta");
-                    System.out.println("0) Indietro");
-                    System.out.print("Scelta: ");
-                    String choice2 = scanner.nextLine();
-                    if (choice2 == null) return;
-                    choice2 = choice2.trim();
-                    switch (choice2) {
-                        case "1" -> onAcceptTradeProposal(sel.getProposalId());
-                        case "2" -> onDeclineTradeProposal(sel.getProposalId());
-                        default -> {/* back */}
-                    }
-                } else {
-                    // Sender: only back
-                    System.out.println();
-                    System.out.println("0) Indietro");
-                    System.out.print("Premi INVIO per tornare...");
-                    scanner.nextLine();
-                }
-                // After action, reload pending list
-                if (manageController != null) manageController.loadAndDisplayTrades(this);
-            }
-        } finally {
-            // do not close System.in
+        // Ensure latest pending proposals are loaded
+        if (manageController != null) {
+            manageController.loadAndDisplayTrades(this);
         }
+
+        while (true) {
+            renderPendingList();
+
+            System.out.println();
+            System.out.println("0) Torna all'homepage");
+            System.out.print("Inserisci numero di proposta da visualizzare: ");
+
+            String line = readLine(scanner);
+            if (line == null) return; // EOF -> exit
+            line = line.trim();
+
+            if ("0".equals(line)) {
+                if (manageController != null) manageController.navigateToHome();
+                return;
+            }
+
+            ProposalBean sel = selectProposalFromInput(line);
+            if (sel == null) {
+                // invalid or empty -> redisplay
+                continue;
+            }
+
+            showProposalDetails(sel, scanner);
+
+            // After action, reload pending list
+            if (manageController != null) manageController.loadAndDisplayTrades(this);
+        }
+    }
+
+    // --- helpers (extracted to reduce smells) ---
+    private void renderPendingList() {
+        System.out.println("=== PROPOSTE IN ATTESA ===");
+        if (lastPending == null || lastPending.isEmpty()) {
+            System.out.println("(nessuna proposta in attesa)");
+            return;
+        }
+        for (int i = 0; i < lastPending.size(); i++) {
+            model.bean.ProposalBean p = lastPending.get(i);
+            String other;
+            boolean incoming = false;
+            if (currentUsername != null) {
+                incoming = currentUsername.equals(p.getToUser());
+                other = currentUsername.equals(p.getFromUser()) ? p.getToUser() : p.getFromUser();
+            } else {
+                other = p.getFromUser() != null ? p.getFromUser() : p.getToUser();
+            }
+            String direction = incoming ? "(ricevuta)" : "(inviata)";
+            System.out.printf("%d) %s %s - %s %n", i + 1, p.getProposalId(), direction, other);
+        }
+    }
+
+    private String readLine(java.util.Scanner scanner) {
+        // rely on hasNextLine to avoid exceptions
+        if (scanner == null) return null;
+        if (!scanner.hasNextLine()) return null;
+        return scanner.nextLine();
+    }
+
+    private ProposalBean selectProposalFromInput(String line) {
+        if (line == null || line.isEmpty()) return null;
+        int idx = parseIndex(line);
+        if (idx < 0 || lastPending == null || idx >= lastPending.size()) {
+            System.out.println("Numero proposta non valido.");
+            return null;
+        }
+        return lastPending.get(idx);
+    }
+
+    private int parseIndex(String line) {
+        if (line == null) return -1;
+        // accept only integer numbers
+        if (!line.matches("\\d+")) {
+            System.out.println("Input non valido. Inserisci 0 o il numero della proposta.");
+            return -1;
+        }
+        // guard against extremely long numbers that would not fit in int
+        if (line.length() > 10) {
+            System.out.println("Input non valido. Inserisci 0 o il numero della proposta.");
+            return -1;
+        }
+        int parsed = Integer.parseInt(line);
+        return parsed - 1;
+    }
+
+    // Pause helper used to wait for ENTER without closing System.in
+    private void pauseForEnter() {
+        java.util.Scanner sc = new java.util.Scanner(System.in);
+        if (sc.hasNextLine()) sc.nextLine();
+    }
+
+    private void showProposalDetails(ProposalBean sel, java.util.Scanner scanner) {
+        System.out.println();
+        System.out.println("=== OVERVIEW PROPOSTA: " + sel.getProposalId() + " ===");
+        System.out.println("Proposer: " + sel.getFromUser());
+        System.out.println("Receiver: " + sel.getToUser());
+        System.out.println();
+
+        printOffered(sel);
+        System.out.println();
+        printRequested(sel);
+
+        boolean isReceived = currentUsername != null && currentUsername.equals(sel.getToUser());
+        if (isReceived) {
+            handleReceivedChoice(sel, scanner);
+        } else {
+            // Sender: only back
+            System.out.println();
+            System.out.println("0) Indietro");
+            System.out.print("Premi INVIO per tornare...");
+            pauseForEnter();
+        }
+    }
+
+    private void printOffered(ProposalBean sel) {
+        System.out.println("== CARTE OFFERTE DA " + sel.getFromUser() + " ==");
+        if (sel.getOffered() == null || sel.getOffered().isEmpty()) {
+            System.out.println("(nessuna carta)");
+            return;
+        }
+        for (model.bean.CardBean cb : sel.getOffered()) {
+            System.out.printf(" - %s x%d%n", cb.getName(), cb.getQuantity());
+        }
+    }
+
+    private void printRequested(ProposalBean sel) {
+        System.out.println("== CARTE RICHIESTE IN CAMBIO =");
+        if (sel.getRequested() == null || sel.getRequested().isEmpty()) {
+            System.out.println("(nessuna carta)");
+            return;
+        }
+        for (model.bean.CardBean cb : sel.getRequested()) {
+            System.out.printf(" - %s x%d%n", cb.getName(), cb.getQuantity());
+        }
+    }
+
+    private void handleReceivedChoice(ProposalBean sel, java.util.Scanner scanner) {
+        System.out.println();
+        System.out.println("1) Accetta");
+        System.out.println("2) Rifiuta");
+        System.out.println("0) Indietro");
+        System.out.print("Scelta: ");
+        String choice2 = readLine(scanner);
+        if (choice2 == null) return;
+        choice2 = choice2.trim();
+        if ("1".equals(choice2)) onAcceptTradeProposal(sel.getProposalId());
+        else if ("2".equals(choice2)) onDeclineTradeProposal(sel.getProposalId());
+        // else back
     }
 
     @Override
@@ -155,7 +189,6 @@ public class CliManageTradeView implements IManageTradeView {
     public void displayTrades(List<ProposalBean> pending, List<ProposalBean> scheduled) {
         // Cache lists; do not print here to avoid duplicate output. display() prints pending.
         this.lastPending = pending != null ? new java.util.ArrayList<>(pending) : new java.util.ArrayList<>();
-        this.lastConcluded = scheduled != null ? new java.util.ArrayList<>(scheduled) : new java.util.ArrayList<>();
     }
 
     @Override
@@ -190,11 +223,12 @@ public class CliManageTradeView implements IManageTradeView {
         java.util.logging.Logger.getLogger(CliManageTradeView.class.getName()).info(() -> "onAcceptTradeProposal called for id=" + id + " result=" + ok);
         System.out.println(ok ? "\n✓ Proposta accettata: " + id : "\n✗ Fallito nell'accettare la proposta: " + id);
         System.out.print("Premi INVIO per continuare...");
-        try { new java.util.Scanner(System.in).nextLine(); } catch (Exception ignored) {}
+        pauseForEnter();
         // refresh view after accept
         manageController.loadAndDisplayTrades(this);
     }
 
+    @SuppressWarnings("unused")
     public void onCancelTradeProposal(String id) {
         // The controller currently has no explicit 'cancel' operation; map cancel to decline
         if (id == null) return;
@@ -213,7 +247,7 @@ public class CliManageTradeView implements IManageTradeView {
         java.util.logging.Logger.getLogger(CliManageTradeView.class.getName()).info(() -> "onDeclineTradeProposal called for id=" + id + " result=" + ok);
         System.out.println(ok ? "\n✓ Proposta rifiutata: " + id : "\n✗ Fallito nel rifiutare la proposta: " + id);
         System.out.print("Premi INVIO per continuare...");
-        try { new java.util.Scanner(System.in).nextLine(); } catch (Exception ignored) {}
+        pauseForEnter();
         // refresh view after decline
         manageController.loadAndDisplayTrades(this);
     }
@@ -226,33 +260,16 @@ public class CliManageTradeView implements IManageTradeView {
         System.out.println(ok ? "[CLI] Started trade flow for proposal: " + id : "[CLI] Failed to start trade flow for proposal: " + id);
     }
 
+    @SuppressWarnings("unused")
     public void onTradeNowClick(String id) {
         if (id == null) return;
         if (onTradeNowClickCallback != null) { onTradeNowClickCallback.accept(id); return; }
         onTradeClick(id);
     }
 
-    private String formatPending(ProposalBean t) {
-        if (t == null) return "<invalid>";
-        String other = null;
-        boolean incoming = false;
-        // Determine other/incoming using from/to fields
-        if (currentUsername != null) {
-            incoming = currentUsername.equals(t.getToUser());
-            other = currentUsername.equals(t.getFromUser()) ? t.getToUser() : t.getFromUser();
-        }
-        String arrow = incoming ? "<-" : "->";
-        if (other == null) return formatTrade(t);
-        return String.format("%s %s [%s]", arrow, other, t.getStatus());
-    }
-
-    private String formatTrade(ProposalBean t) {
-        String participants = (t.getFromUser() == null ? "" : t.getFromUser()) + " vs " + (t.getToUser() == null ? "" : t.getToUser());
-        String status = t.getStatus() != null ? t.getStatus() : "";
-        return String.format("%s - %s %s", t.getProposalId(), participants, status);
-    }
-
+    @Override
     public void setUsername(String username) {
         this.currentUsername = username;
     }
+
 }

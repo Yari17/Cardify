@@ -52,7 +52,12 @@ public class JsonProposalDao implements IProposalDao {
     private void initializeFile() {
         File file = new File(jsonFilePath);
         File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) parent.mkdirs();
+        if (parent != null && !parent.exists()) {
+            boolean ok = parent.mkdirs();
+            if (!ok) {
+                LOGGER.log(Level.WARNING, "Could not create directories for path: {0}", parent.getAbsolutePath());
+            }
+        }
         if (!file.exists()) saveToJson();
     }
 
@@ -66,10 +71,12 @@ public class JsonProposalDao implements IProposalDao {
                 long max = 0;
                 for (Proposal p : list) {
                     proposalsById.put(p.getProposalId(), p);
-                    try {
-                        long numeric = Long.parseLong(p.getProposalId());
+                    // try to extract numeric id if it's purely digits; avoid catching exceptions
+                    String idStr = p.getProposalId();
+                    if (idStr != null && idStr.matches("\\d+")) {
+                        long numeric = Long.parseLong(idStr);
                         if (numeric > max) max = numeric;
-                    } catch (NumberFormatException _) {}
+                    }
                 }
                 idGenerator.set(max);
                 LOGGER.log(Level.INFO, "Loaded {0} proposals from JSON", list.size());
@@ -135,10 +142,9 @@ public class JsonProposalDao implements IProposalDao {
         List<Proposal> result = new ArrayList<>();
         for (Proposal p : proposalsById.values()) {
             if (p == null) continue;
-            if (username != null && username.equals(p.getProposerId())) {
-                if (p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING || p.getStatus() == model.domain.enumerations.ProposalStatus.EXPIRED) {
-                    result.add(p);
-                }
+            if (username != null && username.equals(p.getProposerId()) &&
+                    (p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING || p.getStatus() == model.domain.enumerations.ProposalStatus.EXPIRED)) {
+                result.add(p);
             }
         }
         return result;
@@ -149,10 +155,9 @@ public class JsonProposalDao implements IProposalDao {
         List<Proposal> result = new ArrayList<>();
         for (Proposal p : proposalsById.values()) {
             if (p == null) continue;
-            if (username != null && username.equals(p.getReceiverId())) {
-                if (p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING || p.getStatus() == model.domain.enumerations.ProposalStatus.EXPIRED) {
-                    result.add(p);
-                }
+            if (username != null && username.equals(p.getReceiverId()) &&
+                    (p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING || p.getStatus() == model.domain.enumerations.ProposalStatus.EXPIRED)) {
+                result.add(p);
             }
         }
         return result;
@@ -164,7 +169,7 @@ public class JsonProposalDao implements IProposalDao {
         for (Proposal p : proposalsById.values()) {
             if (p == null) continue;
             // Scheduled proposals are those accepted (or later) involving the user
-            if ((username != null && (username.equals(p.getProposerId()) || username.equals(p.getReceiverId())))
+            if (username != null && (username.equals(p.getProposerId()) || username.equals(p.getReceiverId()))
                     && p.getStatus() == model.domain.enumerations.ProposalStatus.ACCEPTED) {
                 result.add(p);
             }
@@ -177,8 +182,9 @@ public class JsonProposalDao implements IProposalDao {
         List<Proposal> result = new ArrayList<>();
         for (Proposal p : proposalsById.values()) {
             if (p == null) continue;
-            if (username != null && (username.equals(p.getProposerId()) || username.equals(p.getReceiverId()))) {
-                if (p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING) result.add(p);
+            if (username != null && (username.equals(p.getProposerId()) || username.equals(p.getReceiverId()))
+                    && p.getStatus() == model.domain.enumerations.ProposalStatus.PENDING) {
+                result.add(p);
             }
         }
         return result;

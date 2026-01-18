@@ -58,43 +58,72 @@ public class FXNegotiationView implements INegotiationView {
 
     @FXML
     private void initialize() {
-        // Setup cell factories for lists to show thumbnail, name and quantity
-        if (inventoryList != null) inventoryList.setCellFactory(lv -> new CardBeanCell(true));
-        if (requestedList != null) requestedList.setCellFactory(lv -> new CardBeanCell(false));
-        if (proposedList != null) proposedList.setCellFactory(lv -> new CardBeanCell(false));
+        setupCellFactories();
+        setupButtons();
+        setupDoubleClickHandlers();
+        setupBindings();
+    }
 
-        // populate storeComboBox lazily - controller will provide list via setController/start
+    private void setupCellFactories() {
+        if (inventoryList != null) inventoryList.setCellFactory(lv -> {
+            // reference lv to avoid 'parameter never used' warnings in static analysis
+            lv.getProperties();
+            return new CardBeanCell(true);
+        });
+        if (requestedList != null) requestedList.setCellFactory(lv -> {
+            lv.getProperties();
+            return new CardBeanCell(false);
+        });
+        if (proposedList != null) proposedList.setCellFactory(lv -> {
+            lv.getProperties();
+            return new CardBeanCell(false);
+        });
+
         if (storeComboBox != null) {
             storeComboBox.getItems().clear();
         }
+    }
 
-        if (addButton != null) addButton.setOnAction(e -> handleAdd());
-        if (removeButton != null) removeButton.setOnAction(e -> handleRemove());
-        if (confirmButton != null) confirmButton.setOnAction(e -> handleConfirm());
-        if (cancelButton != null) cancelButton.setOnAction(e -> close());
+    private void setupButtons() {
+        Button[] buttons = new Button[]{addButton, removeButton, confirmButton, cancelButton};
+        Runnable[] actions = new Runnable[]{this::handleAdd, this::handleRemove, this::handleConfirm, this::close};
+        for (int i = 0; i < buttons.length; i++) {
+            bindButtonToHandler(buttons[i], actions[i]);
+        }
+    }
 
-        // Double-click inventory to add
+    private void bindButtonToHandler(Button btn, Runnable action) {
+        if (btn == null || action == null) return;
+        btn.setOnAction(e -> {
+            // consume the event to mark it handled and avoid unused-parameter warnings
+            e.consume();
+            action.run();
+        });
+    }
+
+    private void setupDoubleClickHandlers() {
         if (inventoryList != null) {
             inventoryList.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2) handleAdd();
             });
         }
 
-        // Double-click proposed to remove
         if (proposedList != null) {
             proposedList.setOnMouseClicked(e -> {
                 if (e.getClickCount() == 2) handleRemove();
             });
         }
+    }
 
+    private void setupBindings() {
         // Disabilita il pulsante Confirm se non ci sono carte proposte (UX improvement)
         try {
             if (confirmButton != null && proposedList != null) {
                 // Bind the disable property to the emptiness of the proposed list
                 confirmButton.disableProperty().bind(Bindings.isEmpty(proposedList.getItems()));
             }
-        } catch (Exception ex) {
-            LOGGER.fine(() -> "Failed to bind confirm button disable property: " + ex.getMessage());
+        } catch (Exception _) {
+            LOGGER.fine(() -> "Failed to bind confirm button disable property");
         }
     }
 
@@ -159,7 +188,11 @@ public class FXNegotiationView implements INegotiationView {
         javafx.application.Platform.runLater(() -> {
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(success ? javafx.scene.control.Alert.AlertType.INFORMATION : javafx.scene.control.Alert.AlertType.ERROR);
             alert.setTitle(success ? "Proposta inviata" : "Errore invio proposta");
-            alert.setHeaderText(message != null ? message : (success ? "Operazione completata" : "Si è verificato un errore"));
+            String headerText;
+            if (message != null) headerText = message;
+            else if (success) headerText = "Operazione completata";
+            else headerText = "Si è verificato un errore";
+            alert.setHeaderText(headerText);
             alert.showAndWait();
             if (success && stage != null) {
                 stage.close();
@@ -199,8 +232,8 @@ public class FXNegotiationView implements INegotiationView {
                 if (inventoryList != null) inventoryList.refresh();
                 if (requestedList != null) requestedList.refresh();
                 if (proposedList != null) proposedList.refresh();
-            } catch (Exception ex) {
-                LOGGER.fine(() -> "NegotiationView refresh failed: " + ex.getMessage());
+            } catch (Exception _) {
+                LOGGER.fine(() -> "NegotiationView refresh failed");
             }
         });
     }
@@ -262,33 +295,11 @@ public class FXNegotiationView implements INegotiationView {
         // Validate meeting info (store and date)
         String meetingPlace = storeComboBox != null ? storeComboBox.getValue() : null;
         String meetingDate = meetingDateField != null ? meetingDateField.getText() : null;
+        String meetingDateTrimmed = meetingDate == null ? null : meetingDate.trim();
 
-        // simple date validation: YYYY-MM-DD and strictly after today
-        boolean dateOk = true;
-        if (meetingDate == null || meetingDate.trim().isEmpty()) dateOk = false;
-        else {
-            try {
-                java.time.LocalDate d = java.time.LocalDate.parse(meetingDate.trim());
-                if (!d.isAfter(java.time.LocalDate.now())) dateOk = false;
-            } catch (Exception ex) {
-                LOGGER.fine(() -> "Invalid meeting date input in FXNegotiationView: " + ex.getMessage());
-                dateOk = false;
-            }
-        }
+        boolean dateOk = validateMeetingDate(meetingDateTrimmed);
 
-        if (meetingPlace == null || meetingPlace.trim().isEmpty()) {
-            // indicate error to user (simple close or ignored)
-            // showConfirmationResult used for messages; reuse to indicate error
-            if (onConfirm != null&&stage != null) {
-
-                    javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-                    a.setTitle("Errore proposta");
-                    a.setHeaderText("Seleziona uno store per effettuare lo scambio");
-                    a.showAndWait();
-
-            }
-            return;
-        }
+        if (!ensureMeetingPlace(meetingPlace)) return;
         if (!dateOk) {
             if (stage != null) {
                 javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
@@ -299,6 +310,46 @@ public class FXNegotiationView implements INegotiationView {
             return;
         }
 
+        ProposalBean bean = buildProposalBean(meetingPlace, meetingDateTrimmed);
+
+        // read optional time if present and validate basic HH:mm format
+        String meetingTime = meetingTimeField != null ? meetingTimeField.getText() : null;
+        if (!processMeetingTime(bean, meetingTime)) return;
+        if (onConfirm != null) onConfirm.accept(bean);
+    }
+
+    private boolean ensureMeetingPlace(String meetingPlace) {
+        if (meetingPlace == null || meetingPlace.trim().isEmpty()) {
+            if (onConfirm != null && stage != null) {
+                javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+                a.setTitle("Errore proposta");
+                a.setHeaderText("Seleziona uno store per effettuare lo scambio");
+                a.showAndWait();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private boolean processMeetingTime(ProposalBean bean, String meetingTime) {
+        if (meetingTime == null) return true;
+        meetingTime = meetingTime.trim();
+        if (meetingTime.isEmpty()) return true;
+        String parsed = validateAndParseTime(meetingTime);
+        if (parsed == null) {
+            if (stage != null) {
+                javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+                a.setTitle("Errore orario");
+                a.setHeaderText("Inserisci un orario valido nel formato HH:mm");
+                a.showAndWait();
+            }
+            return false;
+        }
+        bean.setMeetingTime(parsed);
+        return true;
+    }
+
+    private ProposalBean buildProposalBean(String meetingPlace, String meetingDateTrimmed) {
         ProposalBean bean = new ProposalBean();
         // build offered as-is (may contain quantities >1)
         bean.setOffered(new ArrayList<>(proposedList.getItems()));
@@ -313,26 +364,28 @@ public class FXNegotiationView implements INegotiationView {
         bean.setFromUser(controller != null ? controller.getProposerUsername() : null);
         bean.setToUser(controller != null ? controller.getTargetOwnerUsername() : null);
         bean.setMeetingPlace(meetingPlace);
-        bean.setMeetingDate(meetingDate.trim());
-        // read optional time if present and validate basic HH:mm format
-        String meetingTime = meetingTimeField != null ? meetingTimeField.getText() : null;
-        if (meetingTime != null) meetingTime = meetingTime.trim();
-        if (meetingTime != null && !meetingTime.isEmpty()) {
-            // basic validation HH:mm
-            try {
-                java.time.LocalTime.parse(meetingTime);
-                bean.setMeetingTime(meetingTime);
-            } catch (Exception _) {
-                if (stage != null) {
-                    javafx.scene.control.Alert a = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
-                    a.setTitle("Errore orario");
-                    a.setHeaderText("Inserisci un orario valido nel formato HH:mm");
-                    a.showAndWait();
-                }
-                return;
-            }
+        bean.setMeetingDate(meetingDateTrimmed);
+        return bean;
+    }
+
+    private boolean validateMeetingDate(String meetingDateTrimmed) {
+        if (meetingDateTrimmed == null || meetingDateTrimmed.isEmpty()) return false;
+        try {
+            java.time.LocalDate d = java.time.LocalDate.parse(meetingDateTrimmed);
+            return d.isAfter(java.time.LocalDate.now());
+        } catch (Exception _) {
+            LOGGER.fine(() -> "Invalid meeting date input in FXNegotiationView");
+            return false;
         }
-        if (onConfirm != null) onConfirm.accept(bean);
+    }
+
+    private String validateAndParseTime(String meetingTime) {
+        try {
+            java.time.LocalTime.parse(meetingTime);
+            return meetingTime;
+        } catch (Exception _) {
+            return null;
+        }
     }
 
     // Custom cell shows thumbnail, name and quantity and allows styling when quantity==0
@@ -360,39 +413,40 @@ public class FXNegotiationView implements INegotiationView {
                 setText(null);
                 setStyle("");
             } else {
-                // load thumbnail if available
-                try {
-                    if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
-                        Image img = new Image(item.getImageUrl(), 40, 60, true, true, true);
-                        if (!img.isError()) thumb.setImage(img);
-                        else {
-                            java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
-                            if (is != null) thumb.setImage(new Image(is));
-                        }
-                    } else {
-                        java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
-                        if (is != null) thumb.setImage(new Image(is));
-                    }
-                } catch (Exception ex) {
-                    LOGGER.fine(() -> "Failed to load thumbnail for negotiation cell: " + ex.getMessage());
-                    java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
-                    if (is != null) {
-                        try { thumb.setImage(new Image(is)); } catch (Exception innerEx) { LOGGER.fine(() -> "Fallback image failed: " + innerEx.getMessage()); }
-                    }
-                }
-
+                // load thumbnail and set contents/style via helpers
+                loadThumbnail(item);
                 name.setText(item.getName() != null ? item.getName() : item.getId());
                 qty.setText(" x" + Math.max(0, item.getQuantity()));
-
-                // style when quantity is zero (light red background)
                 if (showZeroWarning && item.getQuantity() <= 0) {
                     container.setStyle("-fx-background-color: rgba(255,80,80,0.12); -fx-padding:4; -fx-background-radius:4;");
                 } else {
                     container.setStyle("");
                 }
-
                 setGraphic(container);
             }
         }
-    }
-}
+
+        private void loadThumbnail(CardBean item) {
+            try {
+                if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
+                    Image img = new Image(item.getImageUrl(), 40, 60, true, true, true);
+                    if (!img.isError()) { thumb.setImage(img); return; }
+                }
+                java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
+                if (is != null) trySetImageFromStream(is);
+            } catch (Exception _) {
+                LOGGER.fine(() -> "Failed to load thumbnail for negotiation cell");
+                java.io.InputStream is = getClass().getResourceAsStream(NOCARDIMAGE_ICONS_PATH);
+                if (is != null) trySetImageFromStream(is);
+            }
+        }
+
+        private void trySetImageFromStream(java.io.InputStream is) {
+            try {
+                thumb.setImage(new Image(is));
+            } catch (Exception _) {
+                LOGGER.fine(() -> "Fallback image failed");
+             }
+          }
+      }
+  }

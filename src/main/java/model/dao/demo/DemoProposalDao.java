@@ -37,7 +37,8 @@ public class DemoProposalDao implements IProposalDao {
             try {
                 long numeric = Long.parseLong(p.getProposalId());
                 if (numeric > max) max = numeric;
-            } catch (NumberFormatException ignored) {
+            } catch (NumberFormatException _) {
+                LOGGER.log(Level.WARNING,"Number format exception");
             }
             count++;
         }

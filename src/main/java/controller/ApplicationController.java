@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 public class ApplicationController {
     private static final Logger LOGGER = Logger.getLogger(ApplicationController.class.getName());
     private static final String JAVAFX = "JavaFX";
+    private static final String NULL = "<null>";
     private final Deque<IView> viewStack = new ArrayDeque<>();
     // configurazione
     private String currentInterface;
@@ -210,7 +211,7 @@ public class ApplicationController {
             LiveTradeController controller = new LiveTradeController(username, this);
             // Create the store-specific trade view and associate it with the controller
             view.IStoreTradeView storeView = viewFactory.createStoreTradeView(controller);
-            LOGGER.info(() -> "navigateToStoreTrades: created view instance: " + (storeView != null ? storeView.getClass().getName() : "<null>"));
+            LOGGER.info(() -> "navigateToStoreTrades: created view instance: " + (storeView != null ? storeView.getClass().getName() : NULL));
             // controller.setStoreView(storeView); // already done by factory, but safe to call
             controller.setStoreView(storeView);
             // Ensure the view is shown first so its FXML controls are initialized
@@ -272,7 +273,7 @@ public class ApplicationController {
         // itself
         try {
             LOGGER.log(java.util.logging.Level.INFO, "Presenting negotiation view: proposer={0}, target={1}",
-                    new Object[] { proposerUsername, targetCard != null ? targetCard.getId() : "<null>" });
+                    new Object[] { proposerUsername, targetCard != null ? targetCard.getId() : NULL });
             // The view implementation (FX or CLI) is responsible for presenting itself
             // correctly.
             negotiationView.display();
@@ -309,7 +310,7 @@ public class ApplicationController {
         }
 
         viewStack.addLast(newView);
-        LOGGER.info(() -> "displayView: about to display view instance: " + (newView != null ? newView.getClass().getName() : "<null>"));
+        LOGGER.info(() -> "displayView: about to display view instance: " + (newView != null ? newView.getClass().getName() : NULL));
         try {
             newView.display();
         } catch (Exception ex) {

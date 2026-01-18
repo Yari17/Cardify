@@ -102,12 +102,14 @@ public class CliStoreHPView implements IStoreHPView {
         }
         int i = 0;
         for (model.bean.TradeTransactionBean t : completed) {
-            if (t == null) continue;
-            String s = t.getStatus();
-            if (s == null) s = "?";
-            if (!("COMPLETED".equalsIgnoreCase(s) || "CANCELLED".equalsIgnoreCase(s))) continue;
-            i++;
-            System.out.printf("%d) tx-%d: %s vs %s @ %s [%s]%n", i, t.getTransactionId(), t.getProposerId(), t.getReceiverId(), t.getStoreId(), s);
+            if (t != null) {
+                String s = t.getStatus();
+                if (s == null) s = "?";
+                if ("COMPLETED".equalsIgnoreCase(s) || "CANCELLED".equalsIgnoreCase(s)) {
+                    i++;
+                    System.out.printf("%d) tx-%d: %s vs %s @ %s [%s]%n", i, t.getTransactionId(), t.getProposerId(), t.getReceiverId(), t.getStoreId(), s);
+                }
+            }
         }
         if (i == 0) System.out.println("Nessuno scambio concluso al momento.");
     }
