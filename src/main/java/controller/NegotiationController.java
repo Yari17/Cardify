@@ -23,7 +23,7 @@ public class NegotiationController {
         this.proposerUsername = proposerUsername;
         this.targetOwnerUsername = targetOwnerUsername;
         this.navigationController = navigationController;
-        this.proposalDao = navigationController != null ? navigationController.getDaoFactory().createProposalDao() : null;
+        this.proposalDao = navigationController != null ? navigationController.getProposalDao() : null;
     }
 
     public void setView(INegotiationView view) {
@@ -43,7 +43,7 @@ public class NegotiationController {
 
             
             try {
-                IUserDao userDao = navigationController.getDaoFactory().createUserDao();
+                IUserDao userDao = navigationController.getUserDao();
                 List<String> stores = new ArrayList<>();
                 for (String username : userDao.findAllUsernames()) {
                     model.domain.User u = userDao.findByName(username).orElse(null);

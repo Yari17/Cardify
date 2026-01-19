@@ -3,6 +3,7 @@ package controller;
 import exception.ConnectionException;
 import model.bean.CardBean;
 import model.dao.IBinderDao;
+import model.dao.demo.DemoBinderDao;
 import model.domain.Binder;
 import model.domain.Card;
 import model.domain.TradeTransaction;
@@ -89,6 +90,7 @@ class CardExchangeManagerTest {
         public Map<String, String> getAllSets() { return sets; }
     }
 
+    // Verifica che il ricevente riceva la carta offerta e la quantità venga sommata, mentre il proponente perda la carta
     @Test
     void executeExchange_mergesReceiverCardAnd_removesFromProposer() {
         FakeBinderDao binderDao = new FakeBinderDao();
@@ -135,5 +137,72 @@ class CardExchangeManagerTest {
         
         List<CardBean> proposerCards = binderDao.getUserBinders("user1").get(0).getCards();
         assertTrue(proposerCards.stream().noneMatch(cb -> "base5-9".equals(cb.getId())), "Proposer binder should no longer contain the offered card");
+    }
+
+
+    // Verifica che se si offrono più copie, il ricevente ottenga la quantità corretta e che la carta richiesta venga rimossa dal ricevente
+    @Test
+    void executeExchange_receiverGetsCorrectQuantity_whenOfferedMultiple() {
+        DemoBinderDao binderDao = new DemoBinderDao();
+
+        // Prepare proposer binder with 2 Flareon (base2-3)
+        Binder proposerBinder = new Binder("collectortest1", "base2", "Base 2");
+        CardBean proposerCard = new CardBean("base2-3", "Flareon", "https://example", CardGameType.POKEMON);
+        proposerCard.setQuantity(2);
+        proposerBinder.addCard(proposerCard);
+        binderDao.save(proposerBinder);
+
+        // Prepare receiver binder with 4 Vaporeon (sm115-18) and no Flareon
+        Binder receiverBinderV = new Binder("collectortest2", "sm115", "SM115");
+        CardBean receiverV = new CardBean("sm115-18", "Vaporeon", "https://example", CardGameType.POKEMON);
+        receiverV.setQuantity(4);
+        receiverBinderV.addCard(receiverV);
+        binderDao.save(receiverBinderV);
+
+        // Also ensure receiver has a binder for the offered card set (base2) absent -> will be created by manager
+        // Create offered/requested Card domain objects
+        Card offered = new Card("base2-3", "Flareon", "https://example", CardGameType.POKEMON);
+        offered.setQuantity(2);
+        Card requested = new Card("sm115-18", "Vaporeon", "https://example", CardGameType.POKEMON);
+        requested.setQuantity(1);
+
+        // Build TradeTransaction
+        TradeTransaction.TradeParticipants participants = new TradeTransaction.TradeParticipants("collectortest1", "collectortest2", "Store1");
+        TradeTransaction.TradeDetails details = new TradeTransaction.TradeDetails(LocalDateTime.now(), LocalDateTime.now().plusDays(1), List.of(offered), List.of(requested));
+        TradeTransaction tx = new TradeTransaction(1, TradeStatus.COMPLETED, participants, details);
+
+        // Minimal ICardProvider stub that returns set names
+        model.api.ICardProvider cardProvider = new model.api.ICardProvider() {
+            @Override
+            public List<Card> searchSet(String setId) { throw new UnsupportedOperationException(); }
+            @Override
+            public List<Card> searchCardsByName(String cardName) { throw new UnsupportedOperationException(); }
+            @Override
+            public <T extends Card> T getCardDetails(String cardId) { throw new UnsupportedOperationException(); }
+            @Override
+            public Map<String, String> getAllSets() {
+                return Map.of("base2", "Base 2", "sm115", "SM115");
+            }
+        };
+
+        CardExchangeManager manager = new CardExchangeManager(binderDao, cardProvider);
+
+        // Act
+        manager.executeExchange(tx);
+
+        // Assert: receiver should now have a binder for base2 with Flareon quantity 2
+        List<Binder> receiverBinders = binderDao.getUserBinders("collectortest2");
+        Binder base2Binder = receiverBinders.stream().filter(b -> "base2".equals(b.getSetId())).findFirst().orElse(null);
+        assertNotNull(base2Binder, "Receiver should have a binder for set base2 after exchange");
+        CardBean receivedFlareon = base2Binder.getCards().stream().filter(c -> "base2-3".equals(c.getId())).findFirst().orElse(null);
+        assertNotNull(receivedFlareon, "Receiver should have received Flareon card");
+        assertEquals(2, receivedFlareon.getQuantity(), "Receiver should have quantity 2 of Flareon after exchange");
+
+        // Also assert receiver kept existing Vaporeon quantity
+        Binder smBinder = receiverBinders.stream().filter(b -> "sm115".equals(b.getSetId())).findFirst().orElse(null);
+        assertNotNull(smBinder);
+        CardBean vap = smBinder.getCards().stream().filter(c -> "sm115-18".equals(c.getId())).findFirst().orElse(null);
+        assertNotNull(vap);
+        assertEquals(3, vap.getQuantity(), "Receiver's Vaporeon quantity should be decremented by 1 (requested)");
     }
 }

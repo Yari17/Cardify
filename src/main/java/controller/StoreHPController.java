@@ -58,23 +58,23 @@ public class StoreHPController {
     
     public void loadCompletedTrades() {
         try {
-            model.dao.ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
-            java.util.List<model.domain.TradeTransaction> list = tradeDao.getStoreCompletedTrades(username);
-            java.util.List<model.bean.TradeTransactionBean> beans = new java.util.ArrayList<>();
-            if (list != null) {
-                for (model.domain.TradeTransaction t : list) {
-                    if (t == null) continue;
-                    model.bean.TradeTransactionBean b = new model.bean.TradeTransactionBean();
-                    b.setTransactionId(t.getTransactionId());
-                    b.setProposerId(t.getProposerId());
-                    b.setReceiverId(t.getReceiverId());
-                    b.setStoreId(t.getStoreId());
-                    b.setTradeDate(t.getTradeDate());
-                    b.setStatus(t.getTradeStatus() != null ? t.getTradeStatus().name() : null);
-                    beans.add(b);
-                }
-            }
-            
+            model.dao.ITradeDao tradeDao = navigationController.getTradeDao();
+             java.util.List<model.domain.TradeTransaction> list = tradeDao.getStoreCompletedTrades(username);
+             java.util.List<model.bean.TradeTransactionBean> beans = new java.util.ArrayList<>();
+             if (list != null) {
+                 for (model.domain.TradeTransaction t : list) {
+                     if (t == null) continue;
+                     model.bean.TradeTransactionBean b = new model.bean.TradeTransactionBean();
+                     b.setTransactionId(t.getTransactionId());
+                     b.setProposerId(t.getProposerId());
+                     b.setReceiverId(t.getReceiverId());
+                     b.setStoreId(t.getStoreId());
+                     b.setTradeDate(t.getTradeDate());
+                     b.setStatus(t.getTradeStatus() != null ? t.getTradeStatus().name() : null);
+                     beans.add(b);
+                 }
+             }
+
             
             
             safeDisplayCompletedTrades(beans);

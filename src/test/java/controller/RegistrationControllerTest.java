@@ -98,6 +98,7 @@ class RegistrationControllerTest {
         public void navigateToLogin() { navigatedToLogin = true; }
     }
 
+    // Verifica che una registrazione valida ritorni al login e persista l'utente
     @Test
     void successfulRegistration_invokesNavigationToLogin() {
         FakeUserDao dao = new FakeUserDao();
@@ -114,6 +115,7 @@ class RegistrationControllerTest {
         assertTrue(dao.findAllUsernames().contains("newuser"));
     }
 
+    // Verifica che una registrazione duplicata mostri un errore di input
     @Test
     void duplicateRegistration_showsInputError() {
         FakeUserDao dao = new FakeUserDao();

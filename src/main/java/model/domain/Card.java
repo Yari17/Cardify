@@ -18,12 +18,9 @@ public class Card {
     }
 
     public CardBean toBean() {
-        return new CardBean(
-            this.id,
-            this.name,
-            this.imageUrl,
-            this.gameType
-        );
+        CardBean bean = new CardBean(this.id, this.name, this.imageUrl, this.gameType);
+        bean.setQuantity(this.quantity);
+        return bean;
     }
 
     public String getId() {

@@ -1,5 +1,38 @@
 [
   {
+    "transactionId": 1451338176,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "collectortest1",
+    "receiverId": "collectortest2",
+    "proposerSessionCode": 198425,
+    "receiverSessionCode": 996387,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Store1",
+    "creationTimestamp": "2026-01-19T14:46:19.657361",
+    "tradeDate": "2026-01-20T11:30",
+    "offeredCards": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
+  },
+  {
     "transactionId": 1214693586,
     "tradeStatus": "COMPLETED",
     "proposerId": "user3",
@@ -108,6 +141,39 @@
         "id": "A2-007",
         "name": "Yanmega ex",
         "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/007/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
+  },
+  {
+    "transactionId": 1450885378,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "collectortest1",
+    "receiverId": "collectortest2",
+    "proposerSessionCode": 638354,
+    "receiverSessionCode": 166305,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Store1",
+    "creationTimestamp": "2026-01-19T14:38:46.859603",
+    "tradeDate": "2026-01-20T17:30",
+    "offeredCards": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
         "gameType": "POKEMON",
         "quantity": 1
       }
@@ -242,6 +308,39 @@
         "id": "A2-035",
         "name": "Piplup",
         "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/035/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
+  },
+  {
+    "transactionId": 1452906518,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "collectortest2",
+    "receiverId": "collectortest1",
+    "proposerSessionCode": 335819,
+    "receiverSessionCode": 131784,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Nexus Comics",
+    "creationTimestamp": "2026-01-19T15:12:27.999538",
+    "tradeDate": "2026-01-20T00:00",
+    "offeredCards": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
         "gameType": "POKEMON",
         "quantity": 1
       }

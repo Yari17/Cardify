@@ -49,7 +49,7 @@ public class LiveTradeController {
     
     public boolean verifySessionCode(int transactionId, int sessionCode) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
             if (tx == null) return false;
             boolean accepted = tx.acceptSessionCode(sessionCode);
@@ -86,7 +86,7 @@ public class LiveTradeController {
     
     public TradeTransactionBean refreshTradeStatus(int transactionId) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
             if (tx == null) return null;
             TradeTransactionBean b = new TradeTransactionBean();
@@ -140,7 +140,7 @@ public class LiveTradeController {
     
     public void loadScheduledTrades() {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             List<TradeTransaction> list;
             if (storeView != null) {
                 list = tradeDao.getStoreTradeScheduledTransactions(username, null);
@@ -259,7 +259,7 @@ public class LiveTradeController {
 
     public int confirmPresence(int transactionId) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
             if (tx == null) {
                 LOGGER.warning(() -> "confirmPresence: TradeTransaction not found for id " + transactionId);
@@ -323,7 +323,7 @@ public class LiveTradeController {
     
     public boolean recordInspectionResult(int transactionId, String collectorId, boolean ok) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
             if (tx == null) return false;
             tx.markInspectionResult(collectorId, ok);
@@ -361,7 +361,7 @@ public class LiveTradeController {
     
     public boolean markInspectionPassed(int transactionId) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
             if (tx == null) {
                 LOGGER.warning(() -> "markInspectionPassed: TradeTransaction not found for id " + transactionId);
@@ -401,7 +401,7 @@ public class LiveTradeController {
     
     public void performCardExchange(TradeTransaction tx) {
         try {
-            IBinderDao binderDao = navigationController.getDaoFactory().createBinderDao();
+            IBinderDao binderDao = navigationController.getBinderDao();
             model.api.ICardProvider cardProvider = navigationController.getCardProvider();
             CardExchangeManager manager = new CardExchangeManager(binderDao, cardProvider);
             manager.executeExchange(tx);
@@ -413,7 +413,7 @@ public class LiveTradeController {
     
     public boolean concludeTrade(int transactionId) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
             if (tx == null) {
                 LOGGER.warning(() -> "concludeTrade: TradeTransaction non trovata per id " + transactionId);
@@ -441,7 +441,7 @@ public class LiveTradeController {
     
     public TradeTransactionBean fetchTradeBySessionCodes(int proposerCode, int receiverCode) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionBySessionCodes(proposerCode, receiverCode);
             if (tx == null) {
                 LOGGER.warning(() -> "fetchTradeBySessionCodes: nessuna transazione trovata per i codici " + proposerCode + ", " + receiverCode);
@@ -457,7 +457,7 @@ public class LiveTradeController {
     
     public void loadStoreScheduledTrades() {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             List<TradeTransaction> list = tradeDao.getStoreTradeScheduledTransactions(username, null);
             List<TradeTransactionBean> beans = new ArrayList<>();
             for (TradeTransaction t : list) {
@@ -474,7 +474,7 @@ public class LiveTradeController {
     
     public void loadStoreInProgressTrades() {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             List<TradeTransaction> list = tradeDao.getStoreTradeInProgressTransactions(username);
             List<TradeTransactionBean> beans = new ArrayList<>();
             for (TradeTransaction t : list) {
@@ -491,7 +491,7 @@ public class LiveTradeController {
     
     public void loadCollectorCompletedTrades() {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             List<TradeTransaction> all = tradeDao.getUserCompletedTrades(username);
             
             logCompletedTradesDiagnostic(all);
@@ -526,7 +526,7 @@ public class LiveTradeController {
     
     public void loadStoreCompletedTrades() {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             List<TradeTransaction> all = tradeDao.getStoreCompletedTrades(username);
             if (all == null) all = new ArrayList<>();
             List<TradeTransactionBean> completed = new ArrayList<>();
@@ -540,7 +540,7 @@ public class LiveTradeController {
     
     public boolean cancelTrade(int transactionId) {
         try {
-            ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            ITradeDao tradeDao = navigationController.getTradeDao();
             TradeTransaction tx = tradeDao.getTradeTransactionById(transactionId);
             if (tx == null) {
                 LOGGER.warning(() -> "cancelTrade: TradeTransaction not found for id " + transactionId);

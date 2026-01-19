@@ -659,10 +659,28 @@
         "quantity": 2,
         "isTradable": true,
         "status": ""
+      },
+      {
+        "id": "A2a-035",
+        "name": "Rotom",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/035/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "A2a-039",
+        "name": "Larvitar",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2a/039/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-17T12:33:18.671928",
-    "lastModified": "2026-01-17T20:50:56.693448"
+    "lastModified": "2026-01-19T13:23:52.353221"
   },
   {
     "id": 24,
@@ -753,10 +771,19 @@
         "quantity": 1,
         "isTradable": false,
         "status": ""
+      },
+      {
+        "id": "A2-012",
+        "name": "Torterra",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/012/high.png",
+        "gameType": "POKEMON",
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-17T23:58:59.519045",
-    "lastModified": "2026-01-17T23:58:59.525741"
+    "lastModified": "2026-01-19T13:24:09.103109"
   },
   {
     "id": 28,
@@ -844,63 +871,26 @@
     "lastModified": "2026-01-18T01:40:30.423843"
   },
   {
-    "id": 32,
-    "owner": "collectortest1",
-    "setId": "P-A",
-    "setName": "Promos-A",
+    "id": 41,
+    "owner": "collectortest2",
+    "setId": "base2",
+    "setName": "Jungle",
     "cards": [
       {
-        "id": "P-A-010",
-        "name": "Mewtwo",
-        "imageUrl": "https://assets.tcgdex.net/en/tcgp/P-A/010/high.png",
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
         "gameType": "POKEMON",
-        "quantity": 4,
+        "quantity": 5,
         "isTradable": true,
         "status": ""
       }
     ],
-    "createdAt": "2026-01-18T23:41:28.227335",
-    "lastModified": "2026-01-18T23:41:44.998077"
+    "createdAt": "2026-01-19T14:48:32.819915",
+    "lastModified": "2026-01-19T15:16:15.974123"
   },
   {
-    "id": 35,
-    "owner": "collectortest2",
-    "setId": "sm115",
-    "setName": "Hidden Fates",
-    "cards": [
-      {
-        "id": "sm115-18",
-        "name": "Vaporeon",
-        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
-        "gameType": "POKEMON",
-        "quantity": 3,
-        "isTradable": true,
-        "status": ""
-      }
-    ],
-    "createdAt": "2026-01-18T23:44:13.576288",
-    "lastModified": "2026-01-19T00:32:32.827436"
-  },
-  {
-    "id": 36,
-    "owner": "collectortest2",
-    "setId": "P",
-    "cards": [
-      {
-        "id": "P-A-010",
-        "name": "Mewtwo",
-        "imageUrl": "https://assets.tcgdex.net/en/tcgp/P-A/010/high.png",
-        "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": false,
-        "status": ""
-      }
-    ],
-    "createdAt": "2026-01-19T00:32:32.807379",
-    "lastModified": "2026-01-19T00:32:32.814546"
-  },
-  {
-    "id": 37,
+    "id": 42,
     "owner": "collectortest1",
     "setId": "sm115",
     "setName": "Hidden Fates",
@@ -910,12 +900,12 @@
         "name": "Vaporeon",
         "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
         "gameType": "POKEMON",
-        "quantity": 1,
-        "isTradable": false,
+        "quantity": 5,
+        "isTradable": true,
         "status": ""
       }
     ],
-    "createdAt": "2026-01-19T00:32:32.817660",
-    "lastModified": "2026-01-19T00:32:32.819007"
+    "createdAt": "2026-01-19T14:48:32.825995",
+    "lastModified": "2026-01-19T15:17:34.539123"
   }
 ]

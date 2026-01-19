@@ -126,6 +126,7 @@ class LoginControllerTest {
         public void refresh() { /* not used */}
     }
 
+    // Verifica che un login valido chiuda la view e invochi la navigazione basata sul ruolo
     @Test
     void successfulLogin_callsNavigationAndClosesView() {
         FakeUserDao dao = new FakeUserDao();
@@ -145,6 +146,7 @@ class LoginControllerTest {
         assertEquals("alice", nav.lastUser.getUsername());
     }
 
+    // Verifica che credenziali non valide mostrino un errore di input e non navighino
     @Test
     void invalidCredentials_showInputError() {
         FakeUserDao dao = new FakeUserDao();

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BinderTest {
 
+    // Verifica che l'aggiunta di due CardBean con lo stesso id unisca le quantità in un'unica voce
     @Test
     void addCard_mergesSameId() {
         Binder binder = new Binder();
@@ -30,6 +31,7 @@ class BinderTest {
         assertEquals(2, binder.getCards().get(0).getQuantity(), "Quantity should be incremented to 2");
     }
 
+    // Verifica che card con id diversi creino voci distinte nel binder
     @Test
     void addCard_differentIdsCreateDistinctEntries() {
         Binder binder = new Binder();
@@ -47,6 +49,7 @@ class BinderTest {
         assertEquals(2, binder.getCards().size(), "Two different card ids should create two entries");
     }
 
+    // Verifica che Binder faccia una copia difensiva dell'oggetto aggiunto (non riflette modifiche esterne)
     @Test
     void addCard_usesDefensiveCopy() {
         Binder binder = new Binder();

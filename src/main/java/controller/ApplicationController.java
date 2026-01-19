@@ -34,6 +34,14 @@ public class ApplicationController {
 
     private DaoFactory daoFactory;
 
+    // Invece di creare più istanze di DAO, mantengo riferimenti memorizzati per riutilizzo
+    private model.dao.IUserDao cachedUserDao;
+    private model.dao.ITradeDao cachedTradeDao;
+    private model.dao.IBinderDao cachedBinderDao;
+    private model.dao.IProposalDao cachedProposalDao;
+
+    private final java.util.Map<String, model.dao.IUserDao> userDaoByPersistence = new java.util.HashMap<>();
+
     public DaoFactory getDaoFactory() {
         return daoFactory;
     }
@@ -49,7 +57,7 @@ public class ApplicationController {
         ConfigurationManager config = new ConfigurationManager(inputManager);
         currentInterface = config.chooseInterface();
         currentPersistence = config.choosePersistence();
-        // Remember if the application was started in demo mode so logout can restore demo-only login
+        // serve per ricordare se l'app è stata avviata in modalità demo
         startedInDemoMode = "DEMO".equalsIgnoreCase(currentPersistence);
 
 
@@ -58,8 +66,9 @@ public class ApplicationController {
 
         daoFactory = createDaoFactory();
 
-
-        userDao = daoFactory.createUserDao();
+        // Se c'è già un istanza di dao utente memorizzata, la riutilizzo
+        if (cachedUserDao == null && daoFactory != null) cachedUserDao = daoFactory.createUserDao();
+        userDao = cachedUserDao;
         viewFactory = createViewFactory(inputManager);
 
         if (JAVAFX.equals(currentInterface)) {
@@ -105,12 +114,12 @@ public class ApplicationController {
         // Se l'app è avviata in modalità demo si assicura che sia globalmente configurata in modalità demo
         if (startedInDemoMode) {
             config.AppConfig.setPersistenceType(config.AppConfig.DAO_TYPE_MEMORY);
-            // Do NOT recreate daoFactory/userDao here because that would discard any in-memory changes
             if (daoFactory == null) {
                 daoFactory = DaoFactory.getFactory(model.domain.enumerations.PersistenceType.DEMO);
             }
             if (userDao == null) {
-                userDao = daoFactory.createUserDao();
+                if (cachedUserDao == null && daoFactory != null) cachedUserDao = daoFactory.createUserDao();
+                userDao = cachedUserDao;
             }
         }
         LoginController controller = new LoginController(userDao, this);
@@ -135,7 +144,7 @@ public class ApplicationController {
     }
 
     public void navigateToCollectorHomePage(UserBean user) throws NavigationException {
-        model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
+        model.dao.IBinderDao binderDao = getBinderDao();
         CollectorHPController controller = new CollectorHPController(user.getUsername(), this, binderDao);
         ICollectorHPView view = viewFactory.createCollectorHomePageView(controller);
         controller.setView(view);
@@ -152,7 +161,7 @@ public class ApplicationController {
     }
 
     public void navigateToCollection(String username) throws NavigationException {
-        IBinderDao binderDao = daoFactory.createBinderDao();
+        IBinderDao binderDao = getBinderDao();
         CollectionController controller = new CollectionController(username, this, binderDao);
         ICollectionView collectionView = viewFactory.createCollectionView(controller);
         controller.setView(collectionView);
@@ -252,7 +261,7 @@ public class ApplicationController {
 
 
         try {
-            model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
+            model.dao.IBinderDao binderDao = getBinderDao();
             java.util.List<model.bean.CardBean> inventory = new java.util.ArrayList<>();
             if (proposerUsername != null) {
                 java.util.List<model.domain.Binder> proposerBinders = binderDao.getUserBinders(proposerUsername);
@@ -301,11 +310,9 @@ public class ApplicationController {
     public void logout() throws NavigationException {
         LOGGER.info("Logging out: clearing history and navigating to login");
         if (startedInDemoMode) {
-            // Force demo persistence globally so the login screen behaves as demo-only
+            // Salva globalmente la persistenza in AppConfig in modalità demo
             config.AppConfig.setPersistenceType(config.AppConfig.DAO_TYPE_MEMORY);
-            // Do NOT recreate daoFactory or userDao here; keep the in-memory DAOs so users registered during this session remain available until the app closes.
         } else {
-            // keep AppConfig in sync with non-demo persistence
             updateAppConfigPersistence();
         }
         closeAll();
@@ -363,8 +370,41 @@ public class ApplicationController {
         return cardProvider;
     }
 
-    public boolean isStartedInDemoMode() {
-        return startedInDemoMode;
+    public model.dao.IUserDao getUserDao() {
+        if (cachedUserDao == null && daoFactory != null) cachedUserDao = daoFactory.createUserDao();
+        return cachedUserDao;
     }
 
+    public model.dao.ITradeDao getTradeDao() {
+        if (cachedTradeDao == null && daoFactory != null) cachedTradeDao = daoFactory.createTradeDao();
+        return cachedTradeDao;
+    }
+
+    public model.dao.IBinderDao getBinderDao() {
+        if (cachedBinderDao == null && daoFactory != null) cachedBinderDao = daoFactory.createBinderDao();
+        return cachedBinderDao;
+    }
+
+    public model.dao.IProposalDao getProposalDao() {
+        if (cachedProposalDao == null && daoFactory != null) cachedProposalDao = daoFactory.createProposalDao();
+        return cachedProposalDao;
+    }
+
+    public model.dao.IUserDao getUserDaoForPersistence(String persistenceKey) {
+        if (persistenceKey == null) return getUserDao();
+        return userDaoByPersistence.computeIfAbsent(persistenceKey, key -> {
+            try {
+                model.domain.enumerations.PersistenceType pt = switch (key.toUpperCase()) {
+                    case "DEMO" -> model.domain.enumerations.PersistenceType.DEMO;
+                    case "JDBC" -> model.domain.enumerations.PersistenceType.JDBC;
+                    case "JSON" -> model.domain.enumerations.PersistenceType.JSON;
+                    default -> model.domain.enumerations.PersistenceType.JSON;
+                };
+                return model.dao.factory.DaoFactory.getFactory(pt).createUserDao();
+            } catch (Exception ex) {
+                LOGGER.fine(() -> "Failed to create user DAO for persistence " + key + ": " + ex.getMessage());
+                return null;
+            }
+        });
+    }
 }

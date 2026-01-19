@@ -27,10 +27,8 @@ public class ManageTradeController {
 
     public ManageTradeController(String username, ApplicationController navigationController) {
         this.username = username;
-        
-        this.proposalDao = navigationController != null ? navigationController.getDaoFactory().createProposalDao()
-                : null;
         this.navigationController = navigationController;
+        this.proposalDao = navigationController != null ? navigationController.getProposalDao() : null;
     }
 
 
@@ -42,11 +40,11 @@ public class ManageTradeController {
         List<ProposalBean> concluded = new ArrayList<>();
 
         try {
-            
+
             List<Proposal> pendingProposals = proposalDao != null ? proposalDao.getPendingProposals(username) : List.of();
             List<Proposal> completedProposals = proposalDao != null ? proposalDao.getCompletedProposals(username) : List.of();
 
-            
+
             for (Proposal p : pendingProposals) {
                 if (p == null) continue;
                 pending.add(toBean(p));
@@ -60,7 +58,7 @@ public class ManageTradeController {
             LOGGER.log(Level.FINE, "Stacktrace", ex);
         }
 
-        
+
         view.displayTrades(pending, concluded);
     }
 
@@ -118,15 +116,15 @@ public class ManageTradeController {
         if (navigationController == null || proposalId == null)
             return false;
         try {
-            
+
             Optional<Proposal> opt = proposalDao != null ? proposalDao.getById(proposalId) : Optional.empty();
             if (opt.isEmpty()) return false;
             Proposal p = opt.get();
             java.time.LocalDateTime meeting = p.getMeetingLocalDateTime().orElse(null);
-            model.dao.ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
+            model.dao.ITradeDao tradeDao = navigationController.getTradeDao();
             var txOpt = tradeDao.findByParticipantsAndDate(p.getProposerId(), p.getReceiverId(), meeting);
             if (txOpt.isPresent()) {
-                
+
                 navigationController.navigateToTrade(username);
             } else {
                 LOGGER.warning(() -> "No TradeTransaction found for proposal: " + proposalId);
@@ -253,9 +251,7 @@ public class ManageTradeController {
     
     private void persistTradeTransactionIfNeeded(Proposal p, String proposalId) {
         try {
-            ITradeDao tradeDao = navigationController != null
-                    ? navigationController.getDaoFactory().createTradeDao()
-                    : null;
+            ITradeDao tradeDao = navigationController != null ? navigationController.getTradeDao() : null;
             if (tradeDao != null) {
                TradeTransaction tx = p.toTradeTransaction();
                 if (tx == null) {
