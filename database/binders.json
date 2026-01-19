@@ -881,13 +881,13 @@
         "name": "Flareon",
         "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
         "gameType": "POKEMON",
-        "quantity": 5,
+        "quantity": 4,
         "isTradable": true,
         "status": ""
       }
     ],
     "createdAt": "2026-01-19T14:48:32.819915",
-    "lastModified": "2026-01-19T15:16:15.974123"
+    "lastModified": "2026-01-19T16:15:52.085467"
   },
   {
     "id": 42,
@@ -900,12 +900,59 @@
         "name": "Vaporeon",
         "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
         "gameType": "POKEMON",
-        "quantity": 5,
+        "quantity": 3,
+        "isTradable": true,
+        "status": ""
+      },
+      {
+        "id": "sm115-6",
+        "name": "Pinsir GX",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/6/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2,
         "isTradable": true,
         "status": ""
       }
     ],
     "createdAt": "2026-01-19T14:48:32.825995",
-    "lastModified": "2026-01-19T15:17:34.539123"
+    "lastModified": "2026-01-19T16:15:52.083425"
+  },
+  {
+    "id": 43,
+    "owner": "collectortest2",
+    "setId": "sm115",
+    "setName": "Hidden Fates",
+    "cards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-19T16:15:52.067886",
+    "lastModified": "2026-01-19T16:15:52.074777"
+  },
+  {
+    "id": 44,
+    "owner": "collectortest1",
+    "setId": "base2",
+    "setName": "Jungle",
+    "cards": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-19T16:15:52.079372",
+    "lastModified": "2026-01-19T16:15:52.081175"
   }
 ]

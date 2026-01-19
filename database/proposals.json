@@ -55,6 +55,90 @@
     "meetingDate": "2026-01-20"
   },
   {
+    "proposalId": "13",
+    "proposerId": "collectortest1",
+    "receiverId": "collectortest2",
+    "cardsOffered": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-19T16:01:25.591725",
+    "status": "ACCEPTED",
+    "meetingPlace": "Store1",
+    "meetingDate": "2026-01-20",
+    "meetingTime": "12:30"
+  },
+  {
+    "proposalId": "14",
+    "proposerId": "collectortest1",
+    "receiverId": "collectortest2",
+    "cardsOffered": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-19T16:09:35.142272",
+    "status": "ACCEPTED",
+    "meetingPlace": "Store1",
+    "meetingDate": "2026-01-20",
+    "meetingTime": "12:30"
+  },
+  {
+    "proposalId": "15",
+    "proposerId": "collectortest1",
+    "receiverId": "collectortest2",
+    "cardsOffered": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      }
+    ],
+    "cardsRequested": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "lastUpdated": "2026-01-19T16:13:58.660727",
+    "status": "ACCEPTED",
+    "meetingPlace": "Store1",
+    "meetingDate": "2026-01-20",
+    "meetingTime": "12:30"
+  },
+  {
     "proposalId": "1",
     "proposerId": "user3",
     "receiverId": "user1",

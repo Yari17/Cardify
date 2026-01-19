@@ -347,5 +347,38 @@
     ],
     "proposerReviewed": false,
     "receiverReviewed": false
+  },
+  {
+    "transactionId": 1456597198,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "collectortest1",
+    "receiverId": "collectortest2",
+    "proposerSessionCode": 815740,
+    "receiverSessionCode": 603947,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Store1",
+    "creationTimestamp": "2026-01-19T16:13:58.679818",
+    "tradeDate": "2026-01-20T12:30",
+    "offeredCards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 2
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "base2-3",
+        "name": "Flareon",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base2/3/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
   }
 ]

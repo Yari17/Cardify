@@ -1,6 +1,10 @@
-package model.dao.demo;
+package config;
 
 import model.bean.CardBean;
+import model.dao.demo.DemoBinderDao;
+import model.dao.demo.DemoProposalDao;
+import model.dao.demo.DemoTradeDao;
+import model.dao.demo.DemoUserDao;
 import model.domain.Binder;
 import model.domain.TradeTransaction;
 import model.domain.Proposal;
