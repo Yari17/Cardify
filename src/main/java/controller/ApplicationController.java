@@ -26,11 +26,12 @@ public class ApplicationController {
     private static final String JAVAFX = "JavaFX";
     private static final String NULL = "<null>";
     private final Deque<IView> viewStack = new ArrayDeque<>();
-    
+
     private String currentInterface;
     private String currentPersistence;
-    private String currentGameType = config.AppConfig.POKEMON_GAME; 
-    
+    private boolean startedInDemoMode = false;
+    private String currentGameType = config.AppConfig.POKEMON_GAME;
+
     private DaoFactory daoFactory;
 
     public DaoFactory getDaoFactory() {
@@ -38,7 +39,7 @@ public class ApplicationController {
     }
 
     private IViewFactory viewFactory;
-    
+
     private IUserDao userDao;
 
     private model.api.ICardProvider cardProvider;
@@ -48,14 +49,16 @@ public class ApplicationController {
         ConfigurationManager config = new ConfigurationManager(inputManager);
         currentInterface = config.chooseInterface();
         currentPersistence = config.choosePersistence();
+        // Remember if the application was started in demo mode so logout can restore demo-only login
+        startedInDemoMode = "DEMO".equalsIgnoreCase(currentPersistence);
 
-        
+
         updateAppConfigPersistence();
 
-        
+
         daoFactory = createDaoFactory();
 
-        
+
         userDao = daoFactory.createUserDao();
         viewFactory = createViewFactory(inputManager);
 
@@ -66,22 +69,18 @@ public class ApplicationController {
         }
     }
 
-    
-    
+
     private IViewFactory createViewFactory(InputManager inputManager) {
-        return JAVAFX.equals(currentInterface)
-                ? new FXViewFactory()
-                : new CliIViewFactory(inputManager);
+        return JAVAFX.equals(currentInterface) ? new FXViewFactory() : new CliIViewFactory(inputManager);
     }
 
-    
-    
+
     private DaoFactory createDaoFactory() {
         PersistenceType persistenceType = switch (currentPersistence) {
             case "DEMO" -> PersistenceType.DEMO;
             case "JSON" -> PersistenceType.JSON;
             case "JDBC" -> PersistenceType.JDBC;
-            default -> PersistenceType.JSON; 
+            default -> PersistenceType.JSON;
         };
 
         return DaoFactory.getFactory(persistenceType);
@@ -89,10 +88,10 @@ public class ApplicationController {
 
     private void updateAppConfigPersistence() {
         String appConfigType = switch (currentPersistence) {
-            case "DEMO" -> config.AppConfig.DAO_TYPE_MEMORY; 
-            case "JSON" -> config.AppConfig.DAO_TYPE_JSON; 
-            case "JDBC" -> config.AppConfig.DAO_TYPE_JDBC; 
-            default -> config.AppConfig.DEFAULT_DAO_TYPE; 
+            case "DEMO" -> config.AppConfig.DAO_TYPE_MEMORY;
+            case "JSON" -> config.AppConfig.DAO_TYPE_JSON;
+            case "JDBC" -> config.AppConfig.DAO_TYPE_JDBC;
+            default -> config.AppConfig.DEFAULT_DAO_TYPE;
         };
 
         config.AppConfig.setPersistenceType(appConfigType);
@@ -103,6 +102,17 @@ public class ApplicationController {
     }
 
     public void navigateToLogin() throws NavigationException {
+        // Se l'app è avviata in modalità demo si assicura che sia globalmente configurata in modalità demo
+        if (startedInDemoMode) {
+            config.AppConfig.setPersistenceType(config.AppConfig.DAO_TYPE_MEMORY);
+            // Do NOT recreate daoFactory/userDao here because that would discard any in-memory changes
+            if (daoFactory == null) {
+                daoFactory = DaoFactory.getFactory(model.domain.enumerations.PersistenceType.DEMO);
+            }
+            if (userDao == null) {
+                userDao = daoFactory.createUserDao();
+            }
+        }
         LoginController controller = new LoginController(userDao, this);
         ILoginView view = viewFactory.createLoginView(controller);
         controller.setView(view);
@@ -116,7 +126,7 @@ public class ApplicationController {
         displayView(view);
     }
 
-    
+
     public void navigateToRegistrationWithDao(model.dao.IUserDao userDaoForRegistration) throws NavigationException {
         RegistrationController controller = new RegistrationController(userDaoForRegistration, this);
         IRegistrationView view = viewFactory.createRegistrationView(controller);
@@ -136,8 +146,7 @@ public class ApplicationController {
         StoreHPController controller = new StoreHPController(user.getUsername(), this);
         IStoreHPView view = viewFactory.createStoreHomePageView(controller);
 
-        
-        
+
         controller.setView(view);
         displayView(view);
     }
@@ -150,10 +159,10 @@ public class ApplicationController {
         displayView(collectionView);
     }
 
-    
+
     public void navigateToManageTrade(String username) throws NavigationException {
         try {
-            
+
             if (!viewStack.isEmpty()) {
                 IView top = viewStack.getLast();
                 if (top instanceof IManageTradeView) {
@@ -175,7 +184,7 @@ public class ApplicationController {
             LiveTradeController controller = new LiveTradeController(username, this);
             ICollectorTradeView tradeView = viewFactory.createTradeView(controller);
             controller.setView(tradeView);
-            
+
             LOGGER.info(() -> "navigateToTrade: about to load scheduled and completed trades for user=" + username);
             controller.loadScheduledTrades();
             LOGGER.info(() -> "navigateToTrade: scheduled trades loaded, now loading completed trades for user=" + username);
@@ -192,8 +201,8 @@ public class ApplicationController {
             LiveTradeController controller = new LiveTradeController(username, this);
             ICollectorTradeView tradeView = viewFactory.createTradeView(controller);
             controller.setView(tradeView);
-            
-            
+
+
             LOGGER.info(() -> "navigateToLiveTrades: loading scheduled trades for user=" + username);
             controller.loadScheduledTrades();
             LOGGER.info(() -> "navigateToLiveTrades: loading completed trades for user=" + username);
@@ -204,18 +213,18 @@ public class ApplicationController {
         }
     }
 
-    
+
     public void navigateToStoreTrades(String username) throws NavigationException {
         try {
             LiveTradeController controller = new LiveTradeController(username, this);
-            
+
             view.IStoreTradeView storeView = viewFactory.createStoreTradeView(controller);
             LOGGER.info(() -> "navigateToStoreTrades: created view instance: " + (storeView != null ? storeView.getClass().getName() : NULL));
-            
+
             controller.setStoreView(storeView);
-            
+
             displayView(storeView);
-            
+
         } catch (Exception ex) {
             throw new NavigationException("Failed to navigate to Store Trades", ex);
         }
@@ -227,55 +236,52 @@ public class ApplicationController {
             view.IStoreTradeView storeView = viewFactory.createStoreTradeView(controller);
             controller.setStoreView(storeView);
             displayView(storeView);
-            
+
             controller.loadStoreCompletedTrades();
         } catch (Exception ex) {
             throw new NavigationException("Failed to navigate to Store Completed Trades", ex);
         }
     }
 
-    public void navigateToNegotiation(String proposerUsername, model.bean.CardBean targetCard)
-            throws NavigationException {
-        
+    public void navigateToNegotiation(String proposerUsername, model.bean.CardBean targetCard) throws NavigationException {
+
         String targetOwner = targetCard != null ? targetCard.getOwner() : null;
         NegotiationController controller = new NegotiationController(proposerUsername, targetOwner, this);
         INegotiationView negotiationView = viewFactory.createNegotiationView(controller);
         controller.setView(negotiationView);
 
-        
+
         try {
             model.dao.IBinderDao binderDao = daoFactory.createBinderDao();
             java.util.List<model.bean.CardBean> inventory = new java.util.ArrayList<>();
             if (proposerUsername != null) {
                 java.util.List<model.domain.Binder> proposerBinders = binderDao.getUserBinders(proposerUsername);
                 for (model.domain.Binder b : proposerBinders) {
-                    if (b != null && b.getCards() != null)
-                        inventory.addAll(b.getCards());
+                    if (b != null && b.getCards() != null) inventory.addAll(b.getCards());
                 }
             }
 
             java.util.List<model.bean.CardBean> requested = new java.util.ArrayList<>();
             if (targetCard != null) {
-                
+
                 model.bean.CardBean copy = new model.bean.CardBean(targetCard);
                 copy.setQuantity(1);
                 requested.add(copy);
             }
 
-            
+
             controller.start(inventory, requested);
         } catch (Exception ex) {
             LOGGER.log(java.util.logging.Level.WARNING, "Could not assemble negotiation data: {0}", ex.getMessage());
         }
 
-        
+
         try {
-            LOGGER.log(java.util.logging.Level.INFO, "Presenting negotiation view: proposer={0}, target={1}",
-                    new Object[] { proposerUsername, targetCard != null ? targetCard.getId() : NULL });
+            LOGGER.log(java.util.logging.Level.INFO, "Presenting negotiation view: proposer={0}, target={1}", new Object[]{proposerUsername, targetCard != null ? targetCard.getId() : NULL});
             negotiationView.display();
             LOGGER.info("Negotiation view presentation requested");
         } catch (Exception ex) {
-            
+
             throw new NavigationException("Failed to present negotiation view", ex);
         }
     }
@@ -294,12 +300,20 @@ public class ApplicationController {
 
     public void logout() throws NavigationException {
         LOGGER.info("Logging out: clearing history and navigating to login");
+        if (startedInDemoMode) {
+            // Force demo persistence globally so the login screen behaves as demo-only
+            config.AppConfig.setPersistenceType(config.AppConfig.DAO_TYPE_MEMORY);
+            // Do NOT recreate daoFactory or userDao here; keep the in-memory DAOs so users registered during this session remain available until the app closes.
+        } else {
+            // keep AppConfig in sync with non-demo persistence
+            updateAppConfigPersistence();
+        }
         closeAll();
         navigateToLogin();
     }
 
     private void displayView(IView newView) throws NavigationException {
-        
+
         if (!viewStack.isEmpty()) {
             IView currentView = viewStack.getLast();
             closeView(currentView);
@@ -313,14 +327,14 @@ public class ApplicationController {
             String viewName = newView.getClass().getSimpleName();
             LOGGER.log(java.util.logging.Level.SEVERE, "Failed to display view: {0}", viewName);
             LOGGER.log(java.util.logging.Level.FINE, "Underlying error while displaying view", ex);
-            
+
             try {
-                
+
                 newView.showError("Errore interno: " + ex.getMessage());
-             } catch (Exception inner) {
-                 LOGGER.log(java.util.logging.Level.FINER, "Failed to show error on view", inner);
-             }
-            
+            } catch (Exception inner) {
+                LOGGER.log(java.util.logging.Level.FINER, "Failed to show error on view", inner);
+            }
+
         }
     }
 
@@ -347,6 +361,10 @@ public class ApplicationController {
             cardProvider = new model.api.ApiFactory().getCardProvider(currentGameType);
         }
         return cardProvider;
+    }
+
+    public boolean isStartedInDemoMode() {
+        return startedInDemoMode;
     }
 
 }

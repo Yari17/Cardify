@@ -9,7 +9,7 @@ import model.dao.demo.DemoTradeDao;
 
 public class DemoDaoFactory extends DaoFactory {
 
-    
+
     private DemoUserDao userDao;
     private DemoBinderDao binderDao;
     private DemoProposalDao proposalDao;

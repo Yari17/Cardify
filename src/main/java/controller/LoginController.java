@@ -40,11 +40,15 @@ public class LoginController {
         model.domain.enumerations.PersistenceType chosen = view.getPersistenceType();
         IUserDao daoToUse = userDao;
         if (chosen != null) {
-            try {
-                daoToUse = model.dao.factory.DaoFactory.getFactory(chosen).createUserDao();
-            } catch (Exception _) {
-                
-                daoToUse = userDao;
+            //Se è stata scelta la persistenza DEMO, usa l'userDao in memoria già esistente
+            if (chosen == model.domain.enumerations.PersistenceType.DEMO) {
+                daoToUse = this.userDao;
+            } else {
+                try {
+                    daoToUse = model.dao.factory.DaoFactory.getFactory(chosen).createUserDao();
+                } catch (Exception _) {
+                    daoToUse = userDao;
+                }
             }
         }
 
@@ -94,10 +98,14 @@ public class LoginController {
         model.domain.enumerations.PersistenceType chosen = view.getPersistenceType();
         model.dao.IUserDao daoForReg = userDao;
         if (chosen != null) {
-            try {
-                daoForReg = model.dao.factory.DaoFactory.getFactory(chosen).createUserDao();
-            } catch (Exception _) {
-                daoForReg = userDao;
+            if (chosen == model.domain.enumerations.PersistenceType.DEMO) {
+                daoForReg = this.userDao; // reuse existing in-memory user dao
+            } else {
+                try {
+                    daoForReg = model.dao.factory.DaoFactory.getFactory(chosen).createUserDao();
+                } catch (Exception _) {
+                    daoForReg = userDao;
+                }
             }
         }
         try {
