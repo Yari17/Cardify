@@ -530,7 +530,10 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     private void processPresenceConfirmed(model.bean.TradeTransactionBean updated, TradeTransactionBean transaction, Label date) {
         if (updated != null) {
-            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) {  }
+            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) {
+                // Ignoriamo eccezioni minori qui: l'aggiornamento della label della data non deve interrompere il flusso
+                // dell'interfaccia utente. Il blocco è intenzionalmente vuoto per resilienza UI.
+            }
         }
         displayScheduledTrades(java.util.List.of(updated != null ? updated : transaction));
         refresh();

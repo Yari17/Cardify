@@ -13,8 +13,6 @@ public class CliManageTradeView implements IManageTradeView {
     private java.util.function.Consumer<String> onAcceptCallback;
     private java.util.function.Consumer<String> onDeclineCallback;
     private java.util.function.Consumer<String> onCancelCallback;
-    private java.util.function.Consumer<String> onTradeClickCallback;
-    private java.util.function.Consumer<String> onTradeNowClickCallback;
     private java.util.List<model.bean.ProposalBean> lastPending = new java.util.ArrayList<>();
 
     @Override
@@ -210,10 +208,14 @@ public class CliManageTradeView implements IManageTradeView {
     public void registerOnCancel(java.util.function.Consumer<String> onCancel) { this.onCancelCallback = onCancel; }
 
     @Override
-    public void registerOnTradeClick(java.util.function.Consumer<String> onTradeClick) { this.onTradeClickCallback = onTradeClick; }
+    public void registerOnTradeClick(java.util.function.Consumer<String> onTradeClick) {
+        //no - op
+    }
 
     @Override
-    public void registerOnTradeNowClick(java.util.function.Consumer<String> onTradeNowClick) { this.onTradeNowClickCallback = onTradeNowClick; }
+    public void registerOnTradeNowClick(java.util.function.Consumer<String> onTradeNowClick) {
+        // no - op
+    }
 
     public void onAcceptTradeProposal(String id) {
         if (id == null) return;
@@ -251,8 +253,6 @@ public class CliManageTradeView implements IManageTradeView {
         
         manageController.loadAndDisplayTrades(this);
     }
-
-
 
     @Override
     public void setUsername(String username) {

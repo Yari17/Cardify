@@ -828,7 +828,9 @@ public class FXCollectionView implements ICollectionView {
             case MANAGE -> addNavSelectedTo(manageTradesLabel);
             case "logout" -> addNavSelectedTo(logoutLabel);
             default -> {
-                
+                // Nessuna azione necessaria per valori di navigazione non riconosciuti.
+                // Il comportamento desiderato è semplicemente non evidenziare nessuna voce quando
+                // la selezione non corrisponde a quelle previste — lasciamo il blocco vuoto intenzionalmente.
             }
         }
     }
