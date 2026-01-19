@@ -9,10 +9,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
-/**
- * Encapsulates the logic to exchange cards between collectors' binders.
- * Extracted from LiveTradeController to reduce cognitive complexity in the controller.
- */
+
 public class CardExchangeManager {
     private static final Logger LOGGER = Logger.getLogger(CardExchangeManager.class.getName());
 
@@ -78,7 +75,7 @@ public class CardExchangeManager {
         removeCardsFromOwner(tx.getReceiverId(), tx.getRequestedCards(), this::logReceiverBinderMissing, this::logReceiverCardMissing);
     }
 
-    // Helper functional interfaces for succinct logging callbacks
+    
     @FunctionalInterface
     private interface BinderMissingLogger {
         void log(String setId, String owner);
@@ -89,7 +86,7 @@ public class CardExchangeManager {
         void log(String cardId, String owner);
     }
 
-    // Generic remover shared by both proposer and receiver flows.
+    
     private void removeCardsFromOwner(String owner, List<Card> cardsToRemove, BinderMissingLogger missingBinderLog,
                                       CardMissingLogger missingCardLog) {
         if (owner == null || cardsToRemove == null) return;
@@ -108,8 +105,8 @@ public class CardExchangeManager {
         }
     }
 
-    // Extracted helper: remove the specified card from a binder, adjusting quantity or removing the bean.
-    // Returns true if the binder was modified and saved.
+    
+    
     private boolean removeCardFromBinder(Binder binder, Card card) {
         if (binder == null || card == null) return false;
         List<model.bean.CardBean> cards = binder.getCards();
@@ -130,7 +127,7 @@ public class CardExchangeManager {
         return false;
     }
 
-    // Logging helpers extracted from lambdas to reduce caller cognitive complexity
+    
     private void logProposerBinderMissing(String setId, String owner) {
         LOGGER.fine(() -> "CardExchangeManager: proposer binder not found for set=" + setId + " owner=" + owner);
     }

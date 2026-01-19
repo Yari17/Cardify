@@ -59,21 +59,21 @@ public class PokemonCardProvider implements ICardProvider {
             LOGGER.fine(() -> "NullPointer while processing set data: " + ex.getMessage());
             return new ArrayList<>();
         } catch (Exception ex) {
-            // Rethrow with context only (avoid logging then rethrow to satisfy static analysis rules)
+            
             throw new exception.ConnectionException("Failed to fetch set " + setId, ex);
         }
     }
 
-    // l'sdk non fornisce un metodo per cercare le carte per nome, quindi devo fare
-    // una richiesta http
+    
+    
     @Override
     public List<Card> searchCardsByName(String cardName) throws exception.ConnectionException {
         try {
-            // Costruisci l'URL con il parametro di ricerca
+            
             String encodedName = URLEncoder.encode(cardName, StandardCharsets.UTF_8);
             String url = "https://api.tcgdex.net/v2/en/cards?name=" + encodedName;
 
-            // Effettua la richiesta HTTP GET
+            
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(java.net.URI.create(url))
                     .GET()
@@ -82,7 +82,7 @@ public class PokemonCardProvider implements ICardProvider {
             HttpResponse<String> response = HTTP_CLIENT.send(request,
                     HttpResponse.BodyHandlers.ofString());
 
-            // Parse del JSON response direttamente in Card usando JsonArray
+            
             Gson gson = new Gson();
             JsonArray jsonArray = gson.fromJson(response.body(), JsonArray.class);
 
@@ -144,7 +144,7 @@ public class PokemonCardProvider implements ICardProvider {
         }
     }
 
-    // Helper: create and populate the basic PokemonCard fields from the SDK model
+    
     private PokemonCard buildPokemonCardFromApi(net.tcgdex.sdk.models.Card card) {
         String imageUrl = card.getImage() != null ? card.getImage() + HIGH_PNG_SUFFIX : null;
         PokemonCard pc = new PokemonCard(card.getId(), card.getName(), imageUrl);
@@ -184,7 +184,7 @@ public class PokemonCardProvider implements ICardProvider {
         return pc;
     }
 
-    // Helper: convert and attach attacks to the PokemonCard
+    
     private void populateAttacks(net.tcgdex.sdk.models.Card card, PokemonCard pc) {
         var attacksRaw = card.getAttacks();
         if (attacksRaw.isEmpty()) return;
@@ -203,7 +203,7 @@ public class PokemonCardProvider implements ICardProvider {
         pc.setAttacks(attacksList);
     }
 
-    // Helper: convert and attach weaknesses to the PokemonCard
+    
     private void populateWeaknesses(net.tcgdex.sdk.models.Card card, PokemonCard pc) {
         var weaknessesRaw = card.getWeaknesses();
         if (weaknessesRaw.isEmpty()) return;

@@ -148,5 +148,105 @@
     "proposerReviewed": false,
     "receiverReviewed": false,
     "proposerInspectionOk": true
+  },
+  {
+    "transactionId": 1404657715,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "user1",
+    "receiverId": "user2",
+    "proposerSessionCode": 443492,
+    "receiverSessionCode": 988807,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Store1",
+    "creationTimestamp": "2026-01-19T01:48:19.196042",
+    "tradeDate": "2026-01-20T00:00",
+    "offeredCards": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "ecard3-2",
+        "name": "Alakazam",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/2/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
+  },
+  {
+    "transactionId": 1398720821,
+    "tradeStatus": "COMPLETED",
+    "proposerId": "collectortest1",
+    "receiverId": "collectortest2",
+    "proposerSessionCode": 680074,
+    "receiverSessionCode": 652396,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "La Tana del Goblin",
+    "creationTimestamp": "2026-01-19T00:09:22.302875",
+    "tradeDate": "2026-01-20T12:00",
+    "offeredCards": [
+      {
+        "id": "P-A-010",
+        "name": "Mewtwo",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/P-A/010/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false,
+    "proposerInspectionOk": true
+  },
+  {
+    "transactionId": 1404418590,
+    "tradeStatus": "CANCELLED",
+    "proposerId": "user1",
+    "receiverId": "user2",
+    "proposerSessionCode": 186405,
+    "receiverSessionCode": 947371,
+    "proposerArrived": true,
+    "receiverArrived": true,
+    "storeId": "Store1",
+    "creationTimestamp": "2026-01-19T01:44:20.071543",
+    "tradeDate": "2026-01-20T12:00",
+    "offeredCards": [
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "requestedCards": [
+      {
+        "id": "A2-035",
+        "name": "Piplup",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/A2/035/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1
+      }
+    ],
+    "proposerReviewed": false,
+    "receiverReviewed": false
   }
 ]

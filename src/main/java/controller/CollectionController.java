@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-//Controller applicativo per la gestione della collezione di carte di un utente
+
 public class CollectionController {
     private static final Logger LOGGER = Logger.getLogger(CollectionController.class.getName());
     private static final String SET_NOT_FOUND_MSG = "Set not found for setId: ";
@@ -25,10 +25,10 @@ public class CollectionController {
     private final ApiFactory apiFactory;
     private ICollectionView view;
 
-    // Cache locale dei binder dell'utente: setId -> Binder
+    
     private Map<String, Binder> cachedBinders;
 
-    // Mappa per tracciare i binder modificati: setId -> Binder
+    
     private final Map<String, Binder> pendingChanges;
     private boolean hasUnsavedChanges;
 
@@ -54,27 +54,25 @@ public class CollectionController {
         return username;
     }
 
-    /**
-     * Carica la collezione dell'utente organizzata per set
-     */
+    
     public void loadUserCollection() {
         try {
             List<Binder> userBinders = binderDao.getUserBinders(username);
 
-            // Mappa: setId -> Binder
+            
             Map<String, Binder> bindersBySet = new HashMap<>();
             for (Binder binder : userBinders) {
                 bindersBySet.put(binder.getSetId(), binder);
             }
 
-            // Update the cached binders
+            
             this.cachedBinders = new HashMap<>(bindersBySet);
 
-            // Prepare setId -> List<Card> map by fetching card details via provider for card ids in binders
+            
             Map<String, List<Card>> setCardsMap = new HashMap<>();
             ICardProvider provider = getCardProviderSafe();
 
-            // Iterate entries and fetch cards in a delegated helper to keep method simple
+            
             for (Map.Entry<String, Binder> entry : bindersBySet.entrySet()) {
                 String setId = entry.getKey();
                 Binder binder = entry.getValue();
@@ -82,7 +80,7 @@ public class CollectionController {
                 setCardsMap.put(setId, cards);
             }
 
-            // Clear pending changes since we're loading fresh data
+            
             pendingChanges.clear();
             hasUnsavedChanges = false;
             if (view != null) {
@@ -115,16 +113,14 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Crea un nuovo set nella collezione
-     */
+    
     public void createBinder(String setId, String setName) {
         try {
             binderDao.createBinder(username, setId, setName);
 
             LOGGER.info(() -> "Created new set: " + setName + " for user: " + username);
 
-            // Ricarica la collezione
+            
             loadUserCollection();
 
             if (view != null) {
@@ -138,9 +134,7 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Elimina un binder dalla collezione
-     */
+    
     public void deleteBinder(String setId) {
         try {
             Binder binder = cachedBinders.get(setId);
@@ -153,7 +147,7 @@ public class CollectionController {
 
             LOGGER.info(() -> "Deleted set: " + binder.getSetName() + " for user: " + username);
 
-            // Ricarica la collezione
+            
             loadUserCollection();
 
             if (view != null) {
@@ -167,12 +161,10 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Aggiunge una carta al set (o incrementa la quantità se già posseduta)
-     */
+    
     public void addCardToSet(String setId, Card card) {
         try {
-            // Use cached binder instead of reloading from database
+            
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
@@ -180,18 +172,18 @@ public class CollectionController {
                 return;
             }
 
-            // Controlla se la carta esiste già
+            
             CardBean existingCard = binder.getCards().stream()
                     .filter(c -> c.getId().equals(card.getId()))
                     .findFirst()
                     .orElse(null);
 
             if (existingCard != null) {
-                // Incrementa la quantità
+                
                 existingCard.setQuantity(existingCard.getQuantity() + 1);
                 LOGGER.info(() -> "Increased quantity of " + card.getName() + " to " + existingCard.getQuantity());
             } else {
-                // Aggiungi nuova carta
+                
                 CardBean cardBean = new CardBean(
                         card.getId(),
                         card.getName(),
@@ -201,12 +193,12 @@ public class CollectionController {
                 LOGGER.info(() -> "Added card " + card.getName() + " to set " + setId);
             }
 
-            // Track pending changes instead of persisting immediately
+            
             pendingChanges.put(setId, binder);
             hasUnsavedChanges = true;
             if (view != null) {
                 view.setSaveButtonVisible(true);
-                // Update only the specific card in the UI
+                
                 view.updateCardInSet(setId, card.getId());
             }
         } catch (Exception ex) {
@@ -217,12 +209,10 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Rimuove una carta dal set (o decrementa la quantità)
-     */
+    
     public void removeCardFromSet(String setId, Card card) {
         try {
-            // Use cached binder instead of reloading from database
+            
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
@@ -230,7 +220,7 @@ public class CollectionController {
                 return;
             }
 
-            // Trova la carta
+            
             CardBean existingCard = binder.getCards().stream()
                     .filter(c -> c.getId().equals(card.getId()))
                     .findFirst()
@@ -238,21 +228,21 @@ public class CollectionController {
 
             if (existingCard != null) {
                 if (existingCard.getQuantity() > 1) {
-                    // Decrementa la quantità
+                    
                     existingCard.setQuantity(existingCard.getQuantity() - 1);
                     LOGGER.info(() -> "Decreased quantity of " + card.getName() + " to " + existingCard.getQuantity());
                 } else {
-                    // Rimuovi completamente la carta
+                    
                     binder.removeCard(card.getId());
                     LOGGER.info(() -> "Removed card " + card.getName() + " from set " + setId);
                 }
 
-                // Track pending changes instead of persisting immediately
+                
                 pendingChanges.put(setId, binder);
                 hasUnsavedChanges = true;
                 if (view != null) {
                     view.setSaveButtonVisible(true);
-                    // Update only the specific card in the UI
+                    
                     view.updateCardInSet(setId, card.getId());
                 }
             }
@@ -264,12 +254,10 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Toglie/imposta una carta come scambiabile
-     */
+    
     public void toggleCardTradable(String setId, String cardId, boolean tradable) {
         try {
-            // Use cached binder instead of reloading from database
+            
             Binder binder = cachedBinders.get(setId);
 
             if (binder == null) {
@@ -277,7 +265,7 @@ public class CollectionController {
                 return;
             }
 
-            // Trova la carta e aggiorna il flag tradable
+            
             CardBean cardToUpdate = binder.getCards().stream()
                     .filter(c -> c.getId().equals(cardId))
                     .findFirst()
@@ -286,12 +274,12 @@ public class CollectionController {
             if (cardToUpdate != null) {
                 cardToUpdate.setTradable(tradable);
 
-                // Track pending changes instead of persisting immediately
+                
                 pendingChanges.put(setId, binder);
                 hasUnsavedChanges = true;
                 if (view != null) {
                     view.setSaveButtonVisible(true);
-                    // DO NOT update UI for tradable toggle - it's already updated by the checkbox
+                    
                 }
 
                 LOGGER.info(() -> "Set card " + cardId + " as " + (tradable ? "tradable" : "not tradable"));
@@ -301,9 +289,7 @@ public class CollectionController {
         }
     }
 
-    /**
-     * Salva tutte le modifiche pendenti in persistenza
-     */
+    
     public void saveChanges() {
         if (!hasUnsavedChanges || pendingChanges.isEmpty()) {
             LOGGER.info("No changes to save");
@@ -321,7 +307,7 @@ public class CollectionController {
 
             final int finalSavedCount = savedCount;
 
-            // Clear pending changes after successful save
+            
             pendingChanges.clear();
             hasUnsavedChanges = false;
 
@@ -332,7 +318,7 @@ public class CollectionController {
 
             LOGGER.info(() -> "Successfully saved " + finalSavedCount + " binder changes");
 
-            // Reload the collection to refresh the UI with saved data
+            
             loadUserCollection();
         } catch (Exception ex) {
             LOGGER.severe("Error saving changes: " + ex.getMessage());
@@ -397,7 +383,7 @@ public class CollectionController {
     }
 
     private List<Card> fetchCardsForSet(String setId, Binder binder, ICardProvider provider) {
-        // Try to fetch the full set; if unavailable or empty, fall back to fetching details only for owned cards
+        
         List<Card> fromSearch = trySearchSet(setId, provider);
         if (!fromSearch.isEmpty()) return fromSearch;
         return fetchDetailsFromBinder(binder, provider);

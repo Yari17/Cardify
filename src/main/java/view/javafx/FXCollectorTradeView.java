@@ -27,7 +27,7 @@ import view.ICollectorTradeView;
 public class FXCollectorTradeView implements ICollectorTradeView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectorTradeView.class.getName());
 
-    // Constants to avoid duplicated literals
+    
     private static final String NAV_SELECTED = "nav-selected";
     private static final String CELL_SECONDARY = "cell-secondary";
     private static final String BG_COLOR_STYLE = "-fx-background-color: #1E2530;";
@@ -46,9 +46,9 @@ public class FXCollectorTradeView implements ICollectorTradeView {
     private ListView<model.bean.TradeTransactionBean> scheduledTradesList;
 
     @FXML
-    private ListView<model.bean.TradeTransactionBean> completedTradesList; // Nuova ListView per gli scambi conclusi
+    private ListView<model.bean.TradeTransactionBean> completedTradesList; 
 
-    // Navigation label fields to allow marking selected state
+    
     @FXML
     private Label homeLabel;
 
@@ -66,33 +66,30 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     private LiveTradeController controller;
     private Stage stage;
-    private static final boolean STORE_MODE = false; // quando true la view si comporta come interfaccia dello store
+    private static final boolean STORE_MODE = false; 
     private String currentUsername;
 
-    public FXCollectorTradeView() {
-        // FXML fields will be injected by FXMLLoader
-    }
 
     @FXML
     public void initialize() {
         if (scheduledTradesList != null) {
-            setTradeListCellFactory(scheduledTradesList);
+            setTradeListCellFactory(scheduledTradesList, false);
         }
         if (completedTradesList != null) {
-            setTradeListCellFactory(completedTradesList);
+            setTradeListCellFactory(completedTradesList, true);
         }
-        // Carica automaticamente sia gli scambi programmati che quelli conclusi all'apertura della pagina
+        
         if (controller != null) {
             controller.loadScheduledTrades();
             controller.loadCollectorCompletedTrades();
         }
     }
 
-    // Helper to attach the standard trade cell factory to a ListView
-    private void setTradeListCellFactory(javafx.scene.control.ListView<model.bean.TradeTransactionBean> listView) {
+    
+    private void setTradeListCellFactory(javafx.scene.control.ListView<model.bean.TradeTransactionBean> listView, boolean isCompleted) {
         if (listView == null) return;
         listView.setCellFactory(lv -> {
-            // reference lv to avoid 'parameter never used' warnings
+            
             lv.getItems();
             return new ListCell<>() {
                 @Override
@@ -103,14 +100,14 @@ public class FXCollectorTradeView implements ICollectorTradeView {
                         setGraphic(null);
                         return;
                     }
-                    setGraphic(createTradeCellContent(item));
+                    setGraphic(createTradeCellContent(item, isCompleted));
                 }
             };
         });
     }
 
-    // Extracted helper to construct the Node used as ListCell graphic
-    private Node createTradeCellContent(TradeTransactionBean item) {
+    
+    private Node createTradeCellContent(TradeTransactionBean item, boolean isCompleted) {
         HBox root = new HBox(12);
         root.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
         root.getStyleClass().add("trade-list-cell");
@@ -125,7 +122,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
         root.getChildren().add(spacer);
 
-        VBox rightBox = buildRightBox(item);
+        VBox rightBox = buildRightBox(item, isCompleted);
         root.getChildren().add(rightBox);
 
         return root;
@@ -164,8 +161,8 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         return txt;
     }
 
-    private VBox buildRightBox(TradeTransactionBean item) {
-        // Badge
+    private VBox buildRightBox(TradeTransactionBean item, boolean isCompleted) {
+        
         Label badge = new Label(item.getStatus() != null ? item.getStatus().toUpperCase() : "UNKNOWN");
         badge.getStyleClass().addAll("status-badge");
         applyBadgeStyle(badge, item.getStatus());
@@ -175,7 +172,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         Label counts = new Label("Offerte: " + offeredCount + "  •  Richieste: " + requestedCount);
         counts.getStyleClass().add(CELL_SECONDARY);
 
-        HBox actions = buildActions(item);
+        HBox actions = buildActions(item, isCompleted);
 
         VBox rightBox = new VBox(6);
         rightBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
@@ -204,14 +201,17 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         }
     }
 
-    private HBox buildActions(TradeTransactionBean item) {
+    private HBox buildActions(TradeTransactionBean item, boolean isCompleted) {
         HBox actions = new HBox(6);
         actions.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
 
-        Button tradeNowBtn = new Button("Trade Now");
-        tradeNowBtn.getStyleClass().add("button-accent");
-        tradeNowBtn.setOnAction(evt -> { displayTrade(item); evt.consume(); });
-        actions.getChildren().add(tradeNowBtn);
+        
+        if (!isCompleted) {
+            Button tradeNowBtn = new Button("Trade Now");
+            tradeNowBtn.getStyleClass().add("button-accent");
+            tradeNowBtn.setOnAction(evt -> { displayTrade(item); evt.consume(); });
+            actions.getChildren().add(tradeNowBtn);
+        }
 
         if (isTradeToday(item)) {
             Button tradeBtn = new Button("Trade");
@@ -228,31 +228,29 @@ public class FXCollectorTradeView implements ICollectorTradeView {
     public void setController(LiveTradeController controller) {
         this.controller = controller;
     }
-    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
-    @Override
     public void display() {
         if (stage != null) {
             stage.show();
         } else {
             LOGGER.warning("Stage not set, cannot display");
         }
-        // mark this view as the selected nav item
+        
         markNavSelectedLive();
     }
 
     private void markNavSelectedLive() {
-        // remove selected style from all
+        
         removeNavSelectedFrom(homeLabel);
         removeNavSelectedFrom(collectionLabel);
         removeNavSelectedFrom(liveTradeLabel);
         removeNavSelectedFrom(manageTradesLabel);
         removeNavSelectedFrom(logoutLabel);
 
-        // this view represents the Live Trades navigation
+        
         addNavSelectedTo(liveTradeLabel);
     }
 
@@ -289,7 +287,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     @Override
     public void showError(String errorMessage) {
-        //not implemented
+        /* not used */
     }
 
     @Override
@@ -321,11 +319,11 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         if (controller != null) navigationToManageFromLive();
     }
 
-    // helper to call ApplicationController.navigateToManageTrade via LiveTradeController
+    
     private void navigationToManageFromLive() {
         try {
             if (controller != null) {
-                // LiveTradeController delegates to ApplicationController to navigate to Manage Trades
+                
                 controller.navigateToManage();
             }
         } catch (Exception ex) {
@@ -377,7 +375,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         });
     }
 
-    // Extracted helper to create the Scene used to display trade details
+    
     private Scene createTradeDialogScene(TradeTransactionBean transaction) {
         VBox content = new VBox(12);
         content.setPadding(new Insets(16));
@@ -393,7 +391,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         }
         Label date = new Label("Data: " + dateStr); date.setStyle(TEXT_FILL_WHITE);
 
-        // Label stato e bottone refresh (definiti una sola volta)
+        
         Label statusLabel = new Label("Stato: " + (transaction.getStatus() != null ? transaction.getStatus() : "--"));
         statusLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FFD700;");
         Button refreshBtn = new Button("Aggiorna");
@@ -415,7 +413,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         HBox lists = buildTradeLists(transaction);
         content.getChildren().addAll(lists);
 
-        // Append the store/collector specific action area (extracted for clarity)
+        
         content.getChildren().add(createActionArea(transaction, statusLabel, refreshBtn, date));
 
         Scene scene = new Scene(content, 700, 500);
@@ -428,7 +426,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         return scene;
     }
 
-    // Extracted action area builder to reduce method size and complexity
+    
     private VBox createActionArea(TradeTransactionBean transaction, Label statusLabel, Button refreshBtn, Label date) {
         if (STORE_MODE) {
             return createStoreActionArea(transaction, statusLabel, refreshBtn);
@@ -436,7 +434,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         return createCollectorActionArea(transaction, date);
     }
 
-    // Extracted store-mode branch from createActionArea
+    
     private VBox createStoreActionArea(TradeTransactionBean transaction, Label statusLabel, Button refreshBtn) {
         VBox actionArea = new VBox(6);
         actionArea.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
@@ -445,7 +443,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
             actionArea.getChildren().add(createStoreNobodyArrivedArea(transaction, statusLabel, refreshBtn));
             return actionArea;
         }
-        // Almeno uno è arrivato: mostra informazioni e pulsante refresh
+        
         actionArea.getChildren().addAll(statusLabel, refreshBtn);
         return actionArea;
     }
@@ -470,7 +468,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         return node;
     }
 
-    // Extracted collector-mode branch from createActionArea
+    
     private VBox createCollectorActionArea(TradeTransactionBean transaction, Label date) {
         VBox actionArea = new VBox(6);
         actionArea.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
@@ -491,7 +489,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         return actionArea;
     }
 
-    // Extracted handler for confirm presence to reduce complexity in the factory method
+    
     private void handleConfirmPresence(javafx.event.ActionEvent ev, TradeTransactionBean transaction, Label date, VBox actionArea) {
         if (controller == null) { showError("Controller non connesso"); ev.consume(); return; }
         int code = controller.confirmPresence(transaction.getTransactionId());
@@ -502,13 +500,13 @@ public class FXCollectorTradeView implements ICollectorTradeView {
             model.bean.TradeTransactionBean updated = controller.refreshTradeStatus(transaction.getTransactionId());
             processPresenceConfirmed(updated, transaction, date);
         } else {
-            // find the confirm button and update text
+            
             if (ev.getSource() instanceof Button b) b.setText("Errore durante la conferma");
         }
         ev.consume();
     }
 
-    // Handler for submitting session code (extracted to reduce complexity)
+    
     private void handleSubmitSessionCode(javafx.event.ActionEvent ev, javafx.scene.control.TextField codeField, Button submit, TradeTransactionBean transaction, Label statusLabel, VBox actionArea) {
         String txt = codeField.getText();
         try {
@@ -532,14 +530,14 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     private void processPresenceConfirmed(model.bean.TradeTransactionBean updated, TradeTransactionBean transaction, Label date) {
         if (updated != null) {
-            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) { /* ignore */ }
+            try { date.setText((updated.getTradeDate() != null ? updated.getTradeDate().toLocalDate().toString() : "TBD") + " • " + (updated.getStoreId() != null ? updated.getStoreId() : "TBD")); } catch (Exception _) {  }
         }
         displayScheduledTrades(java.util.List.of(updated != null ? updated : transaction));
         refresh();
     }
 
     private HBox buildTradeLists(TradeTransactionBean transaction) {
-        // Left column: what the current user is giving (Stai cedendo)
+        
         Label youGiveLabel = new Label("Stai cedendo");
         youGiveLabel.setStyle(TEXT_FILL_WHITE + " -fx-font-weight: bold;");
         javafx.scene.control.ListView<String> offeredList = new javafx.scene.control.ListView<>();
@@ -549,7 +547,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
         VBox left = new VBox(6, youGiveLabel, offeredList);
         left.setPrefWidth(320);
 
-        // Right column: what the user will receive (Avrai in cambio)
+        
         Label youGetLabel = new Label("Avrai in cambio");
         youGetLabel.setStyle(TEXT_FILL_WHITE + " -fx-font-weight: bold;");
         javafx.scene.control.ListView<String> requestedList = new javafx.scene.control.ListView<>();
@@ -566,13 +564,13 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     @Override
     public void displayIspection() {
-        // Minimal placeholder: show a dialog indicating inspection should happen
+        
         javafx.application.Platform.runLater(() -> showModalDialog("Ispezione", "Inspect cards in store (UI pending)"));
     }
 
     @Override
     public void onIspectionComplete(String username) {
-        // simple feedback; real logic should update domain via controller
+        
         javafx.application.Platform.runLater(() -> showModalDialog("Ispezione completata", "Ispezione completata da: " + (username != null ? username : "?")));
     }
 
@@ -583,13 +581,13 @@ public class FXCollectorTradeView implements ICollectorTradeView {
             scheduledTradesList.getItems().clear();
             if (scheduled == null || scheduled.isEmpty()) return;
             for (model.bean.TradeTransactionBean t : scheduled) {
-                if (isFinalizedStatus(t)) continue; // Non mostrare scambi conclusi tra i programmati
+                if (isFinalizedStatus(t)) continue; 
                 scheduledTradesList.getItems().add(t);
             }
         });
     }
 
-    // Helper to detect finalized statuses
+    
     private boolean isFinalizedStatus(TradeTransactionBean t) {
         if (t == null) return false;
         String status = t.getStatus();
@@ -601,7 +599,7 @@ public class FXCollectorTradeView implements ICollectorTradeView {
     public void displayCompletedTrades(java.util.List<model.bean.TradeTransactionBean> completedTrades) {
         if (completedTradesList == null) return;
         javafx.application.Platform.runLater(() -> {
-            // Diagnostic: log incoming completed trades count
+            
             try {
                 if (completedTrades == null || completedTrades.isEmpty()) {
                     LOGGER.info(() -> "FXCollectorTradeView.displayCompletedTrades: received 0 completed trades");
@@ -632,11 +630,11 @@ public class FXCollectorTradeView implements ICollectorTradeView {
 
     @Override
     public void onTradeComplete(String tradeId) {
-        // minimal feedback: inform user the trade is complete
+        
         javafx.application.Platform.runLater(() -> showModalDialog("Trade completato", "Trade " + (tradeId != null ? tradeId : "<id>") + " completato"));
     }
 
-    // Helper to show a small modal dialog with a message and OK button (standard size)
+    
     private void showModalDialog(String title, String message) {
         final int MODAL_WIDTH = 360;
         final int MODAL_HEIGHT = 120;

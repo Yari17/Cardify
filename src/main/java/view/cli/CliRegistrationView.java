@@ -62,7 +62,7 @@ public class CliRegistrationView implements IRegistrationView {
                 ? UserBean.USER_TYPE_STORE
                 : UserBean.USER_TYPE_COLLECTOR;
 
-        // If application not in demo mode, ask which persistence to use for registration
+        
         if (!config.AppConfig.DAO_TYPE_MEMORY.equals(config.AppConfig.getPersistenceType())) {
             System.out.println("Scegli persistenza per la registrazione: 1) JSON  2) JDBC (MySQL)  3) DEMO");
             System.out.print("Scelta (1-3, default 1): ");
@@ -93,12 +93,7 @@ public class CliRegistrationView implements IRegistrationView {
 
     @Override
     public void refresh() {
-        // CLI: refresh is a no-op for interactive views; caller may invoke display().
-    }
-
-    @Override
-    public void setStage(javafx.stage.Stage stage) {
-        // CLI does not use JavaFX stages, method present for interface compatibility.
+        /* not used */
     }
 
     @Override

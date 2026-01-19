@@ -1,7 +1,7 @@
 package model.domain;
 
 public class User {
-    private long id; // ID per compatibilità con IDao
+    private long id; 
     private String name;
     private int reliabilityScore;
     private int reviewCount;

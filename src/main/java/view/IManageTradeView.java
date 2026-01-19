@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 public interface IManageTradeView extends IView {
 
-    // Mostra le proposte in attesa e le proposte concluse/programmati
+    
     void displayTrades(List<ProposalBean> pending, List<ProposalBean> scheduled);
 
 

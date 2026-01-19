@@ -52,13 +52,13 @@ public class FXCollectorHPView implements ICollectorHPView {
     @FXML
     private ComboBox<String> gameComboBox;
 
-    @FXML // Will be used when expansion filtering is implemented
+    @FXML 
     private ComboBox<String> expansionComboBox;
 
     @FXML
     private ComboBox<String> languageComboBox;
 
-    @FXML // Will be used when ITCGCard condition filtering is implemented
+    @FXML 
     private CheckBox mintCheckBox;
 
     @FXML
@@ -73,10 +73,10 @@ public class FXCollectorHPView implements ICollectorHPView {
     @FXML
     private CheckBox playedCheckBox;
 
-    @FXML // Will be used when price filtering is implemented
+    @FXML 
     private Slider priceSlider;
 
-    @FXML // Will be used to display cards
+    @FXML 
     private FlowPane cardsFlowPane;
 
     @FXML
@@ -111,9 +111,9 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     private CollectorHPController controller;
     private Stage stage;
-    private Map<String, String> setsIdToNameMap; // ID -> Nome del set
+    private Map<String, String> setsIdToNameMap; 
 
-    // Pagination fields
+    
     private List<CardBean> allCards;
     private int currentPage = 0;
     private static final int CARDS_PER_PAGE = 20;
@@ -126,10 +126,6 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @FXML
     private Label pageLabel;
-
-    public FXCollectorHPView() {
-        // FXML fields will be injected by FXMLLoader
-    }
 
     @FXML
     private void initialize() {
@@ -207,7 +203,7 @@ public class FXCollectorHPView implements ICollectorHPView {
         content.setAlignment(javafx.geometry.Pos.CENTER);
         content.setStyle("-fx-background-color: #1E2530;");
 
-        // Diagnostic logging: report owner and tradable state to help debug negotiation flow
+        
         try {
             String owner = card != null ? card.getOwner() : "<null>";
             boolean tradable = card != null && card.isTradable();
@@ -232,7 +228,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             content.getChildren().add(createTradableInfo());
         }
 
-        // If the card belongs to another user and is tradable, add a "Proponi scambio" button
+        
         if (card.getOwner() != null && !card.getOwner().isEmpty() && controller != null
                 && !controller.getUsername().trim().equalsIgnoreCase(card.getOwner().trim())
                 && card.isTradable()) {
@@ -334,7 +330,7 @@ public class FXCollectorHPView implements ICollectorHPView {
         addIfNotNull(detailsBox, createLabel("📋 Categoria: " + pokemonCard.getCategory(),
                 NO_IMAGE_STYLE));
 
-        // Additional sections
+        
         addIfNotNull(detailsBox, createWeaknessRetreatBox(pokemonCard));
         addIfNotNull(detailsBox, createDescriptionBox(pokemonCard));
         addIfNotNull(detailsBox, createAttacksBox(pokemonCard));
@@ -545,44 +541,41 @@ public class FXCollectorHPView implements ICollectorHPView {
 
     @Override
     public void displayCards(List<CardBean> cards) {
-        // Ensure UI updates happen on the FX thread
+        
         Platform.runLater(() -> {
-            // Show cards view
+            
             initialViewBox.setVisible(false);
             initialViewBox.setManaged(false);
             cardsViewBox.setVisible(true);
             cardsViewBox.setManaged(true);
 
-            // Clear previous cards to free memory
+            
             cardsFlowPane.getChildren().clear();
 
             if (cards == null || cards.isEmpty()) {
                 LOGGER.info("No cards to display (empty result)");
-                // Show a friendly placeholder
+                
                 Label emptyLabel = new Label("Nessuna carta trovata per il filtro selezionato.");
                 emptyLabel.setStyle("-fx-text-fill: #9CA3AF; -fx-font-size: 14px; -fx-padding: 20;");
                 cardsFlowPane.getChildren().add(emptyLabel);
 
-                // Reset pagination state
+                
                 this.allCards = new ArrayList<>();
                 this.currentPage = 0;
                 updatePaginationControls(1);
                 return;
             }
 
-            // Store all cards and reset to first page
+            
             this.allCards = cards;
             this.currentPage = 0;
 
-            // Show first page
+            
             showCardsPage(0);
         });
     }
 
-    /**
-     * Display a specific page of cards to prevent OutOfMemoryError.
-     * Limits rendering to CARDS_PER_PAGE cards at a time.
-     */
+    
     private void showCardsPage(int pageIndex) {
         if (allCards == null || allCards.isEmpty()) {
             return;
@@ -590,7 +583,7 @@ public class FXCollectorHPView implements ICollectorHPView {
 
         int totalPages = (int) Math.ceil((double) allCards.size() / CARDS_PER_PAGE);
 
-        // Validate page index
+        
         if (pageIndex < 0 || pageIndex >= totalPages) {
             return;
         }
@@ -606,29 +599,27 @@ public class FXCollectorHPView implements ICollectorHPView {
         List<CardBean> pageCards = allCards.subList(startIndex, endIndex);
 
         Platform.runLater(() -> {
-            // Assicurati che il box delle carte sia visibile
+            
             initialViewBox.setVisible(false);
             initialViewBox.setManaged(false);
             cardsViewBox.setVisible(true);
             cardsViewBox.setManaged(true);
 
-            // Clear previous cards to free memory
+            
             cardsFlowPane.getChildren().clear();
 
-            // Load only cards for current page
+            
             for (CardBean card : pageCards) {
                 VBox cardContainer = createCardView(card);
                 cardsFlowPane.getChildren().add(cardContainer);
             }
 
-            // Update pagination controls
+            
             updatePaginationControls(totalPages);
         });
     }
 
-    /**
-     * Update pagination button states and page label.
-     */
+    
     private void updatePaginationControls(int totalPages) {
         if (pageLabel != null) {
             pageLabel.setText(String.format("Page %d of %d", currentPage + 1, totalPages));
@@ -677,7 +668,7 @@ public class FXCollectorHPView implements ICollectorHPView {
         boolean imageLoaded = false;
         if (card.getImageUrl() != null && !card.getImageUrl().isEmpty()) {
             try {
-                // Direct loading (background)
+                
                 Image image = new Image(card.getImageUrl(), true);
                 if (!image.isError()) {
                     imageView.setImage(image);
@@ -689,7 +680,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             }
         }
 
-        // Se l'immagine non è caricata, mostra placeholder
+        
         if (!imageLoaded) {
             try {
                 Image placeholderImage = new Image(getClass().getResourceAsStream("/icons/nocardimage.svg"));
@@ -721,7 +712,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             cardBox.getChildren().addAll(gameTypeLabel, imageView, nameLabel, idLabel);
         }
 
-        // Aggiungi evento click per aprire dialog dettagli
+        
         cardBox.setOnMouseClicked(_ -> showCardDetailsDialog(card));
 
         return cardBox;
@@ -734,9 +725,7 @@ public class FXCollectorHPView implements ICollectorHPView {
         }
     }
 
-    /**
-     * Mostra una finestra modale con i dettagli della carta selezionata.
-     */
+    
     private void showCardDetailsDialog(CardBean card) {
         if (controller != null) {
             controller.showCardDetails(card);
@@ -791,13 +780,13 @@ public class FXCollectorHPView implements ICollectorHPView {
             return;
         }
 
-        // Nascondi il box iniziale e mostra il box delle carte
+        
         initialViewBox.setVisible(false);
         initialViewBox.setManaged(false);
         cardsViewBox.setVisible(true);
         cardsViewBox.setManaged(true);
 
-        // Cerca le carte per nome
+        
         String searchName = query.trim();
         LOGGER.log(java.util.logging.Level.INFO, "Searching for cards with name: {0}", searchName);
         controller.searchCardsByName(searchName);
@@ -806,13 +795,13 @@ public class FXCollectorHPView implements ICollectorHPView {
     @FXML
     private void onViewPopularCardsClicked() {
         if (controller != null) {
-            // Nascondi il box iniziale e mostra il box delle carte
+            
             initialViewBox.setVisible(false);
             initialViewBox.setManaged(false);
             cardsViewBox.setVisible(true);
             cardsViewBox.setManaged(true);
 
-            // Carica le carte popolari
+            
             controller.loadPopularCards();
         }
     }
@@ -828,7 +817,7 @@ public class FXCollectorHPView implements ICollectorHPView {
             return;
         }
 
-        // Salva la mappa per usarla quando l'utente seleziona un set
+        
         this.setsIdToNameMap = setsMap;
 
         LOGGER.log(java.util.logging.Level.INFO, "Set map contents: {0}", setsMap);
@@ -843,22 +832,22 @@ public class FXCollectorHPView implements ICollectorHPView {
 
             setFilterButton.getItems().clear();
 
-            // Opzione "Popular Cards"
+            
             MenuItem popularItem = new MenuItem(POPULAR_CARDS_LABEL);
             popularItem.setOnAction(_ -> onSetSelected(POPULAR_CARDS_LABEL));
             setFilterButton.getItems().add(popularItem);
 
             LOGGER.info("Added 'Popular Cards' option");
 
-            // Aggiungi i set mostrando il nome leggibile
+            
             int count = 0;
             for (Map.Entry<String, String> entry : setsMap.entrySet()) {
-                String displayName = entry.getValue(); // Mostra solo il nome
+                String displayName = entry.getValue(); 
                 MenuItem setItem = new MenuItem(displayName);
                 setItem.setOnAction(_ -> onSetSelected(displayName));
                 setFilterButton.getItems().add(setItem);
                 count++;
-                if (count <= 5) { // Log solo i primi 5 per non sovraccaricare
+                if (count <= 5) { 
                     LOGGER.log(java.util.logging.Level.INFO, "Added set: {0} -> {1}",
                             new Object[] { entry.getKey(), displayName });
                 }
@@ -874,23 +863,23 @@ public class FXCollectorHPView implements ICollectorHPView {
             return;
         }
 
-        // Aggiorna il testo del bottone con il set selezionato
+        
         setFilterButton.setText(selectedSetName);
 
-        // Nascondi il box iniziale e mostra il box delle carte
+        
         initialViewBox.setVisible(false);
         initialViewBox.setManaged(false);
         cardsViewBox.setVisible(true);
         cardsViewBox.setManaged(true);
 
-        // Caso speciale per le carte popolari
+        
         if (selectedSetName.equals(POPULAR_CARDS_LABEL)) {
             LOGGER.info("Selected popular cards set");
             controller.loadPopularCards();
             return;
         }
 
-        // Trova l'ID corrispondente al nome selezionato
+        
         if (setsIdToNameMap != null) {
             String setId = setsIdToNameMap.entrySet().stream()
                     .filter(entry -> entry.getValue().equals(selectedSetName))
@@ -901,14 +890,13 @@ public class FXCollectorHPView implements ICollectorHPView {
             if (setId != null) {
                 LOGGER.log(java.util.logging.Level.INFO, "Set selected - Query: {0} ({1})",
                         new Object[] { setId, selectedSetName });
-                // Carica le carte del set
+                
                 controller.loadCardsFromSet(setId);
             } else {
                 LOGGER.log(java.util.logging.Level.WARNING, "Set ID not found for: {0}", selectedSetName);
             }
         }
     }
-    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -963,9 +951,9 @@ public class FXCollectorHPView implements ICollectorHPView {
     public void refresh() {
         javafx.application.Platform.runLater(() -> {
             try {
-                // Refresh UX elements if present
+                
                 if (usernameLabel != null) usernameLabel.setText(usernameLabel.getText());
-                // Could refresh lists or other components here
+                
             } catch (Exception ex) {
                 LOGGER.fine(() -> "CollectorHPView refresh failed: " + ex.getMessage());
             }

@@ -20,7 +20,7 @@ public interface IProposalDao {
     List<Proposal> getReceivedProposals(String username);
     List<Proposal> getScheduledProposals(String username);
 
-    // New: convenience methods to fetch by lifecycle state
+    
     List<Proposal> getPendingProposals(String username);
-    List<Proposal> getCompletedProposals(String username); // ACCEPTED, REJECTED, EXPIRED
+    List<Proposal> getCompletedProposals(String username); 
 }

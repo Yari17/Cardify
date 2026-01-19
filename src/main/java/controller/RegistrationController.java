@@ -52,7 +52,7 @@ public class RegistrationController {
         }
     }
 
-    // Handle back/cancel action from the registration view
+    
     public void onBackToLoginRequested() {
         try {
             navigationController.navigateToLogin();

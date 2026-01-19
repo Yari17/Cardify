@@ -20,59 +20,42 @@ public class StoreHPController {
         return username;
     }
 
-    /**
-     * Associa la view grafica a questo controller.
-     * Metodo chiamato dal ApplicationController quando si crea la view.
-     */
+    
     public void setView(IStoreHPView view) {
         this.view = view;
-        // Imposta anche il controller sulla view (la view sa come invocare il controller)
+        
         if (view != null) {
             view.setController(this);
             view.showWelcomeMessage(username);
         }
     }
 
-    /**
-     * Richiesta di logout da parte dell'utente store.
-     * Delegata al ApplicationController per la navigazione.
-     */
+    
     public void onLogoutRequested() {
         LOGGER.log(Level.INFO, "Store user {0} logging out", username);
         navigationController.logout();
     }
 
-    /**
-     * Richiesta di uscita dall'applicazione.
-     */
+    
     public void onExitRequested() {
         System.exit(0);
     }
 
-    /**
-     * Metodo chiamato dalla view quando l'utente preme "Gestisci scambi".
-     * Qui il controller grafico non accede a DAO o logica di business: delega
-     * la navigazione al ApplicationController che si occupa di mostrare la
-     * view dei Live Trades/Manage Trades.
-     */
+    
     public void onManageTradesRequested() {
         LOGGER.log(Level.INFO, "StoreHP: richiesta di gestione scambi per {0}", username);
-        // Delego la navigazione al controller dell'applicazione
+        
         navigationController.navigateToStoreTrades(username);
     }
 
-    /**
-     * Metodo chiamato dalla view quando l'utente vuole vedere gli scambi conclusi.
-     */
+    
     public void onViewCompletedTradesRequested() {
         LOGGER.log(Level.INFO, "StoreHP: richiesta di visualizzazione scambi conclusi per {0}", username);
-        // Load completed trades and show them inside the Store Home Page (no navigation)
+        
         loadCompletedTrades();
     }
 
-    /**
-     * Carica gli scambi conclusi per lo store e richiede alla view di mostrarli.
-     */
+    
     public void loadCompletedTrades() {
         try {
             model.dao.ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -91,9 +74,9 @@ public class StoreHPController {
                     beans.add(b);
                 }
             }
-            // Delegate alla view
-            // view may be null if not set yet
-            // Use try/catch to avoid breaking navigation in case of view errors
+            
+            
+            
             safeDisplayCompletedTrades(beans);
         } catch (Exception ex) {
             LOGGER.warning(() -> "loadCompletedTrades failed: " + ex.getMessage());

@@ -6,11 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Domain class representing a card binder (collection) for a specific set.
- * Follows Information Expert principle - knows its cards and manages collection
- * operations.
- */
+
 public class Binder {
     private long id;
     private String owner;
@@ -33,7 +29,7 @@ public class Binder {
         this.setName = setName;
     }
 
-    // Getters and Setters
+    
     public long getId() {
         return id;
     }
@@ -83,12 +79,23 @@ public class Binder {
         this.lastModified = lastModified;
     }
 
-    // Business methods
+    
     public void addCard(CardBean card) {
-        if (card != null) {
-            this.cards.add(card);
-            updateLastModified();
+        if (card == null) return;
+
+        
+        for (CardBean cb : this.cards) {
+            if (cb != null && cb.getId() != null && cb.getId().equals(card.getId())) {
+                int newQty = cb.getQuantity() + (card.getQuantity() > 0 ? card.getQuantity() : 1);
+                cb.setQuantity(newQty);
+                updateLastModified();
+                return;
+            }
         }
+
+        
+        this.cards.add(new CardBean(card));
+        updateLastModified();
     }
 
     public void removeCard(String cardId) {

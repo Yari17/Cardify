@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.logging.Logger;
 
-//controller Trade - kept minimal; presentation/management moved to ManageTradeController and ManageTradeView
+
 public class LiveTradeController {
     private static final Logger LOGGER = Logger.getLogger(LiveTradeController.class.getName());
     private static final String TRADE_PREFIX = "Trade ";
@@ -38,9 +38,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Associa la view specifica per lo store al controller applicativo.
-     */
+    
     public void setStoreView(view.IStoreTradeView storeView) {
         this.storeView = storeView;
         if (this.storeView != null) {
@@ -48,11 +46,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Verifica il session code inserito dallo store per una trade proposal specifica.
-     * Se il codice è valido aggiorna lo stato della trade transaction e ritorna true,
-     * altrimenti false. La responsabilità di persistere lo stato è del DAO.
-     */
+    
     public boolean verifySessionCode(int transactionId, int sessionCode) {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -76,9 +70,9 @@ public class LiveTradeController {
             if (tx.getTradeStatus() == model.domain.enumerations.TradeStatus.INSPECTION_PHASE) {
                 if (storeView != null) {
                     storeView.showMessage("Both collectors arrived. Inspection phase started for trade " + transactionId);
-                    // Do not open a new dialog here - the store view that initiated the verification
-                    // should update its existing UI. We just send a message; views can refresh themselves
-                    // if they need to by calling controller.refreshTradeStatus().
+                    
+                    
+                    
                 }
                 if (view != null) view.displayIspection();
             } else if (tx.getTradeStatus() == model.domain.enumerations.TradeStatus.PARTIALLY_ARRIVED && storeView != null) {
@@ -89,9 +83,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Richiede al DAO l'ultima versione della trade transaction e la ritorna come bean.
-     */
+    
     public TradeTransactionBean refreshTradeStatus(int transactionId) {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -104,7 +96,7 @@ public class LiveTradeController {
             b.setStoreId(tx.getStoreId());
             b.setTradeDate(tx.getTradeDate());
             b.setStatus(tx.getTradeStatus() != null ? tx.getTradeStatus().name() : null);
-            // map cards
+            
             java.util.List<CardBean> offered = new java.util.ArrayList<>();
             if (tx.getOfferedCards() != null) for (Card c : tx.getOfferedCards()) {
                 CardBean cb = new model.bean.CardBean();
@@ -125,10 +117,10 @@ public class LiveTradeController {
                 requested.add(cb);
             }
             b.setRequested(requested);
-            // inspection status mapping
+            
             b.setProposerInspectionOk(tx.getProposerInspectionOk());
             b.setReceiverInspectionOk(tx.getReceiverInspectionOk());
-            // arrival flags and session codes
+            
             b.setProposerArrived(tx.isProposerArrived());
             b.setReceiverArrived(tx.isReceiverArrived());
             b.setProposerSessionCode(tx.getProposerSessionCode());
@@ -141,11 +133,11 @@ public class LiveTradeController {
     }
 
     public void loadTrades() {
-        // Intentionally empty: ManageTradeController is responsible for loading/managing proposals.
+        
         LOGGER.fine("LiveTradeController.loadTrades() called - no-op by design (delegated to ManageTradeController)");
     }
 
-    // Load scheduled trades for the current user and display them in the live trade view
+    
     public void loadScheduledTrades() {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -166,7 +158,7 @@ public class LiveTradeController {
             } else if (view != null) {
                 LOGGER.info(() -> "loadScheduledTrades: dispatching " + beans.size() + " trades to collector view");
                 view.displayScheduledTrades(beans);
-                // Ensure completed trades are also loaded for collector views (diagnostic)
+                
                 safeLoadCollectorCompletedTrades();
             }
         } catch (Exception ex) {
@@ -174,9 +166,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Helper that wraps the diagnostic loading of collector completed trades used from the UI thread.
-     */
+    
     private void safeLoadCollectorCompletedTrades() {
         try {
             LOGGER.info(() -> "loadScheduledTrades: now loading completed trades for user=" + username);
@@ -186,9 +176,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Mappa una TradeTransaction in un TradeTransactionBean per la UI.
-     */
+    
     private TradeTransactionBean toBean(TradeTransaction t) {
         TradeTransactionBean b = new TradeTransactionBean();
         b.setTransactionId(t.getTransactionId());
@@ -232,9 +220,7 @@ public class LiveTradeController {
         return b;
     }
 
-    /**
-     * Naviga indietro alla homepage dello store. Metodo invocato dalla view (Back button).
-     */
+    
     public void navigateBackToStoreHome() {
         try {
             navigationController.navigateToStoreHomePage(new UserBean(username, config.AppConfig.USER_TYPE_STORE));
@@ -279,7 +265,7 @@ public class LiveTradeController {
                 LOGGER.warning(() -> "confirmPresence: TradeTransaction not found for id " + transactionId);
                 return -1;
             }
-            // FIX: Non permettere conferma se già entrambi arrivati o scambio concluso/annullato
+            
             if (tx.getTradeStatus() == model.domain.enumerations.TradeStatus.BOTH_ARRIVED
                 || tx.getTradeStatus() == model.domain.enumerations.TradeStatus.COMPLETED
                 || tx.getTradeStatus() == model.domain.enumerations.TradeStatus.CANCELLED) {
@@ -308,16 +294,16 @@ public class LiveTradeController {
                 }
                 storeView.displayTrade(bean);
             }
-            // collector view may update itself via refresh; we avoid calling controller->view circularly
+            
         } catch (Exception ex) {
             LOGGER.fine(() -> "Post-confirm notification failed: " + ex.getMessage());
         }
     }
 
-    // Navigate to the live trade view for the given proposal (delegates to ApplicationController)
+    
     public void startTrade(String proposalId) {
         try {
-            // Use the incoming proposalId for diagnostic purposes; navigation remains by username
+            
             LOGGER.fine(() -> "startTrade requested for proposalId=" + proposalId + " user=" + username);
             navigationController.navigateToTrade(username);
         } catch (Exception ex) {
@@ -325,7 +311,7 @@ public class LiveTradeController {
         }
     }
 
-    // Navigate to the manage trades view
+    
     public void navigateToManage() {
         try {
             navigationController.navigateToManageTrade(username);
@@ -334,11 +320,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Registra l'esito dell'ispezione svolta dallo store per un collector su una trade specifica.
-     * Se l'ispezione portata dallo store è negativa per uno dei collector, la trade viene annullata.
-     * Se entrambe sono positive, la trade viene marcata come COMPLETED.
-     */
+    
     public boolean recordInspectionResult(int transactionId, String collectorId, boolean ok) {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -376,10 +358,7 @@ public class LiveTradeController {
         return recordInspectionResult(transactionId, collectorId, false);
     }
 
-    /**
-     * Mark the inspection as passed for the transaction (store confirms inspection).
-     * This forces the transaction into INSPECTION_PASSED and persists the change.
-     */
+    
     public boolean markInspectionPassed(int transactionId) {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -390,14 +369,14 @@ public class LiveTradeController {
             }
             tx.updateTradeStatus(model.domain.enumerations.TradeStatus.INSPECTION_PASSED);
             tradeDao.save(tx);
-            // Notify UI
+            
             TradeTransactionBean bean = refreshTradeStatus(transactionId);
             if (storeView != null) {
                 storeView.displayTrade(bean);
                 storeView.showMessage(TRADE_PREFIX + transactionId + " inspection passed.");
             }
             if (view != null) {
-                // Inform collector views if needed (username unknown here)
+                
                 view.onIspectionComplete(null);
             }
             return true;
@@ -407,7 +386,7 @@ public class LiveTradeController {
         }
     }
 
-    // Utility to safely cast a raw object (from DAO) into a List<Card> when possible.
+    
     private List<Card> toCardList(Object obj) {
         if (obj instanceof List<?> raw) {
             List<Card> result = new ArrayList<>();
@@ -419,10 +398,7 @@ public class LiveTradeController {
         return new ArrayList<>();
     }
 
-    /**
-     * Effettua lo scambio delle carte tra i binders dei collezionisti.
-     * Delegates the detailed operations to CardExchangeManager to keep this controller small.
-     */
+    
     public void performCardExchange(TradeTransaction tx) {
         try {
             IBinderDao binderDao = navigationController.getDaoFactory().createBinderDao();
@@ -434,10 +410,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Conclude manualmente lo scambio: imposta lo stato a COMPLETED e trasferisce le carte tra i raccoglitori.
-     * Può essere chiamato dalla view dello store per completare lo scambio dopo l'ispezione.
-     */
+    
     public boolean concludeTrade(int transactionId) {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -449,10 +422,10 @@ public class LiveTradeController {
             tx.updateTradeStatus(model.domain.enumerations.TradeStatus.COMPLETED);
             tradeDao.save(tx);
             performCardExchange(tx);
-            // Dopo la conclusione, torna alla schermata principale e aggiorna le liste
+            
             if (storeView != null) {
                 storeView.showMessage(TRADE_PREFIX + transactionId + " concluso con successo.");
-                // Naviga e aggiorna la schermata principale
+                
                 navigationController.navigateToStoreTrades(tx.getStoreId());
             }
             if (view != null) {
@@ -465,10 +438,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Cerca una transazione di scambio tramite la coppia di session code dei collezionisti.
-     * Restituisce il TradeTransactionBean se trovato, altrimenti null.
-     */
+    
     public TradeTransactionBean fetchTradeBySessionCodes(int proposerCode, int receiverCode) {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -484,9 +454,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Carica e mostra solo gli scambi programmati (presenza confermata da uno o entrambi, ma non ancora in inspection phase).
-     */
+    
     public void loadStoreScheduledTrades() {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -503,9 +471,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Carica e mostra solo gli scambi in corso (inspection phase o inspection passed) per lo store.
-     */
+    
     public void loadStoreInProgressTrades() {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -515,21 +481,19 @@ public class LiveTradeController {
                 beans.add(toBean(t));
             }
             if (storeView != null) {
-                storeView.displayInProgressTrades(beans); // Mostra nella lista corretta
+                storeView.displayInProgressTrades(beans); 
             }
         } catch (Exception ex) {
             LOGGER.fine(() -> "loadStoreInProgressTrades failed: " + ex.getMessage());
         }
     }
 
-    /**
-     * Carica e mostra solo gli scambi conclusi (COMPLETED o CANCELLED) per il collezionista.
-     */
+    
     public void loadCollectorCompletedTrades() {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
             List<TradeTransaction> all = tradeDao.getUserCompletedTrades(username);
-            // Diagnostic: log how many completed trades were returned by DAO
+            
             logCompletedTradesDiagnostic(all);
             List<TradeTransactionBean> completed = new ArrayList<>();
             if (all != null) {
@@ -545,7 +509,7 @@ public class LiveTradeController {
          }
      }
 
-    // Extracted helper for diagnostic logging to satisfy single responsibility and ease testing
+    
     private void logCompletedTradesDiagnostic(List<TradeTransaction> all) {
         try {
             if (all == null || all.isEmpty()) {
@@ -559,9 +523,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Carica e mostra solo gli scambi conclusi (COMPLETED o CANCELLED) per lo store.
-     */
+    
     public void loadStoreCompletedTrades() {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -575,10 +537,7 @@ public class LiveTradeController {
         }
     }
 
-    /**
-     * Cancella una trade transaction: imposta lo stato a CANCELLED e persiste la modifica.
-     * Utilizzato dallo store quando segnala un problema durante l'ispezione.
-     */
+    
     public boolean cancelTrade(int transactionId) {
         try {
             ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
@@ -589,7 +548,7 @@ public class LiveTradeController {
             }
             tx.updateTradeStatus(model.domain.enumerations.TradeStatus.CANCELLED);
             tradeDao.save(tx);
-            // Notify UI
+            
             TradeTransactionBean bean = refreshTradeStatus(transactionId);
             if (storeView != null) {
                 storeView.displayTrade(bean);

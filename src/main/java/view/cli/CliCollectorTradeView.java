@@ -18,12 +18,12 @@ public class CliCollectorTradeView implements ICollectorTradeView {
 
     private final InputManager inputManager;
     private LiveTradeController controller;
-    // lazily created to avoid write-only warning when analyzer can't see usages
+    
     private CliManageTradeView manageView;
-    // caches for lists provided by controller
+    
     private java.util.List<TradeTransactionBean> scheduledCache = new java.util.ArrayList<>();
     private java.util.List<TradeTransactionBean> completedCache = new java.util.ArrayList<>();
-    // currently logged-in username (collector)
+    
     private String currentUsername;
 
     public CliCollectorTradeView(InputManager inputManager) {
@@ -44,20 +44,20 @@ public class CliCollectorTradeView implements ICollectorTradeView {
         System.out.printf("╚════════════════════════════════════╝%n");
 
         if (controller != null) {
-            // controller will load and then call back displayScheduledTrades/displayCompletedTrades
+            
             controller.loadTrades();
         } else {
             System.out.println("⚠ Controller non connesso, impossibile caricare gli scambi.");
         }
 
-        // Render combined lists and prompt user to select a trade to view.
+        
         renderCombinedTradeListLoop();
     }
 
-    // Loop that renders scheduled and completed trades into a single numbered list and prompts selection
+    
     private void renderCombinedTradeListLoop() {
         while (true) {
-            // Build combined list: scheduled (non-completed) first, then completed/canceled
+            
             java.util.List<TradeTransactionBean> combined = buildCombinedListAndPrint();
 
             System.out.println();
@@ -75,11 +75,11 @@ public class CliCollectorTradeView implements ICollectorTradeView {
             if (chosen != null) {
                 displayTrade(chosen);
             }
-            // after viewing details, loop back to the lists
+            
         }
     }
 
-    // Parse selection string and return the selected TradeTransactionBean or null (and print message)
+    
     private TradeTransactionBean selectTradeFromCombined(String sel, java.util.List<TradeTransactionBean> combined) {
         if (!isPositiveInteger(sel)) {
             System.out.println(INPUT_INVALID_NUMBER_MSG);
@@ -93,7 +93,7 @@ public class CliCollectorTradeView implements ICollectorTradeView {
         return combined.get(n - 1);
     }
 
-    // Build combined list and print entries; returns the combined list in the same order printed
+    
     private java.util.List<TradeTransactionBean> buildCombinedListAndPrint() {
         java.util.List<TradeTransactionBean> combined = new java.util.ArrayList<>();
         int idx = printScheduledAndCollect(combined);
@@ -134,19 +134,19 @@ public class CliCollectorTradeView implements ICollectorTradeView {
     private boolean isPositiveInteger(String s) {
         if (s == null || s.isEmpty()) return false;
         if (!s.matches("\\d+")) return false;
-        // simple guard against exceedingly long numbers
+        
         return s.length() <= 10;
     }
 
     @Override
     public void close() {
-        // Nothing to close in CLI
+        /* not used */
     }
 
     @Override
     public void refresh() {
 
-        // For CLI, refreshing a trade view will attempt to reload trades via controller if available
+        
         if (controller != null) {
             controller.loadTrades();
         }
@@ -165,7 +165,7 @@ public class CliCollectorTradeView implements ICollectorTradeView {
             return;
         }
 
-        // Use printf with %n for platform-specific line separator
+        
         System.out.printf("%n=== OVERVIEW SCAMBIO: tx-%d ===%n", t.getTransactionId());
         System.out.println("Proposer: " + (t.getProposerId() != null ? t.getProposerId() : "?"));
         System.out.println("Receiver: " + (t.getReceiverId() != null ? t.getReceiverId() : "?"));
@@ -173,7 +173,7 @@ public class CliCollectorTradeView implements ICollectorTradeView {
         System.out.println("Date: " + (t.getTradeDate() != null ? t.getTradeDate() : "?"));
         System.out.println("Status: " + (t.getStatus() != null ? t.getStatus() : "?"));
 
-        // If the current user already confirmed presence, show their session code
+        
         if (currentUsername != null) {
             if (currentUsername.equals(t.getProposerId()) && t.isProposerArrived()) {
                 System.out.println("Il tuo session code: " + t.getProposerSessionCode());
@@ -185,13 +185,13 @@ public class CliCollectorTradeView implements ICollectorTradeView {
         printOffered(t);
         printRequested(t);
 
-        // delegate interactive loop to helper to reduce cognitive complexity of this method
+        
         handleInteractiveOptions(t);
     }
 
     @Override
     public void setUsername(String username) {
-        // forward to manage view so CLI manage list can format correctly
+        
         this.currentUsername = username;
         if (manageView == null) manageView = new CliManageTradeView();
         manageView.setUsername(username);
@@ -199,12 +199,12 @@ public class CliCollectorTradeView implements ICollectorTradeView {
 
     @Override
     public void displayIspection() {
-        // For CLI we simply instruct the store operator to inspect and then wait for confirmation
+        
         System.out.printf("%n--- ISPEZIONE CARTE (Store) ---%n");
         System.out.println("Per favore ispeziona le carte fisiche nel negozio e poi premi INVIO per confermare.");
         System.out.print("Premi INVIO quando l'ispezione è completa...");
-        inputManager.readString(); // wait for Enter or input
-        // After local confirmation, call onIspectionComplete with a placeholder username (store operator) if available
+        inputManager.readString(); 
+        
         onIspectionComplete("store");
     }
 
@@ -218,35 +218,35 @@ public class CliCollectorTradeView implements ICollectorTradeView {
 
     @Override
     public void displayScheduledTrades(java.util.List<TradeTransactionBean> scheduled) {
-        // Cache scheduled list for later rendering
+        
         this.scheduledCache = scheduled != null ? new java.util.ArrayList<>(scheduled) : new java.util.ArrayList<>();
     }
 
     @Override
     public void displayCompletedTrades(List<TradeTransactionBean> completedTrades) {
-        // Cache completed list for later rendering
+        
         this.completedCache = completedTrades != null ? new java.util.ArrayList<>(completedTrades) : new java.util.ArrayList<>();
     }
 
-    // Extracted helper to handle the interactive loop from displayTrade to reduce method complexity
+    
     private void handleInteractiveOptions(TradeTransactionBean t) {
-        // Determine trade lifecycle
+        
         String status = t.getStatus() != null ? t.getStatus().toUpperCase() : "";
         boolean isFinal = "COMPLETED".equals(status) || "CANCELLED".equals(status);
 
-        // Determine if current user is proposer or receiver and arrival flag
+        
         boolean isProposer = currentUsername != null && currentUsername.equals(t.getProposerId());
         boolean isReceiver = currentUsername != null && currentUsername.equals(t.getReceiverId());
         boolean userArrived = (isProposer && t.isProposerArrived()) || (isReceiver && t.isReceiverArrived());
 
         if (isFinal) {
-            // Completed or cancelled: only allow returning to list
+            
             loopReturnToList();
         } else if (!userArrived) {
-            // user hasn't confirmed presence yet: show only back + confirm
+            
             loopConfirmPresence(t);
         } else {
-            // user already arrived: only back to list
+            
             loopReturnToList();
         }
     }
@@ -276,7 +276,7 @@ public class CliCollectorTradeView implements ICollectorTradeView {
             if (c.equals("0")) return;
             if (c.equals("1")) {
                 confirmPresenceAction(t);
-                // after confirming (success or not), stop asking and return to list
+                
                 keepAsking = false;
             } else {
                 System.out.println(INVALID_OPTION);
@@ -297,7 +297,7 @@ public class CliCollectorTradeView implements ICollectorTradeView {
         }
     }
 
-    // Helper to print offered cards - extracted to reduce cognitive complexity of displayTrade
+    
     private void printOffered(TradeTransactionBean t) {
         System.out.printf("%nCarte offerte:%n");
         if (t.getOffered() == null || t.getOffered().isEmpty()) {
@@ -307,7 +307,7 @@ public class CliCollectorTradeView implements ICollectorTradeView {
         }
     }
 
-    // Helper to print requested cards - extracted to reduce cognitive complexity of displayTrade
+    
     private void printRequested(TradeTransactionBean t) {
         System.out.printf("%nCarta richiesta:%n");
         if (t.getRequested() == null || t.getRequested().isEmpty()) {

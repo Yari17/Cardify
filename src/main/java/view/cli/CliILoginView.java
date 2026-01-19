@@ -3,7 +3,6 @@ package view.cli;
 import controller.LoginController;
 import model.bean.UserBean;
 import config.InputManager;
-import javafx.stage.Stage;
 import model.domain.enumerations.PersistenceType;
 import view.ILoginView;
 
@@ -34,7 +33,7 @@ public class CliILoginView implements ILoginView {
                 handleLogin();
                 break;
             case "2":
-                // Delegate navigation to the application controller via LoginController
+                
                 if (controller != null) {
                     controller.onRegisterRequested();
                 } else {
@@ -60,7 +59,7 @@ public class CliILoginView implements ILoginView {
         System.out.print("Password: ");
         this.password = inputManager.readString();
 
-        // Ask the user which persistence to use for this login (unless app in demo)
+        
         String appMode = config.AppConfig.getPersistenceType();
         if (!config.AppConfig.DAO_TYPE_MEMORY.equals(appMode)) {
             System.out.println("Scegli persistenza per il login: 1) JSON  2) JDBC");
@@ -105,7 +104,7 @@ public class CliILoginView implements ILoginView {
 
     @Override
     public void close() {
-        // Intentionally empty for CLI (no resources to free).
+        /* not used */
     }
 
     @Override
@@ -113,16 +112,9 @@ public class CliILoginView implements ILoginView {
         System.out.println("[ERROR] " + errorMessage);
     }
 
-    // Implementazione minima di refresh per la vista CLI: non avvia loop, è no-op
+    
     @Override
     public void refresh() {
-        // Per la CLI il refresh non forza il display interattivo; il chiamante può
-        // richiamare display() se desidera re-renderizzare il menu.
-    }
-
-    // Implementazione di setStage per rispettare il contratto IView; per la CLI è no-op
-    @Override
-    public void setStage(Stage stage) {
-        // CLI non usa Stage; metodo fornito per compatibilità.
+        /* not used */
     }
 }

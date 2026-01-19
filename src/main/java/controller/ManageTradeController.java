@@ -27,7 +27,7 @@ public class ManageTradeController {
 
     public ManageTradeController(String username, ApplicationController navigationController) {
         this.username = username;
-        // Only keep the dao reference we need for proposal operations
+        
         this.proposalDao = navigationController != null ? navigationController.getDaoFactory().createProposalDao()
                 : null;
         this.navigationController = navigationController;
@@ -42,11 +42,11 @@ public class ManageTradeController {
         List<ProposalBean> concluded = new ArrayList<>();
 
         try {
-            // Fetch proposals by lifecycle categories using DAO convenience methods
+            
             List<Proposal> pendingProposals = proposalDao != null ? proposalDao.getPendingProposals(username) : List.of();
             List<Proposal> completedProposals = proposalDao != null ? proposalDao.getCompletedProposals(username) : List.of();
 
-            // Map to beans
+            
             for (Proposal p : pendingProposals) {
                 if (p == null) continue;
                 pending.add(toBean(p));
@@ -60,21 +60,21 @@ public class ManageTradeController {
             LOGGER.log(Level.FINE, "Stacktrace", ex);
         }
 
-        // Display pending + concluded; controller registration performed in setView
+        
         view.displayTrades(pending, concluded);
     }
 
-    // Accept a proposal (mark as ACCEPTED and persist)
+    
     public boolean acceptProposal(String proposalId) {
         return updateProposalStatus(proposalId, ProposalStatus.ACCEPTED);
     }
 
-    // Decline a proposal (mark as REJECTED and persist)
+    
     public boolean declineProposal(String proposalId) {
         return updateProposalStatus(proposalId, ProposalStatus.REJECTED);
     }
 
-    // Helper to set a proposal status and persist (used by accept/decline)
+    
     private boolean updateProposalStatus(String proposalId, ProposalStatus newStatus) {
         if (proposalDao == null || proposalId == null || newStatus == null)
             return false;
@@ -83,7 +83,7 @@ public class ManageTradeController {
             if (opt.isEmpty())
                 return false;
             Proposal p = opt.get();
-            // Usa uno switch expression per la transizione di stato
+            
             switch (newStatus) {
                 case ACCEPTED -> p.accept();
                 case REJECTED -> p.decline();
@@ -91,7 +91,7 @@ public class ManageTradeController {
             }
             proposalDao.update(p);
 
-            // If the proposal became ACCEPTED, create and persist a TradeTransaction
+            
             if (newStatus == ProposalStatus.ACCEPTED) {
                 persistTradeTransactionIfNeeded(p, proposalId);
             }
@@ -105,20 +105,20 @@ public class ManageTradeController {
         }
     }
 
-    // Return proposal domain object for detailed view
+    
     public model.domain.Proposal getProposalById(String proposalId) {
         if (proposalDao == null || proposalId == null)
             return null;
         return proposalDao.getById(proposalId).orElse(null);
     }
 
-    // Initiate the live trade (called when parties are meeting at store on meeting
-    // day)
+    
+    
     public boolean initiateTrade(String proposalId) {
         if (navigationController == null || proposalId == null)
             return false;
         try {
-            // Map the Proposal to an existing TradeTransaction by matching participants and meeting date
+            
             Optional<Proposal> opt = proposalDao != null ? proposalDao.getById(proposalId) : Optional.empty();
             if (opt.isEmpty()) return false;
             Proposal p = opt.get();
@@ -126,7 +126,7 @@ public class ManageTradeController {
             model.dao.ITradeDao tradeDao = navigationController.getDaoFactory().createTradeDao();
             var txOpt = tradeDao.findByParticipantsAndDate(p.getProposerId(), p.getReceiverId(), meeting);
             if (txOpt.isPresent()) {
-                // Correggi la chiamata secondo la nuova firma del metodo
+                
                 navigationController.navigateToTrade(username);
             } else {
                 LOGGER.warning(() -> "No TradeTransaction found for proposal: " + proposalId);
@@ -150,13 +150,13 @@ public class ManageTradeController {
         b.setMeetingDate(p.getMeetingDate());
         b.setMeetingTime(p.getMeetingTime());
         b.setStatus(p.getStatus() != null ? p.getStatus().name() : null);
-        // mapping dei campi essenziali
+        
         b.setOffered(mapCardsToBeans(p.getCardsOffered()));
         b.setRequested(mapCardsToBeans(p.getCardsRequested()));
         return b;
     }
 
-    // Convert a list of domain.Card to a list of CardBean safely
+    
     private List<CardBean> mapCardsToBeans(List<Card> cards) {
         List<CardBean> result = new ArrayList<>();
         if (cards == null || cards.isEmpty())
@@ -169,7 +169,7 @@ public class ManageTradeController {
         return result;
     }
 
-    // Convert single domain.Card to CardBean
+    
     private CardBean cardToBean(Card c) {
         CardBean cb = new CardBean();
         cb.setId(c.getId());
@@ -183,7 +183,7 @@ public class ManageTradeController {
     public void setView(IManageTradeView view) {
         this.view = view;
         if (this.view != null) {
-            // Prefer callback registration to decouple view from controller implementation
+            
             try {
                 this.view.registerOnAccept(this::acceptProposal);
                 this.view.registerOnDecline(this::declineProposal);
@@ -191,8 +191,8 @@ public class ManageTradeController {
                 this.view.registerOnTradeClick(this::initiateTrade);
                 this.view.registerOnTradeNowClick(this::initiateTrade);
             } catch (AbstractMethodError | Exception ex) {
-                // fallback for older concrete view implementations that still declare
-                // setManageController. Log the exception and attempt fallback wiring.
+                
+                
                 LOGGER.fine(() -> "Callback registration via interface failed, falling back to setManageController: " + ex.getMessage());
                 try {
                     if (this.view instanceof FXManageTradeView fx)
@@ -249,8 +249,8 @@ public class ManageTradeController {
         }
     }
 
-    // Extracted persistence logic for trade transactions when a proposal is
-    // accepted
+    
+    
     private void persistTradeTransactionIfNeeded(Proposal p, String proposalId) {
         try {
             ITradeDao tradeDao = navigationController != null

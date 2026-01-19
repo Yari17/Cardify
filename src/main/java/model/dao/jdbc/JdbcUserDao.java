@@ -23,12 +23,12 @@ public class JdbcUserDao implements IUserDao {
     private static final String COLUMN_REVIEW_COUNT = "review_count";
     private static final String SELECT = "SELECT ";
 
-    // Static caches to persist data until application stops
+    
     private static final java.util.Map<String, User> userCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static final java.util.Map<String, String> credentialCache = new java.util.concurrent.ConcurrentHashMap<>();
     private static boolean allLoaded = false;
 
-    // Helper to mark the cache as fully loaded. Kept static so updates occur in a static context (avoids Sonar S2696).
+    
     private static void markAllLoaded() {
         allLoaded = true;
     }
@@ -45,12 +45,12 @@ public class JdbcUserDao implements IUserDao {
     }
 
     private Connection getConnection() throws SQLException {
-        // Prefer the application's DBConnector singleton to obtain the Connection
+        
         try {
             return DBConnector.getInstance().getConnection();
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "DBConnector not available, falling back to DriverManager: {0}", e.getMessage());
-            // Fallback to DriverManager if DBConnector cannot provide a connection
+            
             return DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
         }
     }
@@ -154,7 +154,7 @@ public class JdbcUserDao implements IUserDao {
             pstmt.setString(3, userType);
             pstmt.executeUpdate();
 
-            // Update caches
+            
             User newUser = new User(username, 0, 0);
             newUser.setUserType(userType);
             userCache.put(username, newUser);
@@ -167,7 +167,7 @@ public class JdbcUserDao implements IUserDao {
 
     @Override
     public List<String> findAllUsernames() {
-        // Try cache first
+        
         if (allLoaded && !userCache.isEmpty()) {
             return new java.util.ArrayList<>(userCache.keySet());
         }
@@ -180,7 +180,7 @@ public class JdbcUserDao implements IUserDao {
                 String username = rs.getString(COLUMN_USERNAME);
                 result.add(username);
             }
-            // Optionally populate cache by fetching full records
+            
             for (String uname : result) {
                 if (!userCache.containsKey(uname)) {
                     findByName(uname).ifPresent(u -> userCache.put(uname, u));
@@ -190,21 +190,21 @@ public class JdbcUserDao implements IUserDao {
             return result;
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Failed to load usernames from DB", e);
-            // Fallback to cache keys
+            
             return new java.util.ArrayList<>(userCache.keySet());
         }
     }
 
-    // ========== Implementazione metodi IDao<User> ==========
+    
 
     @Override
     public Optional<User> get(long id) {
-        // Gli User in questo sistema sono identificati principalmente per username
-        // Questo metodo cerca per ID se implementato nella tabella
+        
+        
 
-        // Check cache first (iterating cache is faster than DB query if size is
-        // reasonable,
-        // but robust implementation should probably query DB if not allLoaded)
+        
+        
+        
         if (allLoaded) {
             return userCache.values().stream()
                     .filter(user -> user.getId() == id)
@@ -259,10 +259,10 @@ public class JdbcUserDao implements IUserDao {
             pstmt.executeUpdate();
 
             userCache.put(user.getName(), user);
-            // Note: save(User) doesn't take password, so we can't update credentialCache
-            // fully
-            // if it's a new user without password. Assuming save() is for existing users or
-            // users created without password (which might be invalid state for auth).
+            
+            
+            
+            
 
         } catch (SQLException e) {
             throw new DataPersistenceException("Failed to save user: " + user.getName(), e);
@@ -275,7 +275,7 @@ public class JdbcUserDao implements IUserDao {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        // Logic check: ensure user exists
+        
         if (findByName(user.getName()).isEmpty()) {
             throw new UserNotFoundException(user.getName());
         }

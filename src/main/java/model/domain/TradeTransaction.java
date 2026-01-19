@@ -1,4 +1,4 @@
-        // Se entrambi sono true -> inspection passed (store must finalize exchange)
+        
 package model.domain;
 
 
@@ -16,7 +16,7 @@ public class TradeTransaction {
     private String receiverId;
     private int proposerSessionCode;
     private int receiverSessionCode;
-    // Flag che indicano se il collector è effettivamente arrivato in negozio
+    
     private boolean proposerArrived;
     private boolean receiverArrived;
     private String storeId;
@@ -27,15 +27,13 @@ public class TradeTransaction {
     private boolean proposerReviewed;
     private boolean receiverReviewed;
 
-    // Nuovi campi per ispezione
+    
     private Boolean proposerInspectionOk;
     private Boolean receiverInspectionOk;
 
     private static final Random RANDOM = new Random();
 
-    /**
-     * Value Object che raggruppa i dati degli utenti coinvolti nello scambio.
-     */
+    
     public static class TradeParticipants {
         public final String proposerId;
         public final String receiverId;
@@ -48,9 +46,7 @@ public class TradeTransaction {
         }
     }
 
-    /**
-     * Value Object che raggruppa i dettagli dello scambio.
-     */
+    
     public static class TradeDetails {
         public final LocalDateTime creationTimestamp;
         public final LocalDateTime tradeDate;
@@ -65,7 +61,7 @@ public class TradeTransaction {
         }
     }
 
-    // Costruttore refattorizzato: ora accetta oggetti value invece di tanti parametri singoli
+    
     public TradeTransaction(int transactionId, TradeStatus tradeStatus, TradeParticipants participants, TradeDetails details) {
         this.transactionId = transactionId;
         this.tradeStatus = tradeStatus;
@@ -85,7 +81,7 @@ public class TradeTransaction {
     }
 
     public int generateSessionCode() {
-        // Genera un codice casuale a 6 cifre usando Random statico
+        
         return RANDOM.nextInt(900000) + 100000;
     }
 
@@ -106,7 +102,7 @@ public class TradeTransaction {
             code = this.receiverSessionCode;
         }
 
-        // Update status: if both collectors have arrived, set BOTH_ARRIVED; otherwise PARTIALLY_ARRIVED
+        
         if (this.proposerArrived && this.receiverArrived) {
             this.tradeStatus = TradeStatus.BOTH_ARRIVED;
         } else if (this.proposerArrived || this.receiverArrived) {
@@ -116,11 +112,7 @@ public class TradeTransaction {
         return code;
     }
 
-    /**
-     * Verifica se il session code passato corrisponde a uno dei codici generati
-     * e marca l'arrivo del relativo collector. Ritorna true se il codice è valido.
-     * Metodo di dominio: la logica di transizione di stato è qui (Information Expert).
-     */
+    
     public boolean acceptSessionCode(int code) {
         if (code <= 0) return false;
         if (code == proposerSessionCode) {
@@ -131,7 +123,7 @@ public class TradeTransaction {
             return false;
         }
 
-        // Aggiorna lo stato in base agli arrivi
+        
         if (proposerArrived && receiverArrived) {
             this.tradeStatus = TradeStatus.INSPECTION_PHASE;
         } else {
@@ -140,10 +132,7 @@ public class TradeTransaction {
         return true;
     }
 
-    /**
-     * Registra l'esito dell'ispezione per uno dei collector (true = ok, false = rejected).
-     * Se uno dei due fallisce, lo scambio viene annullato; se entrambi passano, lo scambio è completato.
-     */
+    
     public void markInspectionResult(String collectorId, boolean ok) {
         if (collectorId == null) return;
         if (collectorId.equals(proposerId)) {
@@ -152,7 +141,7 @@ public class TradeTransaction {
             this.receiverInspectionOk = ok;
         }
 
-        // Se uno dei due è false -> annulla immediatamente
+        
         if (Boolean.FALSE.equals(this.proposerInspectionOk) || Boolean.FALSE.equals(this.receiverInspectionOk)) {
             this.tradeStatus = TradeStatus.CANCELLED;
             return;
@@ -177,12 +166,12 @@ public class TradeTransaction {
         return receiverInspectionOk;
     }
 
-    // ===== Getters used by controllers/views =====
+    
     public int getTransactionId() {
         return transactionId;
     }
 
-    // Getters per i session code (utili per lo store per verificare i codici generati dai collector)
+    
     public int getProposerSessionCode() {
         return proposerSessionCode;
     }

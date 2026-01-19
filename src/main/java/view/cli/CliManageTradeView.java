@@ -9,7 +9,7 @@ import java.util.List;
 public class CliManageTradeView implements IManageTradeView {
     private String currentUsername;
     private ManageTradeController manageController;
-    // callbacks
+    
     private java.util.function.Consumer<String> onAcceptCallback;
     private java.util.function.Consumer<String> onDeclineCallback;
     private java.util.function.Consumer<String> onCancelCallback;
@@ -19,9 +19,9 @@ public class CliManageTradeView implements IManageTradeView {
 
     @Override
     public void display() {
-        java.util.Scanner scanner = new java.util.Scanner(System.in); // do not close System.in
+        java.util.Scanner scanner = new java.util.Scanner(System.in); 
 
-        // Ensure latest pending proposals are loaded
+        
         if (manageController != null) {
             manageController.loadAndDisplayTrades(this);
         }
@@ -34,7 +34,7 @@ public class CliManageTradeView implements IManageTradeView {
             System.out.print("Inserisci numero di proposta da visualizzare: ");
 
             String line = readLine(scanner);
-            if (line == null) return; // EOF -> exit
+            if (line == null) return; 
             line = line.trim();
 
             if ("0".equals(line)) {
@@ -44,18 +44,18 @@ public class CliManageTradeView implements IManageTradeView {
 
             ProposalBean sel = selectProposalFromInput(line);
             if (sel == null) {
-                // invalid or empty -> redisplay
+                
                 continue;
             }
 
             showProposalDetails(sel, scanner);
 
-            // After action, reload pending list
+            
             if (manageController != null) manageController.loadAndDisplayTrades(this);
         }
     }
 
-    // --- helpers (extracted to reduce smells) ---
+    
     private void renderPendingList() {
         System.out.println("=== PROPOSTE IN ATTESA ===");
         if (lastPending == null || lastPending.isEmpty()) {
@@ -78,7 +78,7 @@ public class CliManageTradeView implements IManageTradeView {
     }
 
     private String readLine(java.util.Scanner scanner) {
-        // rely on hasNextLine to avoid exceptions
+        
         if (scanner == null) return null;
         if (!scanner.hasNextLine()) return null;
         return scanner.nextLine();
@@ -96,12 +96,12 @@ public class CliManageTradeView implements IManageTradeView {
 
     private int parseIndex(String line) {
         if (line == null) return -1;
-        // accept only integer numbers
+        
         if (!line.matches("\\d+")) {
             System.out.println("Input non valido. Inserisci 0 o il numero della proposta.");
             return -1;
         }
-        // guard against extremely long numbers that would not fit in int
+        
         if (line.length() > 10) {
             System.out.println("Input non valido. Inserisci 0 o il numero della proposta.");
             return -1;
@@ -110,7 +110,7 @@ public class CliManageTradeView implements IManageTradeView {
         return parsed - 1;
     }
 
-    // Pause helper used to wait for ENTER without closing System.in
+    
     private void pauseForEnter() {
         java.util.Scanner sc = new java.util.Scanner(System.in);
         if (sc.hasNextLine()) sc.nextLine();
@@ -131,7 +131,7 @@ public class CliManageTradeView implements IManageTradeView {
         if (isReceived) {
             handleReceivedChoice(sel, scanner);
         } else {
-            // Sender: only back
+            
             System.out.println();
             System.out.println("0) Indietro");
             System.out.print("Premi INVIO per tornare...");
@@ -172,12 +172,12 @@ public class CliManageTradeView implements IManageTradeView {
         choice2 = choice2.trim();
         if ("1".equals(choice2)) onAcceptTradeProposal(sel.getProposalId());
         else if ("2".equals(choice2)) onDeclineTradeProposal(sel.getProposalId());
-        // else back
+        
     }
 
     @Override
     public void close() {
-        // nothing to close for CLI
+        /* not used */
     }
 
     @Override
@@ -187,13 +187,13 @@ public class CliManageTradeView implements IManageTradeView {
 
     @Override
     public void displayTrades(List<ProposalBean> pending, List<ProposalBean> scheduled) {
-        // Cache lists; do not print here to avoid duplicate output. display() prints pending.
+        
         this.lastPending = pending != null ? new java.util.ArrayList<>(pending) : new java.util.ArrayList<>();
     }
 
     @Override
     public void refresh() {
-        // Intentionally no-op for CLI to avoid duplicate printing; display() controls output.
+        /* not used */
     }
 
     public void setManageController(ManageTradeController controller) {
@@ -224,13 +224,13 @@ public class CliManageTradeView implements IManageTradeView {
         System.out.println(ok ? "\n✓ Proposta accettata: " + id : "\n✗ Fallito nell'accettare la proposta: " + id);
         System.out.print("Premi INVIO per continuare...");
         pauseForEnter();
-        // refresh view after accept
+        
         manageController.loadAndDisplayTrades(this);
     }
 
     @SuppressWarnings("unused")
     public void onCancelTradeProposal(String id) {
-        // The controller currently has no explicit 'cancel' operation; map cancel to decline
+        
         if (id == null) return;
         if (onCancelCallback != null) { onCancelCallback.accept(id); return; }
         if (manageController == null) { System.out.println("[CLI] No manage controller wired - cannot cancel proposal"); return; }
@@ -248,24 +248,11 @@ public class CliManageTradeView implements IManageTradeView {
         System.out.println(ok ? "\n✓ Proposta rifiutata: " + id : "\n✗ Fallito nel rifiutare la proposta: " + id);
         System.out.print("Premi INVIO per continuare...");
         pauseForEnter();
-        // refresh view after decline
+        
         manageController.loadAndDisplayTrades(this);
     }
 
-    public void onTradeClick(String id) {
-        if (id == null) return;
-        if (onTradeClickCallback != null) { onTradeClickCallback.accept(id); return; }
-        if (manageController == null) { System.out.println("[CLI] No manage controller wired - cannot initiate trade"); return; }
-        boolean ok = manageController.initiateTrade(id);
-        System.out.println(ok ? "[CLI] Started trade flow for proposal: " + id : "[CLI] Failed to start trade flow for proposal: " + id);
-    }
 
-    @SuppressWarnings("unused")
-    public void onTradeNowClick(String id) {
-        if (id == null) return;
-        if (onTradeNowClickCallback != null) { onTradeNowClickCallback.accept(id); return; }
-        onTradeClick(id);
-    }
 
     @Override
     public void setUsername(String username) {

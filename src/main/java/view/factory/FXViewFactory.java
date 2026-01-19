@@ -22,6 +22,7 @@ import view.javafx.FXCollectorTradeView;
 import view.ICollectorTradeView;
 import view.javafx.FXStoreTradeView;
 import view.IStoreTradeView;
+import view.javafx.FXNegotiationView;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -155,7 +156,7 @@ public class FXViewFactory implements IViewFactory {
                 stage.setTitle("Cardify - My Collection");
                 fxController.setStage(stage);
 
-                // Set controller
+                
                 fxController.setController(controller);
 
                 return fxController;
@@ -183,14 +184,14 @@ public class FXViewFactory implements IViewFactory {
                 stage.setScene(scene);
                 stage.setTitle("Cardify - Trade");
 
-                // Wire known concrete implementation
+                
                 if (tradeView instanceof FXCollectorTradeView fxLegacy) {
                     fxLegacy.setStage(stage);
                     fxLegacy.setController(controller);
                 }
 
-                // Notify view of username via controller.setView when appropriate
-                // controller.setView will set username on the view
+                
+                
                 controller.setView(tradeView);
 
                 return tradeView;
@@ -221,13 +222,13 @@ public class FXViewFactory implements IViewFactory {
                 if (storeView instanceof FXStoreTradeView fxStore) {
                     fxStore.setStage(stage);
                     fxStore.setController(controller);
-                    // Log whether FXML-injected controls appear initialized
+                    
                     LOGGER.info(() -> "FXStoreTradeView initialized fields present: " + fxStore.isInitialized());
                 }
 
-                // associate the store view with the controller (controller applicativo)
+                
                 controller.setStoreView(storeView);
-                // Trigger a load after association to ensure UI receives data (defensive)
+                
                 safeLoadScheduledTrades(controller);
 
                 return storeView;
@@ -278,17 +279,22 @@ public class FXViewFactory implements IViewFactory {
             Parent root = loader.load();
             Object fxmlController = loader.getController();
 
-            if (fxmlController instanceof INegotiationView fxController) {
+            if (fxmlController instanceof INegotiationView negotiationView) {
                 Scene scene = new Scene(root);
                 Stage stage = new Stage();
                 stage.setScene(scene);
                 stage.setTitle("Cardify - Trade Negotiation");
-                fxController.setStage(stage);
 
-                // Set controller
-                fxController.setController(controller);
+                
+                if (negotiationView instanceof FXNegotiationView fxNegotiation) {
+                    fxNegotiation.setStage(stage);
+                    fxNegotiation.setController(controller);
+                    return fxNegotiation;
+                }
 
-                return fxController;
+                
+                negotiationView.setController(controller);
+                return negotiationView;
             } else {
                 String controllerClass = fxmlController != null ? fxmlController.getClass().getName() : "null";
                 throw new IllegalStateException(

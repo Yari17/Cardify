@@ -87,7 +87,7 @@ public class CliIViewFactory implements IViewFactory {
     public IManageTradeView createManageTradeView(ManageTradeController controller) {
         CliManageTradeView view = new CliManageTradeView();
         view.setManageController(controller);
-        // register callbacks
+        
         view.registerOnAccept(controller::acceptProposal);
         view.registerOnDecline(controller::declineProposal);
         view.registerOnCancel(controller::declineProposal);

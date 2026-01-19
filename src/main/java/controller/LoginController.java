@@ -36,22 +36,40 @@ public class LoginController {
             return;
         }
 
-        // Use view-selected persistence for this auth action (polymorphic choice)
+        
         model.domain.enumerations.PersistenceType chosen = view.getPersistenceType();
         IUserDao daoToUse = userDao;
         if (chosen != null) {
             try {
                 daoToUse = model.dao.factory.DaoFactory.getFactory(chosen).createUserDao();
-            } catch (Exception ex) {
-                // fallback to default app DAO
+            } catch (Exception _) {
+                
                 daoToUse = userDao;
             }
         }
 
-        Optional<User> authenticatedUser = daoToUse.authenticateAndGetUser(
-            userBean.getUsername(),
-            userBean.getPassword()
-        );
+        Optional<User> authenticatedUser = java.util.Optional.empty();
+        try {
+            authenticatedUser = daoToUse.authenticateAndGetUser(
+                    userBean.getUsername(),
+                    userBean.getPassword()
+            );
+        } catch (exception.UserNotFoundException _) {
+            
+            view.showInputError("Utente non trovato nella persistenza selezionata. Riprova con la persistenza corretta o registrati.");
+            return;
+        } catch (exception.AuthenticationException _) {
+            view.showInputError("Credenziali non valide. Riprova.");
+            return;
+        } catch (exception.DataPersistenceException dpe) {
+            view.showError("Errore di persistenza: " + dpe.getMessage());
+            return;
+        } catch (RuntimeException rte) {
+            
+            java.util.logging.Logger.getLogger(LoginController.class.getName()).log(java.util.logging.Level.SEVERE, "Unexpected error during authentication", rte);
+            view.showError("Si è verificato un errore durante l'autenticazione. Riprova più tardi.");
+            return;
+        }
 
         if (authenticatedUser.isPresent()) {
             User user = authenticatedUser.get();
@@ -62,7 +80,7 @@ public class LoginController {
 
             view.close();
 
-            // After login, ensure application-wide persistence reverts to JSON
+            
             config.AppConfig.setPersistenceType(config.AppConfig.DAO_TYPE_JSON);
 
             navigationController.handleRoleBasedNavigation(loggedInUserBean);
@@ -72,20 +90,20 @@ public class LoginController {
     }
 
     public void onRegisterRequested() {
-        // Use view-selected persistence to start registration process
+        
         model.domain.enumerations.PersistenceType chosen = view.getPersistenceType();
         model.dao.IUserDao daoForReg = userDao;
         if (chosen != null) {
             try {
                 daoForReg = model.dao.factory.DaoFactory.getFactory(chosen).createUserDao();
-            } catch (Exception ex) {
+            } catch (Exception _) {
                 daoForReg = userDao;
             }
         }
         try {
             navigationController.navigateToRegistrationWithDao(daoForReg);
-        } catch (Exception e) {
-            // fallback
+        } catch (Exception _) {
+            
             navigationController.navigateToRegistration();
         }
     }

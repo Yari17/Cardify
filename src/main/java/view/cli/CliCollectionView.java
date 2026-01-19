@@ -13,11 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/**
- * CLI implementation of the Collection View.
- * Provides text-based interface for managing card collections.
- */
-@SuppressWarnings("java:S106")
+
+
 public class CliCollectionView implements ICollectionView {
     private static final Logger LOGGER = Logger.getLogger(CliCollectionView.class.getName());
     private static final String SEPARATOR = "━".repeat(80);
@@ -58,9 +55,9 @@ public class CliCollectionView implements ICollectionView {
     @Override
     public void displayCollection(Map<String, Binder> bindersBySet, Map<String, List<model.domain.Card>> setCardsMap) {
         this.currentBinders = bindersBySet;
-        // store provided persistence map for later use; CLI must not call DAOs
-        // convert incoming map to local Map<String, List<Card>> via unchecked cast
-        //noinspection unchecked
+        
+        
+        
         this.localSetCards = setCardsMap != null ? new HashMap<>(setCardsMap) : new HashMap<>();
 
         clearScreen();
@@ -77,14 +74,14 @@ public class CliCollectionView implements ICollectionView {
 
     @Override
     public void updateCardInSet(String setId, String cardId) {
-        // If we are currently managing the same set, request a refresh of the manage screen
+        
         if (setId != null && setId.equals(this.managingSetId)) {
             this.refreshRequested = true;
             LOGGER.info(() -> "Update requested for card " + cardId + " in managed set " + setId);
             return;
         }
 
-        // Otherwise, simply log (or set save button visible) - minimal CLI behavior
+        
         LOGGER.info(() -> "Card updated in cache (not currently managed): " + cardId + " in set " + setId);
     }
 
@@ -107,25 +104,22 @@ public class CliCollectionView implements ICollectionView {
 
     @Override
     public void display() {
-        // Main loop già gestito dal menu
+        //not used
     }
 
     @Override
     public void close() {
-        // CLI non ha risorse da chiudere
+        //not used
     }
 
     @Override
     public void refresh() {
-        // CLI: refresh is a no-op; callers may invoke displayCollection/display() to re-render.
+        //not used
     }
 
-    @Override
-    public void setStage(javafx.stage.Stage stage) {
-        // CLI does not use JavaFX Stage; method present for interface compatibility.
-    }
+    
 
-    // ==================== PRIVATE METHODS ====================
+    
 
     private void clearScreen() {
         System.out.print("\033[H\033[2J");
@@ -149,7 +143,7 @@ public class CliCollectionView implements ICollectionView {
         for (Map.Entry<String, Binder> entry : currentBinders.entrySet()) {
             Binder binder = entry.getValue();
             try {
-                // Use setCards supplied by controller (no DAO/API calls here)
+                
                 List<Card> allCards = localSetCards.getOrDefault(entry.getKey(), java.util.Collections.emptyList());
                 int totalCards = allCards.size();
                 int ownedCards = binder.getCardCount();
@@ -158,7 +152,7 @@ public class CliCollectionView implements ICollectionView {
                 System.out.printf("   [%d] %s - %d carte possedute, \u001B[31m%d mancanti\u001B[0m%n",
                         index++, binder.getSetName(), ownedCards, missingCards);
             } catch (Exception _) {
-                // Fallback se non si riesce a caricare il totale
+                
                 System.out.printf("   [%d] %s - %d carte possedute%n",
                         index++, binder.getSetName(), binder.getCardCount());
             }
@@ -184,7 +178,7 @@ public class CliCollectionView implements ICollectionView {
                 case "1" -> manageSets();
                 case "2" -> addNewSet();
                 case "3" -> {
-                    // Guard style: do nothing if save not visible or controller missing
+                    
                     if (!saveButtonVisible || controller == null) break;
                     controller.saveChanges();
                 }
@@ -235,7 +229,7 @@ public class CliCollectionView implements ICollectionView {
     }
 
     private void manageSet(String setId, Binder binder) {
-        // Mark which set we're managing so updateCardInSet can trigger a refresh
+        
         this.managingSetId = setId;
         try {
             while (true) {
@@ -270,7 +264,7 @@ public class CliCollectionView implements ICollectionView {
                         case "2" -> removeCardFromSet(setId, allCards);
                         case "3" -> manageCardDetails(setId, allCards, ownedCardsMap);
                         case "4" -> {
-                            // Use guard to reduce nesting
+                            
                             if (!confirmDeleteSet(binder.getSetName())) break;
                             if (controller != null) {
                                 controller.deleteBinder(setId);
@@ -284,7 +278,7 @@ public class CliCollectionView implements ICollectionView {
                         default -> System.out.println(INVALID_CHOICE);
                     }
 
-                    // If controller requested a refresh, restart the loop to reflect latest state
+                    
                     if (this.refreshRequested) {
                         this.refreshRequested = false;
                     }
@@ -296,7 +290,7 @@ public class CliCollectionView implements ICollectionView {
                 }
             }
         } finally {
-            // Clear managing state when leaving the manage screen
+            
             this.managingSetId = null;
             this.refreshRequested = false;
         }
@@ -336,7 +330,7 @@ public class CliCollectionView implements ICollectionView {
             System.out.printf("  %-6s %s%n", status, card.getName());
             count++;
 
-            // Paginazione ogni 15 carte
+            
             if (count % 15 == 0 && count < allCards.size()) {
                 System.out.print(PRESS_ENTER);
                 inputManager.readString();
@@ -415,7 +409,7 @@ public class CliCollectionView implements ICollectionView {
             if (index >= 0 && index < ownedCards.size()) {
                 CardBean selectedCard = ownedCards.get(index);
 
-                // Trova la carta completa
+                
                 Card fullCard = allCards.stream()
                         .filter(c -> c.getId().equals(selectedCard.getId()))
                         .findFirst()
@@ -486,7 +480,7 @@ public class CliCollectionView implements ICollectionView {
         if (controller == null)
             return;
 
-        // Trova la carta completa
+        
         Card fullCard = allCards.stream()
                 .filter(c -> c.getId().equals(cardBean.getId()))
                 .findFirst()

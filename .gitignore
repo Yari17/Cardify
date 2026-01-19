@@ -37,3 +37,20 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Build artifacts (additional) ###
+# compiled classes
+*.class
+
+# jars and packaged archives
+*.jar
+*.war
+*.ear
+
+# IDE / tool folders
+out/
+.build/
+
+# Custom agent folder to ignore
+.agent/
+.vscode/

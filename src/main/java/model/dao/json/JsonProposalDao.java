@@ -71,7 +71,7 @@ public class JsonProposalDao implements IProposalDao {
                 long max = 0;
                 for (Proposal p : list) {
                     proposalsById.put(p.getProposalId(), p);
-                    // try to extract numeric id if it's purely digits; avoid catching exceptions
+                    
                     String idStr = p.getProposalId();
                     if (idStr != null && idStr.matches("\\d+")) {
                         long numeric = Long.parseLong(idStr);
@@ -168,7 +168,7 @@ public class JsonProposalDao implements IProposalDao {
         List<Proposal> result = new ArrayList<>();
         for (Proposal p : proposalsById.values()) {
             if (p == null) continue;
-            // Scheduled proposals are those accepted (or later) involving the user
+            
             if (username != null && (username.equals(p.getProposerId()) || username.equals(p.getReceiverId()))
                     && p.getStatus() == model.domain.enumerations.ProposalStatus.ACCEPTED) {
                 result.add(p);

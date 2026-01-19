@@ -21,10 +21,10 @@ public abstract class DaoFactory {
 
     public abstract IBinderDao createBinderDao();
 
-    // Proposal DAO factory method
+    
     public abstract IProposalDao createProposalDao();
 
-    // Trade DAO factory method
+    
     public abstract model.dao.ITradeDao createTradeDao();
 
 }

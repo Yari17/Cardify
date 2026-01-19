@@ -16,7 +16,7 @@ import java.util.logging.Level;
 
 public class JsonUserDao implements IUserDao {
     private static final Logger LOGGER = Logger.getLogger(JsonUserDao.class.getName());
-    // Static caches to persist data until application stops
+    
     private static final Map<String, User> users = new ConcurrentHashMap<>();
     private static final Map<String, String> credentials = new ConcurrentHashMap<>();
     private static boolean loaded = false;
@@ -44,7 +44,7 @@ public class JsonUserDao implements IUserDao {
             parentDir.mkdirs();
         }
 
-        // Remove direct call to loadFromJson() from constructor to support lazy loading
+        
     }
 
     private synchronized void ensureLoaded() {
@@ -125,13 +125,13 @@ public class JsonUserDao implements IUserDao {
         saveToJson();
     }
 
-    // ========== Implementazione metodi IDao<User> ==========
+    
 
     @Override
     public Optional<User> get(long id) {
         ensureLoaded();
-        // Gli User sono indicizzati per username, non per ID numerico
-        // Cerca l'utente che ha questo ID
+        
+        
         return users.values().stream()
                 .filter(user -> user.getId() == id)
                 .findFirst();

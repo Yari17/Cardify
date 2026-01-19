@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CliStoreTradeView implements IStoreTradeView {
 
-    // Status constants to avoid duplicated literals
+    
     private static final String STATUS_INSPECTION_PASSED = "INSPECTION_PASSED";
     private static final String STATUS_INSPECTION_PHASE = "INSPECTION_PHASE";
     private static final String STATUS_COMPLETED = "COMPLETED";
@@ -25,7 +25,7 @@ public class CliStoreTradeView implements IStoreTradeView {
     private LiveTradeController controller;
     private final java.util.List<TradeTransactionBean> lastScheduled = new java.util.ArrayList<>();
     private final java.util.List<TradeTransactionBean> lastInProgress = new java.util.ArrayList<>();
-    // Flags to control whether incoming DAO-driven display calls should render immediately
+    
     private boolean showScheduled = false;
     private boolean showInProgress = false;
 
@@ -50,7 +50,7 @@ public class CliStoreTradeView implements IStoreTradeView {
 
         boolean running = true;
         while (running) {
-            // Section selection menu: choose which list to view
+            
             System.out.println();
             System.out.println("1) Scambi programmati");
             System.out.println("2) Scambi attivi");
@@ -79,12 +79,12 @@ public class CliStoreTradeView implements IStoreTradeView {
         }
     }
 
-    // Extracted handlers to reduce the size and complexity of display()
+    
     private void handleScheduledSection() {
         showScheduled = true;
         showInProgress = false;
         if (controller != null) controller.loadStoreScheduledTrades();
-        // The callback to displayScheduledTrades will populate lastScheduled; if empty, nothing to select
+        
         if (lastScheduled.isEmpty()) {
             return;
         }
@@ -108,7 +108,7 @@ public class CliStoreTradeView implements IStoreTradeView {
         }
         TradeTransactionBean selected = lastScheduled.get(selIdx - 1);
         displayTrade(selected);
-        // after overview, reload both lists
+        
         if (controller != null) {
             controller.loadStoreScheduledTrades();
             controller.loadStoreInProgressTrades();
@@ -150,12 +150,12 @@ public class CliStoreTradeView implements IStoreTradeView {
 
     @Override
     public void close() {
-        // Nothing to close in CLI
+        /* not used */
     }
 
     @Override
     public void refresh() {
-        // For CLI, refreshing a trade view will attempt to reload trades via controller if available
+        
         if (controller != null) {
             controller.loadTrades();
         }
@@ -184,7 +184,7 @@ public class CliStoreTradeView implements IStoreTradeView {
         }
 
         if (STATUS_INSPECTION_PHASE.equals(status)) {
-            // interactive inspection menu for inspection phase
+            
             handleInspectionPhase(t);
             return;
         }
@@ -194,11 +194,11 @@ public class CliStoreTradeView implements IStoreTradeView {
             return;
         }
 
-        // Otherwise offer to validate session codes
+        
         handleSessionCodeValidation();
     }
 
-    // Small extraction to reduce method size
+    
     private void printTradeOverview(TradeTransactionBean t) {
         System.out.printf("%n=== OVERVIEW SCAMBIO: tx-%d ===%n", t.getTransactionId());
         System.out.println("Proposer: " + (t.getProposerId() != null ? t.getProposerId() : "?"));
@@ -218,7 +218,7 @@ public class CliStoreTradeView implements IStoreTradeView {
         System.out.println();
     }
 
-    // Handles loops and choices while in INSPECTION_PHASE
+    
     private void handleInspectionPhase(TradeTransactionBean t) {
         String status = t.getStatus();
         while (true) {
@@ -307,7 +307,7 @@ public class CliStoreTradeView implements IStoreTradeView {
         }
     }
 
-    // Handles session-code validation flow (the default path when entering displayTrade)
+    
     private void handleSessionCodeValidation() {
         System.out.println("Inserisci i session code per validare la coppia e avviare l'ispezione:");
         System.out.print("Codice proposer: ");
@@ -363,8 +363,8 @@ public class CliStoreTradeView implements IStoreTradeView {
         System.out.println("Codici convalidati. Stato aggiornato: " + updated.getStatus());
 
         if (STATUS_INSPECTION_PHASE.equals(updated.getStatus()) || STATUS_INSPECTION_PASSED.equals(updated.getStatus())) {
-            // Reuse inspection actions loop to allow marking results
-            // If cancelled/completed inside the loop, the helper will return
+            
+            
             handleInspectionActionsAfterValidation(txId);
         }
     }
@@ -392,7 +392,7 @@ public class CliStoreTradeView implements IStoreTradeView {
 
     private TradeTransactionBean processInspectionChoiceFromTx(int txId, TradeTransactionBean updated, String choice) {
         if (choice == null) return updated;
-        // Ensure updated is available
+        
         if (updated == null) {
             updated = controller != null ? controller.refreshTradeStatus(txId) : null;
             if (updated == null) {
@@ -424,7 +424,7 @@ public class CliStoreTradeView implements IStoreTradeView {
 
     @Override
     public void displayInProgressTrades(List<TradeTransactionBean> inProgress) {
-        // Update cache then render via helper
+        
         lastInProgress.clear();
         if (inProgress != null) {
             for (TradeTransactionBean t : inProgress) {
@@ -452,13 +452,13 @@ public class CliStoreTradeView implements IStoreTradeView {
     }
     @Override
     public void showMessage(String message) {
-        // CLI: display the message to the user
+        
         if (message != null) System.out.println(message);
     }
 
     @Override
     public void displayScheduledTrades(List<TradeTransactionBean> scheduled) {
-         // Always update cached list, but render only if user requested the scheduled section
+         
          lastScheduled.clear();
          if (scheduled != null) {
              for (TradeTransactionBean t : scheduled) {
@@ -488,7 +488,7 @@ public class CliStoreTradeView implements IStoreTradeView {
     }
     @Override
     public void displayCompletedTrades(List<TradeTransactionBean> trades) {
-        // Intentionally left empty
+        /* not used */
     }
 }
 

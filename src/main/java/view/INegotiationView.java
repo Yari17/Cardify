@@ -19,10 +19,10 @@ public interface INegotiationView extends IView {
     void showConfirmationResult(boolean success, String message);
     void setController(NegotiationController controller);
 
-    // Provide list of available stores to choose from
+    
     void showAvailableStores(List<String> storeUsernames);
 
-    // Optionally populate a meeting date hint (e.g., tomorrow's date)
+    
     void setMeetingDateHint(String dateHint);
 
 }

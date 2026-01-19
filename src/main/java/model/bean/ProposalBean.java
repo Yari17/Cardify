@@ -10,10 +10,10 @@ public class ProposalBean {
     private String toUser;
     private List<CardBean> offered = new ArrayList<>();
     private List<CardBean> requested = new ArrayList<>();
-    private String meetingPlace; // store username or id
-    private String meetingDate; // date as string, expected format YYYY-MM-DD
-    private String meetingTime; // time as string, expected format HH:mm (optional)
-    private String status; // ProposalStatus name: PENDING, ACCEPTED, REJECTED, EXPIRED
+    private String meetingPlace; 
+    private String meetingDate; 
+    private String meetingTime; 
+    private String status; 
 
     public String getProposalId() { return proposalId; }
     public void setProposalId(String proposalId) { this.proposalId = proposalId; }

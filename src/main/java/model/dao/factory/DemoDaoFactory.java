@@ -9,7 +9,7 @@ import model.dao.demo.DemoTradeDao;
 
 public class DemoDaoFactory extends DaoFactory {
 
-    // Cached demo DAO instances to preserve in-memory state across the application lifetime
+    
     private DemoUserDao userDao;
     private DemoBinderDao binderDao;
     private DemoProposalDao proposalDao;

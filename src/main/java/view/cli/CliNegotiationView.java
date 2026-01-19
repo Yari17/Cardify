@@ -26,7 +26,7 @@ public class CliNegotiationView implements INegotiationView {
     private Consumer<CardBean> onUnpropose;
     private Consumer<ProposalBean> onConfirm;
 
-    // Reused format and message constants to avoid duplication
+    
     private static final String ITEM_LINE_FMT = " %d) %s x%d%n";
     private static final String INVALID_INDEX_MSG = "Invalid index";
 
@@ -45,7 +45,7 @@ public class CliNegotiationView implements INegotiationView {
         if (requested != null) {
             for (CardBean cb : requested) {
                 CardBean copy = new CardBean(cb);
-                copy.setQuantity(1); // requested card must be one unit
+                copy.setQuantity(1); 
                 this.requested.add(copy);
             }
         }
@@ -75,7 +75,7 @@ public class CliNegotiationView implements INegotiationView {
     public void showConfirmationResult(boolean success, String message) {
         System.out.println(success ? "✓ " + message : "✗ " + message);
         if (success) {
-            // mark that a proposal was successfully sent so the interactive loop can exit
+            
             proposalSent = true;
         }
     }
@@ -97,7 +97,7 @@ public class CliNegotiationView implements INegotiationView {
 
     @Override
     public void display() {
-        // simple interactive loop
+        
         while (true) {
             printNegotiationView();
 
@@ -105,7 +105,7 @@ public class CliNegotiationView implements INegotiationView {
             String line = inputManager.readString();
             if (line == null) line = "";
             line = line.trim();
-            // single continue for empty input
+            
             if (line.isEmpty()) {
                 continue;
             }
@@ -128,7 +128,7 @@ public class CliNegotiationView implements INegotiationView {
         }
     }
 
-    // Print helpers extracted to reduce complexity of display()
+    
     private void printNegotiationView() {
         System.out.println("=== TRADE NEGOTIATION ===");
         printRequestedItems();
@@ -175,7 +175,7 @@ public class CliNegotiationView implements INegotiationView {
             String cardId = card.getId();
             int availableQty = card.getQuantity();
 
-            // compute current proposed quantity for this card using streams (removes manual loop)
+            
             int currentProposedQty = proposed.stream()
                     .filter(pb -> pb != null && cardId != null && cardId.equals(pb.getId()))
                     .mapToInt(CardBean::getQuantity)
@@ -188,14 +188,14 @@ public class CliNegotiationView implements INegotiationView {
 
             ensureProposedIsModifiable();
 
-            // find existing proposed entry (if any) using stream
+            
             CardBean existing = proposed.stream()
                     .filter(pb -> pb != null && cardId != null && cardId.equals(pb.getId()))
                     .findFirst().orElse(null);
 
             if (existing != null) {
                 existing.setQuantity(existing.getQuantity() + 1);
-                // notify one-unit proposed
+                
                 CardBean unit = new CardBean(existing);
                 unit.setQuantity(1);
                 if (onPropose != null) onPropose.accept(unit);
@@ -212,7 +212,7 @@ public class CliNegotiationView implements INegotiationView {
         }
     }
 
-    // Ensure the proposed list is modifiable (keeps original defensive behavior)
+    
     private void ensureProposedIsModifiable() {
         if (!(proposed instanceof java.util.ArrayList)) {
             proposed = new java.util.ArrayList<>(proposed);
@@ -224,20 +224,20 @@ public class CliNegotiationView implements INegotiationView {
          try {
              int idx = Integer.parseInt(param) - 1;
              if (idx < 0 || idx >= proposed.size()) { System.out.println(INVALID_INDEX_MSG); return; }
-             // Defensive: ensure modifiable
+             
              if (!(proposed instanceof java.util.ArrayList)) {
                  proposed = new java.util.ArrayList<>(proposed);
              }
             CardBean card = proposed.get(idx);
             if (card.getQuantity() > 1) {
                 card.setQuantity(card.getQuantity() - 1);
-                // Notify single unit removal
+                
                 CardBean unit = new CardBean(card);
                 unit.setQuantity(1);
                 if (onUnpropose != null) onUnpropose.accept(unit);
                 System.out.println("Rimossa: " + card.getName() + " x1 (rimangono: " + card.getQuantity() + ")");
             } else {
-                // quantity == 1 -> remove entry
+                
                 CardBean removed = proposed.remove(idx);
                 if (onUnpropose != null) onUnpropose.accept(removed);
                 System.out.println("Rimossa: " + removed.getName() + " x1");
@@ -248,7 +248,7 @@ public class CliNegotiationView implements INegotiationView {
      }
 
     private void handleConfirm() {
-        // VALIDATION: ensure at least one offered card
+        
         if (proposed == null || proposed.isEmpty()) {
             System.out.println("Devi offrire almeno una carta prima di confermare la proposta.");
             return;
@@ -265,7 +265,7 @@ public class CliNegotiationView implements INegotiationView {
         if (onConfirm != null) onConfirm.accept(bean);
     }
 
-    // Extracted helper: prompt user to select a store, return null on cancel/invalid
+    
     private String selectStore() {
         System.out.println("Available stores:");
         for (int i = 0; i < availableStores.size(); i++) {
@@ -283,7 +283,7 @@ public class CliNegotiationView implements INegotiationView {
         return null;
     }
 
-    // Extracted helper: read and validate meeting date, returns the input string or null on failure
+    
     private String readAndValidateDate() {
         System.out.print("Enter meeting date (YYYY-MM-DD) [hint: " + (meetingDateHint != null ? meetingDateHint : "tomorrow") + "]: ");
         String dateIn = inputManager.readString();
@@ -303,7 +303,7 @@ public class CliNegotiationView implements INegotiationView {
         return dateIn;
     }
 
-    // Extracted helper: read optional time, returns null if empty
+    
     private String readOptionalTime() {
         System.out.print("Enter meeting time (HH:mm) [optional, press ENTER to skip]: ");
         String timeIn = inputManager.readString();
@@ -317,7 +317,7 @@ public class CliNegotiationView implements INegotiationView {
     private ProposalBean getProposalBean(String chosenStore, String dateIn, String timeIn) {
         ProposalBean bean = new ProposalBean();
         bean.setOffered(new ArrayList<>(proposed));
-        // ensure requested copies are quantity 1
+        
         List<CardBean> requestedCopies = new ArrayList<>();
         for (CardBean cb : requested) {
             CardBean copy = new CardBean(cb);
@@ -344,7 +344,7 @@ public class CliNegotiationView implements INegotiationView {
 
     @Override
     public void close() {
-        // nothing to close for CLI
+        /* not used */
     }
 
     @Override
@@ -354,11 +354,6 @@ public class CliNegotiationView implements INegotiationView {
 
     @Override
     public void refresh() {
-        // CLI: refresh does not automatically start the interactive loop; caller may call display().
-    }
-
-    @Override
-    public void setStage(javafx.stage.Stage stage) {
-        // CLI does not use JavaFX stages; present for interface compatibility.
+        /* not used */
     }
 }

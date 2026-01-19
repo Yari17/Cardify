@@ -20,7 +20,7 @@ public final class AppConfig {
         currentPersistenceType = type;
     }
 
-    // Return the raw persistence type string currently configured
+    
     public static String getPersistenceType() {
         return currentPersistenceType;
     }

@@ -2,7 +2,6 @@ package view.cli;
 
 import controller.StoreHPController;
 import config.InputManager;
-import javafx.stage.Stage;
 import view.IStoreHPView;
 
 @SuppressWarnings("java:S106")
@@ -41,7 +40,7 @@ public class CliStoreHPView implements IStoreHPView {
 
             switch (choice) {
                 case "1":
-                    // Delegate to controller which will ask ApplicationController to navigate
+                    
                     if (controller != null) controller.onManageTradesRequested();
                     break;
                 case "2":
@@ -63,17 +62,12 @@ public class CliStoreHPView implements IStoreHPView {
 
     @Override
     public void close() {
-        // Do not call controller.onExitRequested() here: close() is used by
-        // ApplicationController to close the current view during navigation.
-        // Exiting the whole JVM must be done only when the user explicitly
-        // requests exit from the menu. Keep close() as a no-op to allow
-        // seamless navigation between CLI views.
-        // No-op
+        /* not used */
     }
 
     @Override
     public void refresh() {
-        // CLI: refresh is a no-op here; display() drives the interactive loop.
+        /* not used */
     }
 
     @Override
@@ -86,11 +80,6 @@ public class CliStoreHPView implements IStoreHPView {
         System.out.println("\n╔════════════════════════════════════╗");
         System.out.println("║   Benvenuto STORE " + username + "!      ║");
         System.out.println("╚════════════════════════════════════╝");
-    }
-
-    @Override
-    public void setStage(Stage stage) {
-        // CLI does not use a JavaFX Stage; method implemented for compatibility with IView.
     }
 
     @Override

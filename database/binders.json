@@ -362,7 +362,7 @@
         "name": "Dark Hypno",
         "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
         "gameType": "POKEMON",
-        "quantity": 4,
+        "quantity": 3,
         "isTradable": true,
         "status": ""
       },
@@ -395,7 +395,7 @@
       }
     ],
     "createdAt": "2026-01-14T14:37:39.995239",
-    "lastModified": "2026-01-16T13:59:22.060045"
+    "lastModified": "2026-01-19T01:49:46.624718"
   },
   {
     "id": 17,
@@ -444,7 +444,7 @@
         "name": "Alakazam",
         "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/2/high.png",
         "gameType": "POKEMON",
-        "quantity": 1,
+        "quantity": 3,
         "isTradable": true,
         "status": ""
       },
@@ -468,7 +468,7 @@
       }
     ],
     "createdAt": "2026-01-14T18:30:47.597867",
-    "lastModified": "2026-01-15T19:43:21.514299"
+    "lastModified": "2026-01-19T01:49:46.626683"
   },
   {
     "id": 19,
@@ -697,10 +697,19 @@
         "quantity": 1,
         "isTradable": false,
         "status": ""
+      },
+      {
+        "id": "base5-9",
+        "name": "Dark Hypno",
+        "imageUrl": "https://assets.tcgdex.net/en/base/base5/9/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-17T20:06:36.138639",
-    "lastModified": "2026-01-17T20:06:36.143318"
+    "lastModified": "2026-01-19T01:49:46.606493"
   },
   {
     "id": 26,
@@ -716,10 +725,19 @@
         "quantity": 1,
         "isTradable": false,
         "status": ""
+      },
+      {
+        "id": "ecard3-2",
+        "name": "Alakazam",
+        "imageUrl": "https://assets.tcgdex.net/en/ecard/ecard3/2/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
       }
     ],
     "createdAt": "2026-01-17T20:06:36.147443",
-    "lastModified": "2026-01-17T20:06:36.150273"
+    "lastModified": "2026-01-19T01:49:46.614206"
   },
   {
     "id": 27,
@@ -855,12 +873,49 @@
         "name": "Vaporeon",
         "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
         "gameType": "POKEMON",
-        "quantity": 4,
+        "quantity": 3,
         "isTradable": true,
         "status": ""
       }
     ],
     "createdAt": "2026-01-18T23:44:13.576288",
-    "lastModified": "2026-01-18T23:44:28.245824"
+    "lastModified": "2026-01-19T00:32:32.827436"
+  },
+  {
+    "id": 36,
+    "owner": "collectortest2",
+    "setId": "P",
+    "cards": [
+      {
+        "id": "P-A-010",
+        "name": "Mewtwo",
+        "imageUrl": "https://assets.tcgdex.net/en/tcgp/P-A/010/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-19T00:32:32.807379",
+    "lastModified": "2026-01-19T00:32:32.814546"
+  },
+  {
+    "id": 37,
+    "owner": "collectortest1",
+    "setId": "sm115",
+    "setName": "Hidden Fates",
+    "cards": [
+      {
+        "id": "sm115-18",
+        "name": "Vaporeon",
+        "imageUrl": "https://assets.tcgdex.net/en/sm/sm115/18/high.png",
+        "gameType": "POKEMON",
+        "quantity": 1,
+        "isTradable": false,
+        "status": ""
+      }
+    ],
+    "createdAt": "2026-01-19T00:32:32.817660",
+    "lastModified": "2026-01-19T00:32:32.819007"
   }
 ]

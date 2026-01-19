@@ -8,11 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * In-memory implementation of IUserDao for demo purposes.
- * Data persists only during application runtime and is lost on shutdown.
- * Useful for demos and testing.
- */
+
 public class DemoUserDao implements IUserDao {
     private static final Logger LOGGER = Logger.getLogger(DemoUserDao.class.getName());
 
@@ -26,7 +22,7 @@ public class DemoUserDao implements IUserDao {
         LOGGER.info("DemoUserDao initialized - data will be volatile");
     }
 
-    // Seed users into demo DAO
+    
     public void loadFromCollection(Collection<User> initialUsers, Map<String, String> creds) {
         users.clear();
         credentials.clear();

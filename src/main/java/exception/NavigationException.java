@@ -1,8 +1,6 @@
 package exception;
 
-/**
- * Exception thrown when navigation between views fails.
- */
+
 public class NavigationException extends RuntimeException {
 
     public NavigationException(String message) {

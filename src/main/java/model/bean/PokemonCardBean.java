@@ -8,13 +8,13 @@ import java.util.Map;
 
 public class PokemonCardBean extends CardBean {
 
-    // Basic Info
+    
     private String category;
     private String localId;
     private String illustrator;
     private String rarity;
 
-    // Set Information
+    
     private String setId;
     private String setName;
     private String setLogo;
@@ -22,41 +22,41 @@ public class PokemonCardBean extends CardBean {
     private Integer setCardCountOfficial;
     private Integer setCardCountTotal;
 
-    // Variants
+    
     private Boolean variantFirstEdition;
     private Boolean variantHolo;
     private Boolean variantNormal;
     private Boolean variantReverse;
     private Boolean variantWPromo;
 
-    // Pokemon Specific
+    
     private Integer hp;
     private List<String> types;
     private String evolveFrom;
     private String description;
     private String stage;
 
-    // Battle Stats
+    
     private List<Map<String, Object>> attacks;
     private List<Map<String, String>> weaknesses;
     private Integer retreat;
 
-    // Legal/Regulation
+    
     private String regulationMark;
     private Boolean legalStandard;
     private Boolean legalExpanded;
 
-    // Costruttore di default per Jackson
+    
     public PokemonCardBean() {
         super(null, null, null, CardGameType.POKEMON);
     }
 
-    // Costruttore completo
+    
     public PokemonCardBean(String id, String name, String imageUrl) {
         super(id, name, imageUrl, CardGameType.POKEMON);
     }
 
-    // ========== Getters & Setters ==========
+    
 
     public String getCategory() {
         return category;
@@ -266,11 +266,9 @@ public class PokemonCardBean extends CardBean {
         this.legalExpanded = legalExpanded;
     }
 
-    // ========== Utility Methods ==========
+    
 
-    /**
-     * Restituisce il tipo principale della carta (primo della lista)
-     */
+    
     public String getPrimaryType() {
         return types != null && !types.isEmpty() ? types.get(0) : "Unknown";
     }

@@ -11,7 +11,7 @@ import model.api.ApiFactory;
 import model.api.ICardProvider;
 import config.AppConfig;
 
-//Controller applicativo della homepage del collezionista.
+
 public class CollectorHPController {
     private static final Logger LOGGER = Logger.getLogger(CollectorHPController.class.getName());
     private static final String EXCEPTION_DETAILS = "Exception details:";
@@ -22,7 +22,7 @@ public class CollectorHPController {
     private final ICardProvider cardProvider;
     private ICollectorHPView view;
 
-    // Lightweight in-memory cache for fetched card details (not persisted)
+    
     private final Map<String, Card> localCardCache = new HashMap<>();
 
     public CollectorHPController(String username, ApplicationController navigationController,
@@ -30,7 +30,7 @@ public class CollectorHPController {
         this.username = username;
         this.navigationController = navigationController;
         this.binderDao = binderDao;
-        // Obtain provider polymorphically via ApiFactory so controller doesn't depend on concrete provider
+        
         ICardProvider provider = new ApiFactory().getCardProvider(AppConfig.POKEMON_GAME);
         if (provider == null) {
             LOGGER.warning("ApiFactory returned null provider for game: " + AppConfig.POKEMON_GAME + "; using no-op fallback provider to avoid NPE.");
@@ -49,22 +49,18 @@ public class CollectorHPController {
     }
 
     public void loadPopularCards() {
-        // Load popular cards across all other users' binders, not only the default set
+        
         loadCardsFromOtherUsersAllSets();
     }
 
-    /**
-     * Load tradable cards from all other users, ignoring set filter.
-     * This is used for the "Popular Cards" shortcut so the UI shows other collectors' tradable cards
-     * even when the DEFAULT_SET_ID has no tradable cards among other users.
-     */
+    
     private void loadCardsFromOtherUsersAllSets() {
         try {
             List<model.domain.Binder> otherBinders = binderDao.getBindersExcludingOwner(username);
 
             LOGGER.log(java.util.logging.Level.INFO, "(Popular) otherBinders count: {0}", otherBinders.size());
 
-            // Build maps from binder data
+            
             Map<String, model.bean.CardBean> binderMap = new LinkedHashMap<>();
             Map<String, String> ownerMap = new LinkedHashMap<>();
             for (model.domain.Binder b : otherBinders) {
@@ -80,7 +76,7 @@ public class CollectorHPController {
 
             List<CardBean> cardBeans = buildCardBeansFromBinderMap(binderMap, ownerMap);
 
-            // Shuffle popular cards to present them in random order
+            
             Collections.shuffle(cardBeans, new java.util.Random());
 
             LOGGER.log(java.util.logging.Level.INFO, "(Popular) Loaded {0} cards to display", cardBeans.size());
@@ -94,19 +90,15 @@ public class CollectorHPController {
         }
     }
 
-    /**
-     * Load cards for a set, but only those owned by other users (and marked tradable).
-     * Fetches persistence data from Binder DAO, then uses ICardProvider to obtain
-     * details required for the UI. This keeps responsibilities separated (GRASP).
-     */
+    
     public void loadCardsFromSet(String setId) {
         try {
-            // Get binders owned by other users
+            
             List<model.domain.Binder> otherBinders = binderDao.getBindersExcludingOwner(username);
 
             LOGGER.log(java.util.logging.Level.INFO, "otherBinders count: {0}", otherBinders.size());
 
-            // Filter binders for the requested set
+            
             List<model.domain.Binder> setBinders = new ArrayList<>();
             for (model.domain.Binder b : otherBinders) {
                 if (setId != null && setId.equals(b.getSetId())) {
@@ -116,7 +108,7 @@ public class CollectorHPController {
 
             LOGGER.log(java.util.logging.Level.INFO, "setBinders count for set {0}: {1}", new Object[]{setId, setBinders.size()});
 
-            // Build maps from binder data
+            
             Map<String, model.bean.CardBean> binderMap = new LinkedHashMap<>();
             Map<String, String> ownerMap = new LinkedHashMap<>();
             for (model.domain.Binder b : setBinders) {
@@ -159,14 +151,9 @@ public class CollectorHPController {
         }
     }
 
-    /**
-     * Cerca carte Pokemon per nome e le visualizza nella view.
-     * Mostra solamente carte possedute da altri utenti e contrassegnate come tradable.
-     *
-     * @param name nome della carta da cercare
-     */
+    
     public void searchCardsByName(String name) {
-        // thin orchestrator: validate input and delegate to helper
+        
         if (name == null || name.trim().isEmpty()) {
             LOGGER.log(java.util.logging.Level.INFO, "Empty search query");
             if (view != null) view.displayCards(java.util.Collections.emptyList());
@@ -215,7 +202,7 @@ public class CollectorHPController {
                     (setsMap != null ? setsMap.size() : "null"));
 
             if (setsMap != null && !setsMap.isEmpty()) {
-                // Log primi 5 set per debug
+                
                 int count = 0;
                 for (Map.Entry<String, String> entry : setsMap.entrySet()) {
                     if (count < 5) {
@@ -249,7 +236,7 @@ public class CollectorHPController {
                 (view != null ? view.getClass().getName() : "null"));
         this.view = view;
 
-        // Carica i set disponibili DOPO che la view è stata impostata
+        
         if (view != null) {
             LOGGER.info("Loading available sets after view is set");
             loadAvailableSets();
@@ -277,7 +264,7 @@ public class CollectorHPController {
             navigationController.navigateToLiveTrades(username);
          } catch (exception.NavigationException ex) {
              LOGGER.severe(() -> "Failed to navigate to Manage Trades: " + ex.getMessage());
-             // UI feedback omitted here to keep controller decoupled from specific view capabilities the ApplicationController or destination view may show errors as needed.
+             
          }
     }
 
@@ -306,7 +293,7 @@ public class CollectorHPController {
                 new Object[] { card.getName(), card.getId() });
 
         if (view != null) {
-            // Try local cache first
+            
             Card detailedCard = localCardCache.get(card.getId());
             if (detailedCard == null) {
                 LOGGER.log(java.util.logging.Level.INFO, "Card not in local cache, fetching from API: {0}", card.getId());
@@ -318,11 +305,11 @@ public class CollectorHPController {
 
             if (detailedCard != null) {
                 CardBean detailedBean = detailedCard.toBean();
-                // Preserve owner information from the original binder-provided bean
+                
                 if (card.getOwner() != null && !card.getOwner().isEmpty()) {
                     detailedBean.setOwner(card.getOwner());
                 }
-                // Preserve binder-specific flags so the view can show trade controls
+                
 
                     detailedBean.setTradable(card.isTradable());
                     detailedBean.setQuantity(card.getQuantity());
@@ -336,14 +323,11 @@ public class CollectorHPController {
         }
     }
 
-    /**
-     * Open the negotiation UI for the given card: collect necessary data and delegate
-     * to ApplicationController for navigation.
-     */
+    
     public void openNegotiation(CardBean card) {
         if (card == null) return;
-        // Delegate to the application-level navigation controller which will assemble
-        // the inventory/requested lists and create the NegotiationController/view.
+        
+        
         navigationController.navigateToNegotiation(username, card);
     }
 
@@ -367,7 +351,7 @@ public class CollectorHPController {
         if (binders == null || binders.isEmpty()) return result;
 
         for (model.domain.Binder b : binders) {
-            // Single continue for any invalid binder or empty cards
+            
             if (b == null || b.getCards() == null || b.getCards().isEmpty()) continue;
             List<model.bean.CardBean> cards = b.getCards();
             String owner = b.getOwner();
@@ -381,18 +365,18 @@ public class CollectorHPController {
     private CardBean buildFinalCardBean(String id, CardBean binderBean) {
         if (id == null) return null;
 
-        // Prefer binder-provided bean if it already has display info
+        
         if (binderBean != null && binderBean.getName() != null && binderBean.getImageUrl() != null) {
-            return new CardBean(binderBean); // copy
+            return new CardBean(binderBean); 
         }
 
-        // Try local cache
+        
         Card cached = localCardCache.get(id);
         if (cached != null) {
             return cached.toBean();
         }
 
-        // Try provider
+        
         try {
             Card detailed = cardProvider.getCardDetails(id);
             if (detailed != null) {
@@ -403,9 +387,9 @@ public class CollectorHPController {
             LOGGER.fine(() -> "Provider failed to fetch details for " + id + ": " + ex.getMessage());
         }
 
-        // Fallbacks
+        
         if (binderBean != null) {
-            return new CardBean(binderBean); // copy even if partial
+            return new CardBean(binderBean); 
         }
 
         CardBean minimal = new CardBean();
@@ -425,9 +409,9 @@ public class CollectorHPController {
             CardBean finalBean = buildFinalCardBean(id, binderBean);
             if (finalBean == null) continue;
 
-            // set owner for display
+            
             finalBean.setOwner(owner);
-            // Preserve binder-specific properties (important: binderBean may be partial)
+            
             if (binderBean != null) {
                 finalBean.setTradable(binderBean.isTradable());
                 finalBean.setQuantity(binderBean.getQuantity());
@@ -450,7 +434,7 @@ public class CollectorHPController {
                     Card source = java.util.Objects.requireNonNullElse(cached, c);
                     CardBean bean = source.toBean();
                     bean.setOwner(idToOwner.get(id));
-                    // Mark as tradable because presence in idToOwner means some binder has it and flagged tradable
+                    
                     bean.setTradable(true);
                     return bean;
                 })

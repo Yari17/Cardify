@@ -18,8 +18,8 @@ public class Proposal {
     private LocalDateTime lastUpdated;
     private ProposalStatus status;
     private String meetingPlace;
-    private String meetingDate; // YYYY-MM-DD
-    private String meetingTime; // HH:mm (optional)
+    private String meetingDate; 
+    private String meetingTime; 
 
     public String getProposalId() { return proposalId; }
     public void setProposalId(String proposalId) { this.proposalId = proposalId; }
@@ -56,37 +56,27 @@ public class Proposal {
         return "Proposal{" + "proposalId='" + proposalId + '\'' + ", proposerId='" + proposerId + '\'' + ", receiverId='" + receiverId + '\'' + ", offered=" + cardsOffered + ", requested=" + cardsRequested + ", status=" + status + '}';
     }
 
-    // -------------------- Domain behavior (Information Expert) --------------------
+    
 
-    /**
-     * Mark this proposal as accepted and update timestamp.
-     * Business rules about transition can be enforced here.
-     */
+    
     public void accept() {
         this.status = ProposalStatus.ACCEPTED;
         this.lastUpdated = LocalDateTime.now();
     }
 
-    /**
-     * Mark this proposal as declined/rejected and update timestamp.
-     */
+    
     public void decline() {
         this.status = ProposalStatus.REJECTED;
         this.lastUpdated = LocalDateTime.now();
     }
 
-    /**
-     * Returns true if this proposal is expired according to lastUpdated + 1 day rule.
-     */
+    
     public boolean isExpired(LocalDateTime now) {
         if (this.lastUpdated == null || now == null) return false;
         return this.lastUpdated.plusDays(1).isBefore(now);
     }
 
-    /**
-     * Try to parse meetingDate and meetingTime into a LocalDateTime.
-     * Returns empty Optional if parsing fails or no date specified.
-     */
+    
     public Optional<LocalDateTime> getMeetingLocalDateTime() {
         if (this.meetingDate == null || this.meetingDate.isEmpty()) return Optional.empty();
         try {
@@ -101,7 +91,7 @@ public class Proposal {
         }
     }
 
-    // Extracted helper to parse meetingTime into LocalTime, ignoring parse errors
+    
     private Optional<LocalTime> parseMeetingTime(String mt) {
         try {
             LocalTime time = LocalTime.parse(mt);
@@ -111,10 +101,7 @@ public class Proposal {
         }
     }
 
-    /**
-     * Build a TradeTransaction representing the scheduled trade for this proposal.
-     * Returns null if insufficient data.
-     */
+    
     public TradeTransaction toTradeTransaction() {
         TradeStatus defaultStatus = TradeStatus.WAITING_FOR_ARRIVAL;
         int txId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
@@ -127,7 +114,7 @@ public class Proposal {
         List<Card> offered = this.cardsOffered != null ? new java.util.ArrayList<>(this.cardsOffered) : java.util.Collections.emptyList();
         List<Card> requested = this.cardsRequested != null ? new java.util.ArrayList<>(this.cardsRequested) : java.util.Collections.emptyList();
 
-        // Crea i value object richiesti dal costruttore
+        
         TradeTransaction.TradeParticipants participants = new TradeTransaction.TradeParticipants(
             this.proposerId,
             this.receiverId,

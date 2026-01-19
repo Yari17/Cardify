@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public class FXNegotiationView implements INegotiationView {
-    // Simple logger for view-level diagnostics
+    
     private static final Logger LOGGER = Logger.getLogger(FXNegotiationView.class.getName());
     private static final String NOCARDIMAGE_ICONS_PATH = "/icons/nocardimage.svg";
 
@@ -35,9 +35,9 @@ public class FXNegotiationView implements INegotiationView {
     @FXML
     private javafx.scene.control.ComboBox<String> storeComboBox;
     @FXML
-    private javafx.scene.control.TextField meetingDateField; // format YYYY-MM-DD
+    private javafx.scene.control.TextField meetingDateField; 
     @FXML
-    private javafx.scene.control.TextField meetingTimeField; // format HH:mm (optional)
+    private javafx.scene.control.TextField meetingTimeField; 
     @FXML
     private Button addButton;
     @FXML
@@ -53,7 +53,7 @@ public class FXNegotiationView implements INegotiationView {
     private Consumer<CardBean> onPropose;
     private Consumer<CardBean> onUnpropose;
     private Consumer<ProposalBean> onConfirm;
-    @Override
+
     public void setStage(Stage stage) { this.stage = stage; }
 
     @FXML
@@ -66,7 +66,7 @@ public class FXNegotiationView implements INegotiationView {
 
     private void setupCellFactories() {
         if (inventoryList != null) inventoryList.setCellFactory(lv -> {
-            // reference lv to avoid 'parameter never used' warnings in static analysis
+            
             lv.getProperties();
             return new CardBeanCell(true);
         });
@@ -95,7 +95,7 @@ public class FXNegotiationView implements INegotiationView {
     private void bindButtonToHandler(Button btn, Runnable action) {
         if (btn == null || action == null) return;
         btn.setOnAction(e -> {
-            // consume the event to mark it handled and avoid unused-parameter warnings
+            
             e.consume();
             action.run();
         });
@@ -116,10 +116,10 @@ public class FXNegotiationView implements INegotiationView {
     }
 
     private void setupBindings() {
-        // Disabilita il pulsante Confirm se non ci sono carte proposte (UX improvement)
+        
         try {
             if (confirmButton != null && proposedList != null) {
-                // Bind the disable property to the emptiness of the proposed list
+                
                 confirmButton.disableProperty().bind(Bindings.isEmpty(proposedList.getItems()));
             }
         } catch (Exception _) {
@@ -131,7 +131,7 @@ public class FXNegotiationView implements INegotiationView {
     public void showInventory(List<CardBean> inventory) {
         inventoryList.getItems().clear();
         if (inventory != null) {
-            // Use copies to keep original beans intact; ensure quantity is set
+            
             for (CardBean cb : inventory) {
                 CardBean copy = new CardBean(cb);
                 inventoryList.getItems().add(copy);
@@ -145,7 +145,7 @@ public class FXNegotiationView implements INegotiationView {
         if (requested != null) {
             for (CardBean cb : requested) {
                 CardBean copy = new CardBean(cb);
-                // The requested card in a proposal must be exactly one unit
+                
                 copy.setQuantity(1);
                 requestedList.getItems().add(copy);
             }
@@ -241,13 +241,13 @@ public class FXNegotiationView implements INegotiationView {
     private void handleAdd() {
         CardBean sel = inventoryList.getSelectionModel().getSelectedItem();
         if (sel == null) return;
-        if (sel.getQuantity() <= 0) return; // nothing to add
+        if (sel.getQuantity() <= 0) return; 
 
-        // Decrement inventory quantity
+        
         sel.setQuantity(sel.getQuantity() - 1);
         inventoryList.refresh();
 
-        // Add to proposed: aggregate by id
+        
         CardBean existing = proposedList.getItems().stream()
                 .filter(c -> c.getId().equals(sel.getId()))
                 .findFirst().orElse(null);
@@ -260,7 +260,7 @@ public class FXNegotiationView implements INegotiationView {
             proposedList.getItems().add(newBean);
         }
 
-        // update cell styles via refresh
+        
         inventoryList.refresh();
         proposedList.refresh();
 
@@ -271,7 +271,7 @@ public class FXNegotiationView implements INegotiationView {
         CardBean sel = proposedList.getSelectionModel().getSelectedItem();
         if (sel == null) return;
 
-        // Decrement or remove from proposed
+        
         if (sel.getQuantity() > 1) {
             sel.setQuantity(sel.getQuantity() - 1);
             proposedList.refresh();
@@ -279,7 +279,7 @@ public class FXNegotiationView implements INegotiationView {
             proposedList.getItems().remove(sel);
         }
 
-        // Return one to inventory: find matching inventory item and increment
+        
         CardBean inv = inventoryList.getItems().stream()
                 .filter(c -> c.getId().equals(sel.getId()))
                 .findFirst().orElse(null);
@@ -292,7 +292,7 @@ public class FXNegotiationView implements INegotiationView {
     }
 
     private void handleConfirm() {
-        // Validate meeting info (store and date)
+        
         String meetingPlace = storeComboBox != null ? storeComboBox.getValue() : null;
         String meetingDate = meetingDateField != null ? meetingDateField.getText() : null;
         String meetingDateTrimmed = meetingDate == null ? null : meetingDate.trim();
@@ -312,7 +312,7 @@ public class FXNegotiationView implements INegotiationView {
 
         ProposalBean bean = buildProposalBean(meetingPlace, meetingDateTrimmed);
 
-        // read optional time if present and validate basic HH:mm format
+        
         String meetingTime = meetingTimeField != null ? meetingTimeField.getText() : null;
         if (!processMeetingTime(bean, meetingTime)) return;
         if (onConfirm != null) onConfirm.accept(bean);
@@ -351,9 +351,9 @@ public class FXNegotiationView implements INegotiationView {
 
     private ProposalBean buildProposalBean(String meetingPlace, String meetingDateTrimmed) {
         ProposalBean bean = new ProposalBean();
-        // build offered as-is (may contain quantities >1)
+        
         bean.setOffered(new ArrayList<>(proposedList.getItems()));
-        // ensure each requested card is exactly one unit when sending proposal
+        
         List<CardBean> requestedCopies = new ArrayList<>();
         for (CardBean cb : requestedList.getItems()) {
             CardBean copy = new CardBean(cb);
@@ -388,7 +388,7 @@ public class FXNegotiationView implements INegotiationView {
         }
     }
 
-    // Custom cell shows thumbnail, name and quantity and allows styling when quantity==0
+    
     private static class CardBeanCell extends ListCell<CardBean> {
         private final HBox container = new HBox(8);
         private final ImageView thumb = new ImageView();
@@ -413,7 +413,7 @@ public class FXNegotiationView implements INegotiationView {
                 setText(null);
                 setStyle("");
             } else {
-                // load thumbnail and set contents/style via helpers
+                
                 loadThumbnail(item);
                 name.setText(item.getName() != null ? item.getName() : item.getId());
                 qty.setText(" x" + Math.max(0, item.getQuantity()));

@@ -23,13 +23,13 @@ public class JdbcDaoFactory extends DaoFactory {
 
     @Override
     public IBinderDao createBinderDao() {
-        // JDBC binder implementation was removed; use JSON persistence as fallback
+        
         return new JsonBinderDao(DatabaseConfig.BINDERS_JSON_PATH);
     }
 
     @Override
     public IProposalDao createProposalDao() {
-        // JDBC-based proposal persistence not implemented; fallback to JSON file
+        
         return new JsonProposalDao(DatabaseConfig.JSON_DIR + File.separator + "proposals.json");
     }
 

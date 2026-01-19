@@ -107,25 +107,25 @@ public class JsonBinderDao implements IBinderDao {
 
     @Override
     public void save(Binder binder) {
-        // Genera un nuovo ID se non presente
+        
         if (binder.getId() == 0) {
             binder.setId(idGenerator.incrementAndGet());
         }
 
-        // Imposta createdAt se non presente
+        
         if (binder.getCreatedAt() == null) {
             binder.setCreatedAt(LocalDateTime.now());
         }
 
-        // Aggiorna lastModified
+        
         binder.setLastModified(LocalDateTime.now());
 
-        // Salva in cache
+        
         bindersById.put(binder.getId(), binder);
         bindersByOwner.computeIfAbsent(binder.getOwner(), _ -> new ArrayList<>())
                 .add(binder);
 
-        // Persisti su file
+        
         saveToJson();
 
         LOGGER.log(Level.INFO, "Saved binder ID: {0} for user: {1}",
@@ -139,10 +139,10 @@ public class JsonBinderDao implements IBinderDao {
             throw new IllegalArgumentException("Binder not found with ID: " + binder.getId());
         }
 
-        // Aggiorna lastModified
+        
         binder.setLastModified(LocalDateTime.now());
 
-        // Rimuovi dalla cache per owner
+        
         String owner = binder.getOwner();
         List<Binder> ownerBinders = bindersByOwner.get(owner);
         if (ownerBinders != null) {
@@ -150,10 +150,10 @@ public class JsonBinderDao implements IBinderDao {
             ownerBinders.add(binder);
         }
 
-        // Aggiorna in cache principale
+        
         bindersById.put(binder.getId(), binder);
 
-        // Persisti su file
+        
         saveToJson();
 
         LOGGER.log(Level.INFO, "Updated binder ID: {0}", binder.getId());
@@ -165,10 +165,10 @@ public class JsonBinderDao implements IBinderDao {
             throw new IllegalArgumentException("Binder cannot be null");
         }
 
-        // Rimuovi dalla cache principale
+        
         bindersById.remove(binder.getId());
 
-        // Rimuovi dalla cache per owner
+        
         List<Binder> ownerBinders = bindersByOwner.get(binder.getOwner());
         if (ownerBinders != null) {
             ownerBinders.removeIf(b -> b.getId() == binder.getId());
@@ -177,7 +177,7 @@ public class JsonBinderDao implements IBinderDao {
             }
         }
 
-        // Persisti su file
+        
         saveToJson();
 
         LOGGER.log(Level.INFO, "Deleted binder ID: {0}", binder.getId());
@@ -227,7 +227,7 @@ public class JsonBinderDao implements IBinderDao {
         return result;
     }
 
-    // Adapter per LocalDateTime con Gson
+    
     private static class LocalDateTimeAdapter extends com.google.gson.TypeAdapter<LocalDateTime> {
         @Override
         public void write(com.google.gson.stream.JsonWriter out, LocalDateTime value) throws IOException {

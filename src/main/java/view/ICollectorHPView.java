@@ -18,7 +18,7 @@ public interface ICollectorHPView extends IView {
 
     void displayAvailableSets(Map<String, String> setsMap);
 
-    // Generic UI feedback methods (errors/success) to keep controllers decoupled from implementation
+    
     void showSuccess(String message);
     void showError(String message);
 

@@ -10,11 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * In-demo implementation of IBinderDao.
- * Data persists only during application runtime and is lost on shutdown.
- * Useful for demos and testing.
- */
+
 public class DemoBinderDao implements IBinderDao {
     private static final Logger LOGGER = Logger.getLogger(DemoBinderDao.class.getName());
 
@@ -30,7 +26,7 @@ public class DemoBinderDao implements IBinderDao {
         LOGGER.info("DemoBinderDao initialized - data will be volatile");
     }
 
-    // Seed demo binders
+    
     public void loadFromCollection(Collection<Binder> initial) {
         bindersById.clear();
         bindersByOwner.clear();

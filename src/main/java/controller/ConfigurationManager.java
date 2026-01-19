@@ -33,9 +33,9 @@ public class ConfigurationManager {
 
     private String mapPersistenceChoice(String choice) {
         return switch (choice) {
-            case "1" -> "JSON";    // Standard - persistenza su file
-            case "2" -> "DEMO";    // Demo - dati in memoria
-            default -> "JSON";     // Default a JSON se non specificato
+            case "1" -> "JSON";    
+            case "2" -> "DEMO";    
+            default -> "JSON";     
         };
     }
 }

@@ -23,14 +23,14 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//Controller grafico del caso d'uso Gestisci Collezione
+
 public class FXCollectionView implements ICollectionView {
     private static final Logger LOGGER = Logger.getLogger(FXCollectionView.class.getName());
     private static final String CARD_HOVER_STYLE = "card-hover";
-    // centralized constant for repeated style class
+    
     private static final String BUTTON_ACCENT = "button-accent";
     private static final String MANAGE="manage";
-    // navigation constants
+    
     private static final String NAV_SELECTED = "nav-selected";
     private static final String NAV_COLLECTION = "collection";
 
@@ -81,19 +81,19 @@ public class FXCollectionView implements ICollectionView {
 
     private CollectionController controller;
     private Stage stage;
-    // GUI must not hold DAO references. Controller supplies setCardsMap via
-    // displayCollection.
+    
+    
     private Map<String, List<Card>> setCardsMap;
 
-    // Track currently displayed binders to enable partial refresh
+    
     private Map<String, Binder> currentBinders;
 
-    // Pagination fields - track current page for each set
+    
     private final Map<String, Integer> setCurrentPages = new HashMap<>();
     private static final int CARDS_PER_PAGE = 20;
 
     public FXCollectionView() {
-        // FXML fields will be injected by FXMLLoader
+        
         this.currentBinders = new HashMap<>();
     }
 
@@ -110,30 +110,28 @@ public class FXCollectionView implements ICollectionView {
         }
     }
 
-    /**
-     * Visualizza la collezione organizzata per set con le carte
-     */
+    
     public void displayCollection(Map<String, Binder> bindersBySet, Map<String, List<model.domain.Card>> setCardsMap) {
         if (setsContainer == null) {
             LOGGER.warning("setsContainer is null");
             return;
         }
 
-        // Store current binders and setCardsMap for partial refresh
+        
         this.currentBinders = new HashMap<>(bindersBySet);
-        // keep reference to setCards for later updates
+        
         this.setCardsMap = (setCardsMap != null) ? new HashMap<>(setCardsMap) : new HashMap<>();
         Map<String, List<Card>> effectiveSetCards = this.setCardsMap;
 
         setsContainer.getChildren().clear();
 
-        // Pulsante per aggiungere nuovo set (se ci sono binder)
+        
         if (!bindersBySet.isEmpty()) {
             Button addSetButton = createAddSetButton();
             setsContainer.getChildren().add(addSetButton);
         }
 
-        // Per ogni set, mostra le carte
+        
         for (Map.Entry<String, Binder> entry : bindersBySet.entrySet()) {
             String setId = entry.getKey();
             Binder binder = entry.getValue();
@@ -143,7 +141,7 @@ public class FXCollectionView implements ICollectionView {
             setsContainer.getChildren().add(setSection);
         }
 
-        // Se non ci sono set, mostra un placeholder con pulsante
+        
         if (bindersBySet.isEmpty()) {
             VBox emptyState = createEmptyState();
             setsContainer.getChildren().add(emptyState);
@@ -152,9 +150,7 @@ public class FXCollectionView implements ICollectionView {
         LOGGER.log(Level.INFO, "Displayed collection with {0} sets", bindersBySet.size());
     }
 
-    /**
-     * Crea il pulsante per aggiungere un nuovo set
-     */
+    
     private Button createAddSetButton() {
         Button button = new Button("+ Aggiungi Nuovo Set");
         button.getStyleClass().add(BUTTON_ACCENT);
@@ -169,23 +165,21 @@ public class FXCollectionView implements ICollectionView {
         return button;
     }
 
-    /**
-     * Crea una sezione per un set con tutte le sue carte
-     */
+    
     private VBox createSetSection(String setId, Binder binder, List<Card> allCards) {
         VBox setSection = new VBox(15);
         setSection.setPadding(new Insets(20));
         setSection.getStyleClass().add("set-section");
         setSection.setUserData(setId);
 
-        // Header del set
+        
         HBox header = new HBox(20);
         header.setAlignment(Pos.CENTER_LEFT);
 
         Label setNameLabel = new Label(binder.getSetName());
         setNameLabel.getStyleClass().add("set-name-label");
 
-        // Carica tutte le carte del set per calcolare le mancanti
+        
         int totalCards = (allCards != null) ? allCards.size() : 0;
 
         int ownedCards = binder.getCardCount();
@@ -197,40 +191,40 @@ public class FXCollectionView implements ICollectionView {
         Label missingLabel = new Label(missingCards + " mancanti");
         missingLabel.setStyle("-fx-text-fill: #ed4747; -fx-font-size: 16px; -fx-font-weight: bold;");
 
-        // If there are no cards available for this set (persistence/provider returned
-        // nothing),
-        // make it explicit in the UI so user knows why the grid is empty.
+        
+        
+        
         if (totalCards == 0) {
             Label noCardsNote = new Label("Nessuna carta disponibile per questo set (dati non caricati)");
             noCardsNote.setStyle("-fx-text-fill: #cfcfcf; -fx-font-size: 12px;");
             VBox.setMargin(noCardsNote, new Insets(6, 0, 0, 0));
-            // We'll add this below next to the header (after header is assembled)
+            
             header.getChildren().add(noCardsNote);
         }
 
-        // Spacer per spingere il bottone elimina a destra
+        
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        // Bottone elimina set
+        
         Button deleteButton = createDeleteButton(setId, binder.getSetName());
 
         header.getChildren().addAll(setNameLabel, statsLabel, missingLabel, spacer, deleteButton);
 
-        // Griglia delle carte (paginata)
+        
         FlowPane cardsGrid = new FlowPane();
         cardsGrid.setHgap(15);
         cardsGrid.setVgap(15);
         cardsGrid.setPrefWrapLength(Region.USE_COMPUTED_SIZE);
-        cardsGrid.setUserData("cardsGrid_" + setId); // Identificatore per trovare la griglia
+        cardsGrid.setUserData("cardsGrid_" + setId); 
 
-        // Pagination controls
+        
         HBox paginationControls = createPaginationControls(setId, allCards, binder);
 
-        // Initialize to page 0
+        
         setCurrentPages.put(setId, 0);
 
-        // Load first page of cards
+        
         try {
             assert allCards != null;
             loadCardsPage(setId, allCards, binder, cardsGrid, paginationControls);
@@ -244,9 +238,7 @@ public class FXCollectionView implements ICollectionView {
         return setSection;
     }
 
-    /**
-     * Load a specific page of cards for a set
-     */
+    
     private void loadCardsPage(String setId, List<Card> allCards, Binder binder, FlowPane cardsGrid,
             HBox paginationControls) {
         int currentPage = setCurrentPages.getOrDefault(setId, 0);
@@ -265,14 +257,14 @@ public class FXCollectionView implements ICollectionView {
 
         List<Card> pageCards = allCards.subList(startIndex, endIndex);
 
-        // Clear previous cards
+        
         cardsGrid.getChildren().clear();
 
-        // Crea mappa delle carte possedute per accesso rapido
+        
         Map<String, CardBean> ownedCardsMap = binder.getCards().stream()
                 .collect(java.util.stream.Collectors.toMap(CardBean::getId, c -> c));
 
-        // Add cards for current page
+        
         for (Card card : pageCards) {
             CardBean ownedCard = ownedCardsMap.get(card.getId());
             boolean isOwned = ownedCard != null;
@@ -280,13 +272,11 @@ public class FXCollectionView implements ICollectionView {
             cardsGrid.getChildren().add(cardTile);
         }
 
-        // Update pagination controls
+        
         updatePaginationControls(paginationControls, currentPage, totalPages);
     }
 
-    /**
-     * Create pagination controls for a set
-     */
+    
     private HBox createPaginationControls(String setId, List<Card> allCards, Binder binder) {
         HBox controls = new HBox(15);
         controls.setAlignment(Pos.CENTER);
@@ -317,7 +307,7 @@ public class FXCollectionView implements ICollectionView {
         nextIcon.setIconColor(javafx.scene.paint.Color.WHITE);
         nextButton.setGraphic(nextIcon);
 
-        // Set button actions
+        
         prevButton.setOnAction(ev -> {
             int currentPage = setCurrentPages.getOrDefault(setId, 0);
             if (currentPage > 0) {
@@ -348,9 +338,7 @@ public class FXCollectionView implements ICollectionView {
         return controls;
     }
 
-    /**
-     * Update pagination button states
-     */
+    
     private void updatePaginationControls(HBox controls, int currentPage, int totalPages) {
         for (javafx.scene.Node node : controls.getChildren()) {
             if ("prevButton".equals(node.getUserData())) {
@@ -363,9 +351,7 @@ public class FXCollectionView implements ICollectionView {
         }
     }
 
-    /**
-     * Find cards grid for a specific set
-     */
+    
     private FlowPane findCardsGridInSet(String setId) {
         VBox setSection = findSetSection(setId);
         if (setSection == null)
@@ -379,40 +365,38 @@ public class FXCollectionView implements ICollectionView {
         return null;
     }
 
-    /**
-     * Crea un tile per una singola carta con controlli quantità e scambiabilità
-     */
+    
     private VBox createCardTile(Card card, String setId, boolean isOwned, CardBean ownedCard) {
         VBox tile = new VBox();
-        tile.setPrefSize(120, 168); // Dimensione esatta immagine
+        tile.setPrefSize(120, 168); 
         tile.setMinSize(120, 168);
         tile.setMaxSize(120, 168);
         tile.setAlignment(Pos.TOP_CENTER);
         tile.setSpacing(0);
         tile.setPadding(new Insets(0));
 
-        // Store card ID in userData for updates
+        
         tile.setUserData(card.getId());
 
-        // Stili base
+        
         if (isOwned) {
             tile.getStyleClass().addAll("card-tile", "card-owned");
         } else {
             tile.getStyleClass().addAll("card-tile", "card-not-owned");
         }
 
-        // Immagine della carta (dimensione standard carta Pokémon)
+        
         ImageView cardImage = new ImageView();
         cardImage.setFitWidth(120);
         cardImage.setFitHeight(168);
         cardImage.setPreserveRatio(true);
 
-        // Carica immagine con placeholder se non disponibile
+        
         boolean imageLoaded = false;
         String imageUrl = card.getImageUrl();
         if (imageUrl != null && !imageUrl.isEmpty()) {
             try {
-                // Direct loading (background loading enabled)
+                
                 Image image = new Image(imageUrl, true);
                 cardImage.setImage(image);
                 imageLoaded = true;
@@ -422,7 +406,7 @@ public class FXCollectionView implements ICollectionView {
             }
         }
 
-        // Se l'immagine non è caricata, mostra placeholder
+        
         if (!imageLoaded) {
             try {
                 java.net.URL res = getClass().getResource("/icons/nocardimage.svg");
@@ -437,31 +421,31 @@ public class FXCollectionView implements ICollectionView {
             }
         }
 
-        // Applica opacità se non posseduta (slightly obscured to distinguish from
-        // owned)
+        
+        
         if (!isOwned) {
             cardImage.setOpacity(0.5);
         }
 
-        // Container per immagine con overlay controlli
+        
         StackPane imageContainer = new StackPane();
         imageContainer.getChildren().add(cardImage);
 
-        // Se NON posseduta: mostra solo pulsante + per aggiungere
+        
         if (!isOwned) {
             Button addButton = createAddButton(setId, card);
             StackPane.setAlignment(addButton, Pos.BOTTOM_CENTER);
             StackPane.setMargin(addButton, new Insets(0, 0, 5, 0));
             imageContainer.getChildren().add(addButton);
         } else {
-            // Se posseduta: mostra controlli completi SOLO su hover
+            
             VBox controls = createCardControls(setId, card, ownedCard);
-            controls.setVisible(false); // Inizialmente nascosti
+            controls.setVisible(false); 
             StackPane.setAlignment(controls, Pos.BOTTOM_CENTER);
             StackPane.setMargin(controls, new Insets(0, 0, 5, 0));
             imageContainer.getChildren().add(controls);
 
-            // Mostra controlli solo su hover
+            
             tile.setOnMouseEntered(_ -> {
                 controls.setVisible(true);
                 tile.getStyleClass().add(CARD_HOVER_STYLE);
@@ -474,7 +458,7 @@ public class FXCollectionView implements ICollectionView {
 
         tile.getChildren().add(imageContainer);
 
-        // Hover effect per carte non possedute
+        
         if (!isOwned) {
             tile.setOnMouseEntered(_ -> tile.getStyleClass().add(CARD_HOVER_STYLE));
             tile.setOnMouseExited(_ -> tile.getStyleClass().remove(CARD_HOVER_STYLE));
@@ -483,21 +467,19 @@ public class FXCollectionView implements ICollectionView {
         return tile;
     }
 
-    /**
-     * Crea il pulsante + per aggiungere una carta non posseduta
-     */
+    
     private Button createAddButton(String setId, Card card) {
         Button addButton = new Button();
         FontIcon plusIcon = new FontIcon("fas-plus-circle");
         plusIcon.setIconSize(28);
         plusIcon.setIconColor(javafx.scene.paint.Color.web("#29B6F6"));
         addButton.setGraphic(plusIcon);
-        // do not add the 'card-add-button' class which may define a rectangular
-        // background
-        // Make the button visually just the icon: remove default rectangular background
+        
+        
+        
         addButton.setStyle("-fx-background-color: transparent; -fx-padding: 0; -fx-cursor: hand;");
-        // ensure clicks only register on the visible icon, avoiding the larger
-        // rectangular hitbox
+        
+        
         addButton.setPickOnBounds(false);
 
         addButton.setOnAction(_ -> {
@@ -509,9 +491,7 @@ public class FXCollectionView implements ICollectionView {
         return addButton;
     }
 
-    /**
-     * Crea il pulsante per eliminare un binder con dialog di conferma
-     */
+    
     private Button createDeleteButton(String setId, String setName) {
         Button deleteButton = new Button();
         FontIcon trashIcon = new FontIcon("fas-trash-alt");
@@ -529,9 +509,7 @@ public class FXCollectionView implements ICollectionView {
         return deleteButton;
     }
 
-    /**
-     * Mostra dialog di conferma per l'eliminazione di un binder
-     */
+    
     private void showDeleteConfirmationDialog(String setId, String setName) {
         Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
         confirmDialog.setTitle("Conferma Eliminazione");
@@ -548,7 +526,7 @@ public class FXCollectionView implements ICollectionView {
 
         confirmDialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo);
 
-        // Stile per il dialog (guard resource)
+        
         DialogPane dialogPane = confirmDialog.getDialogPane();
         java.net.URL themeRes = getClass().getResource("/styles/theme.css");
         if (themeRes != null)
@@ -561,9 +539,7 @@ public class FXCollectionView implements ICollectionView {
         }
     }
 
-    /**
-     * Crea i controlli per una carta posseduta (quantità, scambiabile, +/-)
-     */
+    
     private VBox createCardControls(String setId, Card card, CardBean ownedCard) {
         VBox controls = new VBox(5);
         controls.setAlignment(Pos.CENTER);
@@ -574,7 +550,7 @@ public class FXCollectionView implements ICollectionView {
         HBox topRow = new HBox(8);
         topRow.setAlignment(Pos.CENTER);
 
-        // Pulsante - (rimuovi carta)
+        
         Button minusButton = new Button();
         FontIcon minusIcon = new FontIcon("fas-minus-circle");
         minusIcon.setIconSize(22);
@@ -588,7 +564,7 @@ public class FXCollectionView implements ICollectionView {
             ev.consume();
         });
 
-        // Label quantità (usa la quantità reale da CardBean)
+        
         int quantity = ownedCard != null ? ownedCard.getQuantity() : 1;
         Label quantityLabel = new Label(String.valueOf(quantity));
         quantityLabel.getStyleClass().add("card-quantity-label");
@@ -596,7 +572,7 @@ public class FXCollectionView implements ICollectionView {
                 "-fx-padding: 5 10; -fx-background-radius: 12; -fx-font-weight: bold; " +
                 "-fx-font-size: 14px; -fx-min-width: 40px;");
 
-        // Pulsante + (aggiungi altra copia)
+        
         Button plusButton = new Button();
         FontIcon plusIcon = new FontIcon("fas-plus-circle");
         plusIcon.setIconSize(22);
@@ -612,7 +588,7 @@ public class FXCollectionView implements ICollectionView {
 
         topRow.getChildren().addAll(minusButton, quantityLabel, plusButton);
 
-        // Checkbox scambiabile (usa lo stato reale da CardBean)
+        
         CheckBox tradableCheckbox = new CheckBox("Scambiabile");
         tradableCheckbox.getStyleClass().add("card-tradable-checkbox");
         tradableCheckbox.setStyle("-fx-text-fill: white; -fx-font-size: 11px;");
@@ -631,9 +607,7 @@ public class FXCollectionView implements ICollectionView {
         return controls;
     }
 
-    /**
-     * Crea lo stato vuoto quando non ci sono set
-     */
+    
     private VBox createEmptyState() {
         VBox emptyState = new VBox(20);
         emptyState.setAlignment(Pos.CENTER);
@@ -660,9 +634,7 @@ public class FXCollectionView implements ICollectionView {
         return emptyState;
     }
 
-    /**
-     * Mostra il dialog per selezionare un set da aggiungere
-     */
+    
     private void showAddSetDialog() {
         if (controller == null) {
             showError("Controller non disponibile");
@@ -727,19 +699,15 @@ public class FXCollectionView implements ICollectionView {
         alert.showAndWait();
     }
 
-    /**
-     * Imposta la visibilità del pulsante Save
-     */
+    
     public void setSaveButtonVisible(boolean visible) {
         if (saveButton != null) {
             saveButton.setVisible(visible);
         }
     }
 
-    /**
-     * Aggiorna una singola carta nel set senza refreshare tutta la collezione
-     */
-    /* Aggiorna una singola carta nel set senza refreshare tutta la collezione */
+    
+    
     public void updateCardInSet(String setId, String cardId) {
         if (setsContainer == null || currentBinders == null) {
             return;
@@ -831,8 +799,8 @@ public class FXCollectionView implements ICollectionView {
         } else {
             LOGGER.warning("Stage not set, cannot display");
         }
-        // When showing collection page, mark the collection nav item as selected and
-        // others unselected
+        
+        
         markNavSelected(NAV_COLLECTION);
     }
 
@@ -846,7 +814,7 @@ public class FXCollectionView implements ICollectionView {
     }
 
     private void markNavSelected(String selected) {
-        // remove selected style from all
+        
         removeNavSelectedFrom(homeLabel);
         removeNavSelectedFrom(collectionLabel);
         removeNavSelectedFrom(liveTradeLabel);
@@ -860,7 +828,7 @@ public class FXCollectionView implements ICollectionView {
             case MANAGE -> addNavSelectedTo(manageTradesLabel);
             case "logout" -> addNavSelectedTo(logoutLabel);
             default -> {
-                // unknown selection: no-op
+                
             }
         }
     }
@@ -886,26 +854,15 @@ public class FXCollectionView implements ICollectionView {
         markNavSelected("home");
     }
 
-    @FXML
-    private void onCollectionClicked() {
-        LOGGER.info("Already in Collection page");
-        markNavSelected(NAV_COLLECTION);
-    }
-
-    @SuppressWarnings("unused")
-    private void unusedSuppressOnCollection() {
-        // helper to suppress 'unused' false positive for FXML binding in some static
-        // analyzers
-    }
 
     @FXML
     private void onTradeClicked() {
         LOGGER.info("Trade clicked - navigating to trade/manage page");
-        // Decide which action the user intended based on which button has focus.
-        // If the live trade button is focused, prefer live; if the manage button is focused, prefer manage.
-        // Defaults differ depending on whether controller is available (preserve original behavior):
-        // - when controller present default to MANAGE
-        // - when controller absent default to LIVE
+        
+        
+        
+        
+        
         String target = determineTradeTarget(controller != null);
 
         if (controller != null) {
@@ -916,12 +873,12 @@ public class FXCollectionView implements ICollectionView {
                 LOGGER.fine(() -> "Navigation from Collection onTradeClicked failed: " + ex.getMessage());
             }
         } else {
-            // still update nav selection to be safe
+            
             markNavForTarget(target);
         }
     }
 
-    // Determine intended trade action based on focus; preferManageDefault controls fallback when no focus
+    
     private String determineTradeTarget(boolean preferManageDefault) {
         if (liveTradeButton != null && liveTradeButton.isFocused()) return "live";
         if (tradeButton != null && tradeButton.isFocused()) return MANAGE;
@@ -969,7 +926,6 @@ public class FXCollectionView implements ICollectionView {
         }
     }
 
-    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -978,15 +934,15 @@ public class FXCollectionView implements ICollectionView {
     public void refresh() {
         javafx.application.Platform.runLater(() -> {
             try {
-                // Instead of referencing non-existing controls (cardsList/setsListView),
-                // re-render the collection using the cached data already stored in this view.
+                
+                
                 Map<String, Binder> binders = (this.currentBinders != null) ? this.currentBinders
                         : java.util.Collections.emptyMap();
                 Map<String, List<Card>> cards = (this.setCardsMap != null) ? this.setCardsMap
                         : java.util.Collections.emptyMap();
 
-                // displayCollection expects Map<String, Binder>, Map<String,
-                // List<model.domain.Card>>
+                
+                
                 displayCollection(binders, cards);
 
             } catch (Exception ex) {

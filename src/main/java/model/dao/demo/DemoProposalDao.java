@@ -19,7 +19,7 @@ public class DemoProposalDao implements IProposalDao {
         LOGGER.info("DemoProposalDao initialized - data will be volatile");
     }
 
-    // Allow seeding demo data
+    
     public void loadFromCollection(Collection<Proposal> initial) {
         map.clear();
         if (initial == null) {
@@ -146,7 +146,7 @@ public class DemoProposalDao implements IProposalDao {
     public List<Proposal> getCompletedProposals(String username) {
         List<Proposal> res = new ArrayList<>();
         for (Proposal p : map.values()) {
-            if (p == null) continue; // single continue allowed
+            if (p == null) continue; 
             boolean involves = (username == null) || username.equals(p.getProposerId()) || username.equals(p.getReceiverId());
             if (involves) {
                 model.domain.enumerations.ProposalStatus s = p.getStatus();

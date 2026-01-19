@@ -36,12 +36,12 @@ public class NegotiationController {
             view.showRequested(requested);
             view.showProposed(java.util.Collections.emptyList());
 
-            // register callbacks if view wants to use them
+            
             view.registerOnCardProposed(this::onCardProposed);
             view.registerOnCardUnproposed(this::onCardUnproposed);
             view.registerOnConfirmRequested(this::onConfirmRequested);
 
-            // Load available stores from user DAO
+            
             try {
                 IUserDao userDao = navigationController.getDaoFactory().createUserDao();
                 List<String> stores = new ArrayList<>();
@@ -52,10 +52,10 @@ public class NegotiationController {
                     }
                 }
                 view.showAvailableStores(stores);
-                // set tomorrow as hint
+                
                 view.setMeetingDateHint(LocalDate.now().plusDays(1).toString());
             } catch (Exception ex) {
-                // Log store loading errors for diagnostics but continue (non-fatal)
+                
                 LOGGER.fine(() -> "Failed to load stores for negotiation view: " + ex.getMessage());
             }
         }
@@ -75,7 +75,7 @@ public class NegotiationController {
     private void onConfirmRequested(ProposalBean proposalBean) {
         LOGGER.info(() -> "Confirm requested: " + proposalBean);
         try {
-            // VALIDATION: ensure at least one offered card with positive quantity
+            
             if (proposalBean == null || proposalBean.getOffered() == null || proposalBean.getOffered().isEmpty()) {
                 if (view != null) view.showConfirmationResult(false, "Devi offrire almeno una carta prima di inviare la proposta.");
                 return;
@@ -90,7 +90,7 @@ public class NegotiationController {
                  model.domain.Proposal p = mapToDomainProposal(proposalBean);
                  proposalDao.save(p);
                  if (view != null) view.showConfirmationResult(true, "Proposta inviata");
-                 // After successful send, navigate back to proposer's home page so CLI returns to homepage
+                 
                  safeNavigateToCollectorHome();
                  return;
              }
@@ -100,7 +100,7 @@ public class NegotiationController {
          if (view != null) view.showConfirmationResult(false, "Impossibile salvare la proposta");
      }
 
-    // Extracted helper to encapsulate the nested navigation try/catch
+    
     private void safeNavigateToCollectorHome() {
         try {
             navigationController.navigateToCollectorHomePage(new model.bean.UserBean(proposerUsername, config.AppConfig.USER_TYPE_COLLECTOR));
@@ -111,7 +111,7 @@ public class NegotiationController {
 
     private model.domain.Proposal mapToDomainProposal(ProposalBean bean) {
         model.domain.Proposal p = new model.domain.Proposal();
-        // Use fromUser/toUser if present, otherwise fall back to controller context
+        
         p.setProposerId(bean.getFromUser() != null ? bean.getFromUser() : proposerUsername);
         p.setReceiverId(bean.getToUser() != null ? bean.getToUser() : targetOwnerUsername);
 
@@ -133,7 +133,7 @@ public class NegotiationController {
             }
             p.setCardsRequested(requested);
         }
-        // Include meeting details
+        
         p.setMeetingPlace(bean.getMeetingPlace());
         p.setMeetingDate(bean.getMeetingDate());
         p.setMeetingTime(bean.getMeetingTime());

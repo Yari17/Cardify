@@ -32,7 +32,7 @@ public class FXLoginView implements ILoginView {
         if (persistenceLabel != null) {
             persistenceLabel.setText(AppConfig.getPersistenceLabel());
         }
-        // Initialize persistence combo only if not demo mode
+        
         try {
             String cfg = config.AppConfig.getPersistenceType();
             if (config.AppConfig.DAO_TYPE_MEMORY.equals(cfg)) {
@@ -44,7 +44,7 @@ public class FXLoginView implements ILoginView {
                 }
             }
         } catch (Exception _) {
-            // ignore and default to hidden
+            
             if (persistenceComboBox != null) persistenceComboBox.setVisible(false);
         }
     }
@@ -156,16 +156,15 @@ public class FXLoginView implements ILoginView {
             LOGGER.fine("messageLabel is null while trying to show error");
         }
     }
-    @Override
-    public void setStage(Stage stage) {
-        this.stage = stage;
-    }
+     public void setStage(Stage stage) {
+         this.stage = stage;
+     }
 
-    @Override
-    public void refresh() {
-        // Default FX view refresh: run on UI thread. Currently no extra state to update here.
-        javafx.application.Platform.runLater(() -> {
-            // no-op: concrete view will override if needed
-        });
-    }
-}
+     @Override
+     public void refresh() {
+         
+         javafx.application.Platform.runLater(() -> {
+             
+         });
+     }
+ }

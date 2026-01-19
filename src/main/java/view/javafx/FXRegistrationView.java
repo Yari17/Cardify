@@ -44,7 +44,7 @@ public class FXRegistrationView implements IRegistrationView {
             
             userTypeComboBox.getSelectionModel().selectFirst();
         }
-        // Initialize persistence combo only if not demo mode
+        
         try {
             String cfg = config.AppConfig.getPersistenceType();
             if (config.AppConfig.DAO_TYPE_MEMORY.equals(cfg)) {
@@ -55,7 +55,7 @@ public class FXRegistrationView implements IRegistrationView {
                     persistenceComboBox.getSelectionModel().select("JSON");
                 }
             }
-        } catch (Exception ex) {
+        } catch (Exception _) {
             if (persistenceComboBox != null) persistenceComboBox.setVisible(false);
         }
     }
@@ -161,17 +161,16 @@ public class FXRegistrationView implements IRegistrationView {
         }
     }
 
-    @Override
     public void setStage(Stage stage) {
         this.stage = stage;
     }
     @Override
     public void refresh() {
-        // Default FX refresh: ensure UI updates happen on FX thread.
+        
         javafx.application.Platform.runLater(() -> {
             try {
                 if (messageLabel != null) {
-                    // reapply current text to force UI bindings/refresh if any
+                    
                     messageLabel.setText(messageLabel.getText());
                 }
             } catch (Exception ex) {
