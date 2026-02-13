@@ -555,11 +555,7 @@ Il progetto applica rigorosamente i principi GRASP (General Responsibility Assig
    - Prepara esempi di codice per ogni pattern
    - Spiega il flusso di un caso d'uso completo (es. creazione proposta)
 
-4. **Testing**:
-   - Spiega come hai testato il sistema
-   - Mostra esempi di unit test con Mockito
-
-5. **Estensibilità**:
+4. **Estensibilità**:
    - Come aggiungeresti un nuovo tipo di persistenza?
    - Come aggiungeresti un nuovo tipo di carta (es. Magic)?
 
