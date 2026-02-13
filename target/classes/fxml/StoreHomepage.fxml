@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      styleClass="root"
+      spacing="20"
+      fx:id="rootBox">
+
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Label fx:id="welcomeLabel" text="Benvenuto Store" styleClass="title-label" HBox.hgrow="ALWAYS"/>
+        <javafx.scene.layout.Region HBox.hgrow="ALWAYS"/>
+        <javafx.scene.control.Button fx:id="logoutBtn" text="Logout" styleClass="logout-btn"/>
+    </HBox>
+
+    <!-- Dashboard Layout -->
+    <VBox spacing="25" VBox.vgrow="ALWAYS">
+        
+        <!-- Top Section: Ongoing Trades -->
+        <VBox spacing="10" VBox.vgrow="ALWAYS">
+            <Label text="Scambi in corso, i collezionisti sono in negozio" styleClass="section-title"/>
+            <ListView fx:id="ongoingList" styleClass="card-list" VBox.vgrow="ALWAYS"/>
+        </VBox>
+
+        <!-- Bottom Section: Split View -->
+        <HBox spacing="20" VBox.vgrow="ALWAYS">
+            
+            <!-- Left: Scheduled Trades -->
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                <Label text="Scambi programmati" styleClass="section-title"/>
+                <ListView fx:id="scheduledList" styleClass="card-list" VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+            <!-- Right: History -->
+            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                <Label text="Scambi conclusi" styleClass="section-title"/>
+                <ListView fx:id="historyList" styleClass="card-list" VBox.vgrow="ALWAYS"/>
+            </VBox>
+
+        </HBox>
+
+    </VBox>
+
+</VBox>

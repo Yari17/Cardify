@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="root"
+      alignment="TOP_LEFT"
+      spacing="0"
+      prefHeight="600.0">
+
+    <!-- Navbar (top) -->
+    <HBox fx:id="navbar" alignment="CENTER_LEFT" spacing="12" prefHeight="80.0" styleClass="navbar">
+
+        <!-- Left menu: HBox of transparent icon buttons -->
+        <HBox fx:id="menuBox" spacing="8" alignment="CENTER_LEFT">
+            <Button fx:id="homeBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="homeIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Homepage" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="collectionBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="collectionIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Collection" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="tradeBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="tradeIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Trade" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="proposalBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="proposalIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Manage Proposals" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="logoutBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="logoutIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Logout" />
+                    </VBox>
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- Separator -->
+        <Separator orientation="VERTICAL" styleClass="nav-separator" />
+
+        <!-- Center: Search and filter -->
+        <HBox fx:id="searchBox" spacing="8" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="Cerca carte, nomi, ecc..." styleClass="search-field" />
+            <Button fx:id="searchBtn" text="Cerca" styleClass="search-btn" />
+            <Button fx:id="filterBtn" text="Filtra" styleClass="filter-btn" />
+        </HBox>
+
+        <!-- spacer -->
+        <Region HBox.hgrow="ALWAYS" />
+
+        <!-- Right: Profile -->
+        <VBox fx:id="profileBox" alignment="CENTER" spacing="6">
+            <ImageView fx:id="avatarImage" fitWidth="48" fitHeight="48" preserveRatio="true" styleClass="profile-avatar" />
+            <Label fx:id="usernameLabel" text="username" styleClass="profile-username" />
+        </VBox>
+
+    </HBox>
+
+    <!-- Content area fills the rest of the window; background shows under navbar -->
+    <Pane fx:id="contentArea" styleClass="collector-content" VBox.vgrow="ALWAYS" />
+
+</VBox>

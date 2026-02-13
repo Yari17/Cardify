@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="root"
+      alignment="TOP_LEFT"
+      spacing="0"
+      prefHeight="600.0"
+      styleClass="collector-content">
+
+    <!-- Navbar (top) -->
+    <HBox fx:id="navbar" alignment="CENTER_LEFT" spacing="12" prefHeight="80.0" styleClass="navbar">
+        <HBox fx:id="menuBox" spacing="8" alignment="CENTER_LEFT">
+             <Button fx:id="homeBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="homeIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Homepage" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="collectionBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="collectionIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Collection" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="tradeBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="tradeIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Trade" />
+                    </VBox>
+                </graphic>
+            </Button>
+             <Button fx:id="proposalBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="proposalIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Manage Proposals" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="logoutBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="logoutIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Logout" />
+                    </VBox>
+                </graphic>
+            </Button>
+        </HBox>
+        <Separator orientation="VERTICAL" styleClass="nav-separator" />
+        <Region HBox.hgrow="ALWAYS" />
+        <VBox fx:id="profileBox" alignment="CENTER" spacing="6">
+            <ImageView fx:id="avatarImage" fitWidth="48" fitHeight="48" preserveRatio="true" styleClass="profile-avatar" />
+            <Label fx:id="usernameLabel" text="username" styleClass="profile-username" />
+        </VBox>
+    </HBox>
+
+    <!-- Content Area -->
+    <VBox fx:id="contentArea" spacing="20" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets top="20" bottom="20" left="20" right="20"/>
+        </padding>
+
+        <!-- Header Info -->
+        <HBox alignment="CENTER_LEFT" spacing="20">
+            <Button text="← Back" onAction="#display" styleClass="back-button" style="-fx-font-size: 14px; -fx-background-color: rgba(255,255,255,0.1); -fx-text-fill: white;"/>
+            <Label text="Dettagli Scambio" styleClass="page-title" style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: white;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblTradeStatus" text="Status" style="-fx-text-fill: #aaaaaa; -fx-font-style: italic; -fx-font-size: 16px;"/>
+        </HBox>
+
+        <!-- Session Code Section -->
+        <HBox alignment="CENTER" spacing="30" style="-fx-background-color: rgba(0,0,0,0.3); -fx-background-radius: 10; -fx-padding: 20;">
+            <VBox alignment="CENTER_LEFT" spacing="5">
+                 <Label text="Luogo e Data" style="-fx-text-fill: #00bcd4; -fx-font-weight: bold;"/>
+                 <Label fx:id="lblMeetingInfo" text="Store Name - Date Time" style="-fx-text-fill: white; -fx-font-size: 18px;"/>
+            </VBox>
+            
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <VBox alignment="CENTER" spacing="10">
+                <Label text="Il tuo Codice Sessione:" style="-fx-text-fill: #e0e0e0;"/>
+                <Label fx:id="lblSessionCode" text="------" style="-fx-text-fill: #fdd835; -fx-font-size: 36px; -fx-font-family: 'Courier New'; -fx-font-weight: bold;"/>
+            </VBox>
+            
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <Button fx:id="btnConfirmPresence" text="Conferma Presenza" styleClass="button-confirm-presence" visible="false"/>
+        </HBox>
+
+        <!-- Cards Split View -->
+        <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+            <!-- Left: Offered Cards -->
+            <VBox spacing="10" style="-fx-background-color: rgba(30, 30, 30, 0.6); -fx-padding: 10;">
+                <Label text="Le tue carte offerte" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                    <content>
+                        <FlowPane fx:id="offeredCardsContainer" hgap="10" vgap="10" style="-fx-background-color: transparent;"/>
+                    </content>
+                </ScrollPane>
+            </VBox>
+
+            <!-- Right: Requested Cards (Partner's Offered) -->
+            <VBox spacing="10" style="-fx-background-color: rgba(30, 30, 30, 0.6); -fx-padding: 10;">
+                <Label fx:id="lblPartnerName" text="Carte richieste (Partner)" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                 <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+                    <content>
+                         <FlowPane fx:id="requestedCardsContainer" hgap="10" vgap="10" style="-fx-background-color: transparent;"/>
+                    </content>
+                </ScrollPane>
+            </VBox>
+        </SplitPane>
+
+    </VBox>
+
+</VBox>

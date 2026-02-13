@@ -1,0 +1,84 @@
+/* Minimal styles for Collector Homepage navbar and content */
+
+.navbar {
+  -fx-background-color: #1E2532;
+  -fx-padding: 12 20 12 20;
+  -fx-alignment: center-left;
+  -fx-border-color: #2fb4f5;
+  -fx-border-width: 0 0 2 0;
+}
+
+/* Force all children inside the navbar to have white text fill unless hovered */
+.navbar * {
+  -fx-text-fill: white;
+}
+
+.nav-button {
+  -fx-background-color: transparent;
+  -fx-padding: 6 10;
+  -fx-cursor: hand;
+}
+
+.nav-button:hover {
+  -fx-background-color: rgba(47, 180, 245, 0.08);
+}
+
+.nav-button:hover * {
+  -fx-text-fill: #2fb4f5;
+}
+
+/* Active page indicator */
+.nav-button.active-nav {
+  -fx-background-color: #2fb4f5;
+  -fx-background-radius: 8;
+}
+
+.nav-button.active-nav * {
+  -fx-text-fill: white;
+}
+
+.nav-separator {
+  -fx-pref-width: 1;
+  -fx-border-color: #3a4652;
+  -fx-border-width: 0 1 0 0;
+  -fx-max-height: 40;
+}
+
+.search-field {
+  -fx-background-color: #ffffff;
+  -fx-text-fill: #1E2532;
+  -fx-prompt-text-fill: #9AA6B2;
+  -fx-background-radius: 6px;
+  -fx-padding: 6 10;
+  -fx-pref-width: 420px;
+}
+
+.search-btn {
+  -fx-background-color: #2fb4f5;
+  -fx-text-fill: white;
+  -fx-background-radius: 5px;
+  -fx-font-weight: bold;
+  -fx-padding: 6 12;
+}
+
+.filter-btn {
+  -fx-background-color: #ed4747;
+  -fx-text-fill: white;
+  -fx-background-radius: 5px;
+  -fx-font-weight: bold;
+  -fx-padding: 6 12;
+}
+
+.collector-content {
+  -fx-background-color: #0a1d3b;
+}
+
+.profile-avatar {
+  -fx-background-radius: 50%;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 6, 0, 0, 2);
+}
+
+.profile-username {
+  -fx-text-fill: #EAF2F7;
+  -fx-font-size: 12px;
+}

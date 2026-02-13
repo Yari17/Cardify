@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:id="tradeProposalRoot"
+            stylesheets="@../styles/trade-proposal.css"
+            styleClass="trade-proposal-root">
+
+    <!-- Header Section -->
+    <top>
+        <HBox styleClass="header-box" alignment="CENTER_LEFT" spacing="10">
+            <Button fx:id="closeBtn" text="✕" styleClass="close-button"/>
+            <Label text="Propose Trade" styleClass="page-title"/>
+        </HBox>
+    </top>
+
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="0">
+            <!-- Trade Area (Top) -->
+            <HBox styleClass="trade-area" alignment="CENTER" VBox.vgrow="NEVER">
+                <!-- User Offer Side -->
+                <VBox alignment="CENTER" spacing="15" HBox.hgrow="ALWAYS" prefWidth="0" minWidth="0">
+                    <Label text="You offer:" styleClass="section-label"/>
+                    <FlowPane fx:id="offerContainer" hgap="10" vgap="10" alignment="CENTER" columnHalignment="CENTER">
+                        <!-- Initial empty slots will be added dynamically or statically here -->
+                        <StackPane styleClass="card-slot">
+                            <Label text="+" styleClass="card-slot-placeholder"/>
+                        </StackPane>
+                        <!-- Only one slot as requested -->
+                    </FlowPane>
+                </VBox>
+
+                <!-- Center Actions -->
+                <VBox alignment="CENTER" spacing="20" HBox.hgrow="ALWAYS" prefWidth="0" minWidth="0">
+                     <ImageView fx:id="swapIcon" fitWidth="40" fitHeight="40" preserveRatio="true">
+                        <image>
+                            <Image url="@../icons/trading.png"/>
+                        </image>
+                    </ImageView>
+                    <Button fx:id="sendTradeRequestBtn" text="Send Trade Request" styleClass="send-trade-btn"/>
+                </VBox>
+
+                <!-- Target Receive Side -->
+                <VBox alignment="CENTER" spacing="15" HBox.hgrow="ALWAYS" prefWidth="0" minWidth="0">
+                    <Label text="You will receive" styleClass="section-label"/>
+                    <VBox fx:id="receiveContainer" alignment="CENTER">
+                        <!-- Target card will be placed here -->
+                        <ImageView fx:id="targetCardImage" fitWidth="120" fitHeight="170" preserveRatio="true"/>
+                    </VBox>
+                </VBox>
+            </HBox>
+
+            <!-- Collection Area (Bottom) -->
+            <VBox styleClass="collection-area" VBox.vgrow="ALWAYS" spacing="10">
+                <Label text="La tua collezione" styleClass="section-label"/>
+                
+                <!-- Filters Removed as requested -->
+
+                <!-- Collection Grid -->
+                <ScrollPane fx:id="collectionScroll" styleClass="collection-scroll" fitToWidth="true" VBox.vgrow="ALWAYS">
+                    <TilePane fx:id="collectionGrid" styleClass="collection-grid" prefColumns="5"/>
+                </ScrollPane>
+            </VBox>
+        </VBox>
+    </center>
+
+</BorderPane>

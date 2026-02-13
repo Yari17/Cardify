@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="root"
+      alignment="TOP_LEFT"
+      spacing="0"
+      prefHeight="600.0">
+
+    <!-- Navbar (top) -->
+    <HBox fx:id="navbar" alignment="CENTER_LEFT" spacing="12" prefHeight="80.0" styleClass="navbar">
+
+        <!-- Left menu: HBox of transparent icon buttons -->
+        <HBox fx:id="menuBox" spacing="8" alignment="CENTER_LEFT">
+            <Button fx:id="homeBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="homeIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Homepage" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="collectionBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="collectionIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Collection" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="tradeBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="tradeIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Trade" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="proposalBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="proposalIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Manage Proposals" />
+                    </VBox>
+                </graphic>
+            </Button>
+            <Button fx:id="logoutBtn" styleClass="nav-button">
+                <graphic>
+                    <VBox alignment="CENTER" spacing="4">
+                        <ImageView fx:id="logoutIcon" fitWidth="28" fitHeight="28" />
+                        <Label text="Logout" />
+                    </VBox>
+                </graphic>
+            </Button>
+        </HBox>
+
+        <!-- Separator -->
+        <Separator orientation="VERTICAL" styleClass="nav-separator" />
+
+        <!-- spacer -->
+        <Region HBox.hgrow="ALWAYS" />
+
+        <!-- Right: Profile -->
+        <VBox fx:id="profileBox" alignment="CENTER" spacing="6">
+            <ImageView fx:id="avatarImage" fitWidth="48" fitHeight="48" preserveRatio="true" styleClass="profile-avatar" />
+            <Label fx:id="usernameLabel" text="username" styleClass="profile-username" />
+        </VBox>
+
+    </HBox>
+
+    <!-- Content area with page title -->
+    <VBox fx:id="contentArea" styleClass="collector-content" VBox.vgrow="ALWAYS" alignment="TOP_CENTER" spacing="20">
+        <padding>
+            <Insets top="40" bottom="20" left="20" right="20" />
+        </padding>
+        <Label text="Trade" styleClass="page-title" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: white;" />
+        
+        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+            <content>
+                <VBox spacing="30" style="-fx-background-color: transparent;" alignment="TOP_CENTER">
+                    <padding>
+                         <Insets top="10" bottom="10" left="10" right="10"/>
+                    </padding>
+                    
+                    <!-- Active Trades Section -->
+                    <VBox spacing="10" alignment="TOP_LEFT" maxWidth="1000">
+                        <Label text="Scambi attivi" styleClass="section-header" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <VBox fx:id="activeTradesContainer" spacing="10" styleClass="trade-list-container"/>
+                    </VBox>
+
+                    <!-- Completed Trades Section -->
+                    <VBox spacing="10" alignment="TOP_LEFT" maxWidth="1000">
+                        <Label text="Scambi conclusi" styleClass="section-header" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                        <VBox fx:id="completedTradesContainer" spacing="10" styleClass="trade-list-container"/>
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </VBox>
+
+</VBox>

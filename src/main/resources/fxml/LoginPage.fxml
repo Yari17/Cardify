@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" styleClass="app-root">
+    <children>
+        <!-- Centered card in a VBox -->
+        <VBox alignment="CENTER" spacing="20" StackPane.alignment="CENTER">
+            <VBox styleClass="card" alignment="TOP_CENTER" spacing="15" fillWidth="true" prefWidth="520">
+                <padding>
+                    <Insets top="40" right="40" bottom="40" left="40" />
+                </padding>
+
+                <Label text="Benvenuto" styleClass="title" />
+
+                <!-- Form stacked: label above input -->
+                <VBox spacing="10" alignment="CENTER_LEFT" fillWidth="true">
+                    <Label text="Username" styleClass="field-label" />
+                    <TextField fx:id="usernameField" promptText="Enter username" maxWidth="Infinity" />
+
+                    <Label text="Password" styleClass="field-label" />
+                    <PasswordField fx:id="passwordField" promptText="Enter password" maxWidth="Infinity" />
+                </VBox>
+
+                <Label fx:id="errorLabel" text="" visible="false" styleClass="error-label" />
+
+                <!-- Full width Login button -->
+                <Button fx:id="loginButton" text="Login" styleClass="login-btn" maxWidth="Infinity" />
+
+                <!-- Two register buttons: Store (red) and Collector (cyan) -->
+                <HBox spacing="10" alignment="CENTER" maxWidth="Infinity">
+                    <Button fx:id="registerStoreButton" text="Registrati come Store" styleClass="btn-store" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                    <Button fx:id="registerCollectorButton" text="Registrati come Collezionista" styleClass="btn-collector" HBox.hgrow="ALWAYS" maxWidth="Infinity" />
+                </HBox>
+
+            </VBox>
+        </VBox>
+    </children>
+</StackPane>

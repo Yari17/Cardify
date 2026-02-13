@@ -1,0 +1,185 @@
+/* Trade Proposal Dark Theme */
+
+.trade-proposal-root {
+    -fx-background-color: #0d1117;
+    /* Very dark background like GitHub dark mode or the screenshot */
+}
+
+/* Header */
+.header-box {
+    -fx-padding: 15 20;
+    -fx-background-color: #161b22;
+    -fx-border-color: #30363d;
+    -fx-border-width: 0 0 1 0;
+}
+
+.page-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Impact";
+    /* Or similar bold font */
+}
+
+.close-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8b949e;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+}
+
+.close-button:hover {
+    -fx-text-fill: white;
+}
+
+/* Trade Area (Top) */
+.trade-area {
+    -fx-padding: 40;
+    -fx-alignment: center;
+    -fx-spacing: 50;
+}
+
+.section-label {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 15 0;
+}
+
+.card-slot {
+    -fx-pref-width: 120;
+    -fx-pref-height: 170;
+    -fx-background-color: #21262d;
+    -fx-border-color: #30363d;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-alignment: center;
+    -fx-content-display: center;
+    /* For the '+' button inside */
+}
+
+.card-slot-placeholder {
+    -fx-text-fill: #2f81f7;
+    /* Blue accent color */
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.card-slot-placeholder:hover {
+    -fx-text-fill: #58a6ff;
+}
+
+/* New style for offered cards */
+.offered-card-item {
+    -fx-background-color: #21262d;
+    -fx-border-color: #2f81f7;
+    /* Blue accent */
+    -fx-border-width: 2;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 0);
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-spacing: 5;
+    -fx-min-width: 100;
+    -fx-min-height: 170;
+}
+
+.offered-card-item:hover {
+    -fx-border-color: #58a6ff;
+    -fx-effect: dropshadow(three-pass-box, rgba(47, 129, 247, 0.4), 8, 0, 0, 0);
+}
+
+.swap-icon {
+    -fx-fill: white;
+    /* If using SVGPath or filter on ImageView */
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 0);
+}
+
+.send-trade-btn {
+    -fx-background-color: #2f81f7;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.send-trade-btn:hover {
+    -fx-background-color: #58a6ff;
+}
+
+/* Collection Area (Bottom) */
+.collection-area {
+    -fx-background-color: #161b22;
+    -fx-padding: 20;
+    -fx-border-color: #30363d;
+    -fx-border-width: 1 0 0 0;
+}
+
+.filter-bar {
+    -fx-spacing: 15;
+    -fx-padding: 0 0 15 0;
+    -fx-alignment: center-left;
+}
+
+.filter-label {
+    -fx-text-fill: #8b949e;
+    -fx-font-size: 12px;
+}
+
+.filter-field {
+    -fx-background-color: #0d1117;
+    -fx-border-color: #30363d;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-text-fill: white;
+    -fx-padding: 5 10;
+}
+
+.filter-combo {
+    -fx-background-color: #0d1117;
+    -fx-border-color: #30363d;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.filter-combo .list-cell {
+    -fx-text-fill: white;
+}
+
+/* Collection Grid */
+.collection-scroll {
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+    -fx-viewport-border: transparent;
+}
+
+.collection-grid {
+    -fx-padding: 10;
+    -fx-hgap: 15;
+    -fx-vgap: 15;
+    -fx-alignment: top-left;
+}
+
+/* Card Item in Grid */
+.grid-card-item {
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.3), 5, 0, 0, 0);
+}
+
+.grid-card-item:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(47, 129, 247, 0.6), 8, 0, 0, 0);
+    /* Glow effect on hover */
+}
+
+.add-overlay {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-background-radius: 50%;
+    -fx-padding: 0;
+}

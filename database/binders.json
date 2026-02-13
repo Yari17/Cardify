@@ -1,0 +1,163 @@
+[
+  {
+    "owner": "user1",
+    "setID": "base3",
+    "setName": "Fossil",
+    "ownedCards": [
+      {
+        "card": {
+          "cardName": "Ditto",
+          "cardID": "base3-3",
+          "setID": "base3",
+          "image": "https://assets.tcgdex.net/en/base/base3/3/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 1
+      },
+      {
+        "card": {
+          "cardName": "Dragonite",
+          "cardID": "base3-4",
+          "setID": "base3",
+          "image": "https://assets.tcgdex.net/en/base/base3/4/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 4
+      },
+      {
+        "card": {
+          "cardName": "Gengar",
+          "cardID": "base3-5",
+          "setID": "base3",
+          "image": "https://assets.tcgdex.net/en/base/base3/5/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "owner": "collector1",
+    "setID": "ecard2",
+    "setName": "Aquapolis",
+    "ownedCards": [
+      {
+        "card": {
+          "cardName": "Azumarill",
+          "cardID": "ecard2-4",
+          "setID": "ecard2",
+          "image": "https://assets.tcgdex.net/en/ecard/ecard2/4/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 1
+      },
+      {
+        "card": {
+          "cardName": "Electrode",
+          "cardID": "ecard2-8",
+          "setID": "ecard2",
+          "image": "https://assets.tcgdex.net/en/ecard/ecard2/8/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 1
+      },
+      {
+        "card": {
+          "cardName": "Donphan",
+          "cardID": "ecard2-7",
+          "setID": "ecard2",
+          "image": "https://assets.tcgdex.net/en/ecard/ecard2/7/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 1
+      },
+      {
+        "card": {
+          "cardName": "Elekid",
+          "cardID": "ecard2-9",
+          "setID": "ecard2",
+          "image": "https://assets.tcgdex.net/en/ecard/ecard2/9/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "owner": "collectortest1",
+    "setID": "swsh5",
+    "setName": "Battle Styles",
+    "ownedCards": []
+  },
+  {
+    "owner": "collectortest2",
+    "setID": "A1",
+    "setName": "Genetic Apex",
+    "ownedCards": [
+      {
+        "card": {
+          "cardName": "Caterpie",
+          "cardID": "A1-005",
+          "setID": "A1",
+          "image": "https://assets.tcgdex.net/en/tcgp/A1/005/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 5
+      }
+    ]
+  },
+  {
+    "owner": "ErBellins10",
+    "setID": "A2",
+    "setName": "Space-Time Smackdown",
+    "ownedCards": [
+      {
+        "card": {
+          "cardName": "Yanmega ex",
+          "cardID": "A2-007",
+          "setID": "A2",
+          "image": "https://assets.tcgdex.net/en/tcgp/A2/007/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 2
+      },
+      {
+        "card": {
+          "cardName": "Roserade",
+          "cardID": "A2-009",
+          "setID": "A2",
+          "image": "https://assets.tcgdex.net/en/tcgp/A2/009/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 3
+      },
+      {
+        "card": {
+          "cardName": "Tangela",
+          "cardID": "A2-004",
+          "setID": "A2",
+          "image": "https://assets.tcgdex.net/en/tcgp/A2/004/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 3
+      }
+    ]
+  },
+  {
+    "owner": "DummyCollector1",
+    "setID": "A1",
+    "setName": "Genetic Apex",
+    "ownedCards": [
+      {
+        "card": {
+          "cardName": "Caterpie",
+          "cardID": "A1-005",
+          "setID": "A1",
+          "image": "https://assets.tcgdex.net/en/tcgp/A1/005/high.jpg",
+          "gameType": "POKEMON"
+        },
+        "quantity": 1
+      }
+    ]
+  }
+]

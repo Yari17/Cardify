@@ -1,0 +1,181 @@
+/* Card Overview Dark Theme */
+
+.card-overview {
+    -fx-background-color: #1E2532;
+}
+
+/* Left Panel - Image */
+.image-panel {
+    -fx-background-color: #161C26;
+    -fx-min-width: 380;
+}
+
+.card-image {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0, 0, 5);
+}
+
+/* Right Panel - Details */
+.details-panel {
+    -fx-background-color: #1E2532;
+}
+
+.details-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.details-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+.details-content {
+    -fx-background-color: transparent;
+}
+
+/* Close Button */
+.close-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #888;
+    -fx-font-size: 18px;
+    -fx-padding: 5 10;
+    -fx-cursor: hand;
+}
+
+.close-button:hover {
+    -fx-text-fill: #ed4747;
+}
+
+/* Header */
+.card-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+}
+
+.hp-badge {
+    -fx-text-fill: #2fb4f5;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.type-badge {
+    -fx-background-color: #3d4f6f;
+    -fx-text-fill: white;
+    -fx-padding: 4 12;
+    -fx-background-radius: 12;
+    -fx-font-size: 12px;
+}
+
+.stage-label {
+    -fx-text-fill: #888;
+    -fx-font-size: 14px;
+    -fx-font-style: italic;
+}
+
+/* Metadata */
+.metadata-section {
+    -fx-padding: 15;
+    -fx-background-color: #252D3A;
+    -fx-background-radius: 8;
+}
+
+.meta-label {
+    -fx-text-fill: #888;
+    -fx-font-size: 13px;
+    -fx-min-width: 90;
+}
+
+.meta-value {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+}
+
+/* Section Titles */
+.section-title {
+    -fx-text-fill: #2fb4f5;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 5 0;
+}
+
+/* Attack Box */
+.attack-box {
+    -fx-background-color: #2C3A4F;
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+}
+
+.attack-header {
+    -fx-spacing: 10;
+}
+
+.attack-cost {
+    -fx-text-fill: #888;
+    -fx-font-size: 12px;
+}
+
+.attack-name {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.attack-damage {
+    -fx-text-fill: #2fb4f5;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.attack-effect {
+    -fx-text-fill: #aaa;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+}
+
+/* Footer Stats */
+.footer-stats {
+    -fx-padding: 15;
+    -fx-background-color: #252D3A;
+    -fx-background-radius: 8;
+}
+
+/* Owner */
+.owner-section {
+    -fx-padding: 10 0;
+}
+
+.owner-name {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+/* Trade Button */
+.trade-button {
+    -fx-background-color: #2fb4f5;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 40;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.trade-button:hover {
+    -fx-background-color: #25a0dc;
+}
+
+/* Back Button */
+.back-button {
+    -fx-background-color: #3d4f6f;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 40;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.back-button:hover {
+    -fx-background-color: #4d6080;
+}

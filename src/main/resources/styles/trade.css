@@ -1,0 +1,114 @@
+/* Trade List Styles */
+
+.trade-list-container {
+    -fx-spacing: 15;
+}
+
+.trade-item {
+    -fx-background-color: rgba(30, 30, 30, 0.8);
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.4), 10, 0, 0, 5);
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-radius: 10;
+    -fx-border-width: 1;
+}
+
+.trade-item:hover {
+    -fx-background-color: rgba(50, 50, 50, 0.9);
+    -fx-border-color: rgba(255, 255, 255, 0.3);
+}
+
+.trade-info-label {
+    -fx-text-fill: #e0e0e0;
+    -fx-font-size: 14px;
+}
+
+.trade-user-label {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.trade-status-label {
+    -fx-text-fill: #aaaaaa;
+    -fx-font-style: italic;
+    -fx-font-size: 12px;
+}
+
+/* Specific Status Colors for Label if needed */
+.status-waiting {
+    -fx-text-fill: #00bcd4;
+}
+
+.status-action {
+    -fx-text-fill: #ff4444;
+}
+
+.status-completed {
+    -fx-text-fill: #4caf50;
+}
+
+.status-cancelled {
+    -fx-text-fill: #9e9e9e;
+}
+
+/* Buttons */
+.button-start-trade {
+    -fx-background-color: #00bcd4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.button-start-trade:hover {
+    -fx-background-color: #26c6da;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 188, 212, 0.6), 10, 0, 0, 0);
+}
+
+.button-go-to-trade {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 20;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+
+.button-go-to-trade:hover {
+    -fx-background-color: #ff5252;
+    -fx-effect: dropshadow(three-pass-box, rgba(244, 67, 54, 0.6), 10, 0, 0, 0);
+}
+
+/* Collector Trade Details Page */
+.page-title {
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 2);
+}
+
+.back-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2) !important;
+    -fx-cursor: hand;
+}
+
+.button-confirm-presence {
+    -fx-background-color: linear-gradient(to right, #43a047, #66bb6a);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 25;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(67, 160, 71, 0.4), 10, 0, 0, 5);
+}
+
+.button-confirm-presence:hover {
+    -fx-background-color: linear-gradient(to right, #388e3c, #4caf50);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.card-item {
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 5, 0, 0, 3);
+}
