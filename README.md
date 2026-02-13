@@ -473,6 +473,54 @@ public Binder getBinderById(int binderId) {
 
 **Motivazione**: Questo garantisce che il dominio sia sempre consistente e che le entità siano complete, evitando "lazy loading" implicito e violazioni dell'incapsulamento.
 
+#### 7. **Cache Volatile nei DAO**
+**Consiglio**: Per ottimizzare le performance e ridurre il carico sulla persistenza, è opportuno implementare una **cache in memoria volatile** nei DAO.
+
+**Implementazione Suggerita**:
+```java
+// ✅ CORRETTO: DAO con cache in memoria
+public class JdbcUserDao implements IUserDao {
+    private final Map<String, User> cache = new HashMap<>();
+    
+    @Override
+    public User getUserByUsername(String username) {
+        // 1. Controlla la cache
+        if (cache.containsKey(username)) {
+            return cache.get(username);
+        }
+        
+        // 2. Se non in cache, preleva dal database
+        User user = loadUserFromDatabase(username);
+        
+        // 3. Salva in cache per accessi futuri
+        if (user != null) {
+            cache.put(username, user);
+        }
+        
+        return user;
+    }
+    
+    @Override
+    public void updateUser(User user) {
+        // Aggiorna database
+        updateUserInDatabase(user);
+        
+        // Invalida/aggiorna cache
+        cache.put(user.getUsername(), user);
+    }
+}
+```
+
+**Vantaggi**:
+- ✅ Riduzione drastica delle query al database per dati frequentemente acceduti
+- ✅ Miglioramento delle performance dell'applicazione
+- ✅ Riduzione del carico sul sistema di persistenza
+
+**Considerazioni**:
+- ⚠️ La cache è volatile: i dati vengono persi al riavvio dell'applicazione
+- ⚠️ Necessaria una strategia di invalidazione per mantenere la coerenza
+- ⚠️ Attenzione alla memoria: implementare politiche di eviction (es. LRU) per cache grandi
+
 ---
 
 ### ✅ Principi GRASP Applicati
